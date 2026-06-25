@@ -8,7 +8,7 @@ import * as subjectService from "../services/subject.service";
  */
 export function useSubjects() {
   // Sincroniza automáticamente los datos de la tabla 'materias'
-  const subjects = useLiveQuery(() => db.materias.toArray(), []) ?? [];
+  const subjects = useLiveQuery(() => db.materias.toArray(), []);
 
   /**
    * Crea una nueva materia.
@@ -27,8 +27,9 @@ export function useSubjects() {
   }
 
   return {
-    subjects,
+    subjects: subjects ?? [],
     addSubject,
     removeSubject,
+    loading: subjects === undefined,
   };
 }
