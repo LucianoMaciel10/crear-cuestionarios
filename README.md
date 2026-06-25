@@ -6,33 +6,30 @@ Aplicación web para generar cuestionarios, flashcards y sistemas de repaso inte
 
 Permitir que los estudiantes carguen apuntes, PDFs y otros materiales para generar automáticamente:
 
-* Cuestionarios interactivos.
-* Flashcards.
-* Repasos inteligentes.
-* Estadísticas de aprendizaje.
-* Sistemas de repetición espaciada.
+- Cuestionarios interactivos.
+- Flashcards.
+- Repasos inteligentes.
+- Estadísticas de aprendizaje.
+- Sistemas de repetición espaciada.
 
 ## Tecnologías
 
-* React
-* TypeScript
-* Vite
-* TailwindCSS
+- React
+- TypeScript
+- Vite
+- TailwindCSS
 
 ## Documentación del Proyecto
 
-* `PROJECT_SPEC.md` → Requisitos y visión del producto.
-* `ARCHITECTURE.md` → Arquitectura técnica.
-* `ROADMAP.md` → Plan de implementación.
-* `MASTER_PROJECT_STATE.md` → Estado actual del desarrollo.
+- `PROJECT_SPEC.md` → Requisitos y visión del producto.
+- `ARCHITECTURE.md` → Arquitectura técnica.
+- `ROADMAP.md` → Plan de implementación.
+- `MASTER_PROJECT_STATE.md` → Estado actual del desarrollo.
 
 ## Estado
 
-Proyecto en fase de diseño y planificación.
+El proyecto se encuentra actualmente en fase de **Diseño de Arquitectura** (completada).
 
 ## Próximos Pasos
 
-1. Diseñar arquitectura.
-2. Definir roadmap.
-3. Implementar proyecto base.
-4. Implementar módulos de negocio.
+Consulte `MASTER_PROJECT_STATE.md` para el plan de implementación detallado por fases.
