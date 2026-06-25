@@ -1,35 +1,75 @@
-# Generador Inteligente de Cuestionarios Académicos
+# React + TypeScript + Vite
 
-Aplicación web para generar cuestionarios, flashcards y sistemas de repaso inteligente a partir de material de estudio universitario.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Objetivo
+Currently, two official plugins are available:
 
-Permitir que los estudiantes carguen apuntes, PDFs y otros materiales para generar automáticamente:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-- Cuestionarios interactivos.
-- Flashcards.
-- Repasos inteligentes.
-- Estadísticas de aprendizaje.
-- Sistemas de repetición espaciada.
+## React Compiler
 
-## Tecnologías
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-- React
-- TypeScript
-- Vite
-- TailwindCSS
+## Expanding the ESLint configuration
 
-## Documentación del Proyecto
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-- `PROJECT_SPEC.md` → Requisitos y visión del producto.
-- `ARCHITECTURE.md` → Arquitectura técnica.
-- `ROADMAP.md` → Plan de implementación.
-- `MASTER_PROJECT_STATE.md` → Estado actual del desarrollo.
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-## Estado
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-El proyecto se encuentra actualmente en fase de **Diseño de Arquitectura** (completada).
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 
-## Próximos Pasos
+```
 
-Consulte `MASTER_PROJECT_STATE.md` para el plan de implementación detallado por fases.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
+```
