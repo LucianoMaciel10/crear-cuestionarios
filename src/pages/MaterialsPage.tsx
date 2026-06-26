@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useMaterials } from '../hooks/useMaterials';
-import MaterialCard from '../components/domain/MaterialCard';
-import AddMaterialModal from '../components/AddMaterialModal';
-import Button from '../components/common/Button';
+import { useState } from "react";
+import { useMaterials } from "../hooks/useMaterials";
+import MaterialCard from "../components/domain/MaterialCard";
+import AddMaterialModal from "../components/AddMaterialModal";
+import Button from "../components/common/Button";
 
 function MaterialsPage() {
   const { materials, addMaterial, removeMaterial, loading } = useMaterials();
@@ -10,15 +10,20 @@ function MaterialsPage() {
 
   const handleAddMaterial = async (
     nombre: string,
-    tipo: 'texto' | 'pdf' | 'docx' | 'txt' | 'md',
-    contenidoOriginal?: string | ArrayBuffer
-  ) => {
-    await addMaterial(nombre, tipo, contenidoOriginal);
+    tipo: "texto" | "pdf" | "docx" | "txt" | "md",
+    contenidoOriginal?: string | ArrayBuffer,
+  ): Promise<string> => {
+    const id = await addMaterial(nombre, tipo, contenidoOriginal);
     setIsModalOpen(false);
+    return id;
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Cargando materiales...</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">
+        Cargando materiales...
+      </div>
+    );
   }
 
   return (
@@ -41,7 +46,9 @@ function MaterialsPage() {
           ))
         ) : (
           <div className="p-12 text-center border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="text-gray-500">Todavía no hay materiales. Crea el primero para comenzar.</p>
+            <p className="text-gray-500">
+              Todavía no hay materiales. Crea el primero para comenzar.
+            </p>
           </div>
         )}
       </section>

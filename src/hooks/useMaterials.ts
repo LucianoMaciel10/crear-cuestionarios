@@ -1,7 +1,6 @@
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../data/db/dexie-db';
-import * as materialService from '../services/material.service';
-import type { IMaterial } from '../data/models/material.model';
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "../data/db/dexie-db";
+import * as materialService from "../services/material.service";
 
 /**
  * Hook para gestionar los materiales.
@@ -12,8 +11,8 @@ export function useMaterials() {
 
   const addMaterial = async (
     nombre: string,
-    tipo: 'texto' | 'pdf' | 'docx' | 'txt' | 'md',
-    contenidoOriginal?: string | ArrayBuffer
+    tipo: "texto" | "pdf" | "docx" | "txt" | "md",
+    contenidoOriginal?: string | ArrayBuffer,
   ): Promise<string> => {
     return await materialService.add(nombre, tipo, contenidoOriginal);
   };
