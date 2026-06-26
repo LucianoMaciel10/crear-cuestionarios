@@ -1,9 +1,11 @@
+import Dashboard from "./pages/Dashboard";
+
 function App() {
   return (
-    <div className="p-8 bg-blue-500 text-white">
-      Tailwind funcionando
+    <div className="min-h-screen bg-gray-50">
+      <Dashboard />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
