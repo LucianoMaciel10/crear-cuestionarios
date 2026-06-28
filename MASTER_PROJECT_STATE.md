@@ -4,8 +4,8 @@
 
 Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción básica) funcional e infraestructura de navegación completa.
 
-- **Fase actual:** Fase 6 (Flashcards y Repetición Espaciada) - COMPLETADA
-- **Avance aproximado:** 60%
+- **Fase actual:** Fase 7 (Estadísticas y Aprendizaje Adaptativo) - COMPLETADA
+- **Avance aproximado:** 65%
 
 ## Arquitectura
 
@@ -15,13 +15,13 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 - `src/components/`: common, domain, layout
 - `src/hooks/`: useMaterials, useSubjects, useQuizEngine
-- `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement, QuizPlayer, Flashcards
+- `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement, QuizPlayer, Flashcards, Statistics
 - `src/routes/`: index.tsx (Router configuración)
-- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/
+- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/
 
 ### Modelos de datos
 
-- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`, `IFlashcard`, `ISpacedRepetitionData`
+- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`, `IFlashcard`, `ISpacedRepetitionData`, `ITopicMastery`, `IWeakPoint`
 
 ### Hooks
 
@@ -39,6 +39,7 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 - `question-generator/boolean-generator`: Generación de preguntas Verdadero/Falso.
 - `flashcard.service`: Gestión persistencia flashcards.
 - `spaced-repetition/sm2-algorithm`: Algoritmo de repetición espaciada (SM-2).
+- `adaptive-learning/adaptive-engine`: Motor de aprendizaje adaptativo (dominio por tema, puntos débiles).
 
 ### Flujo de procesamiento
 
@@ -55,9 +56,10 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
   - Banco de preguntas y generación automática V/F (Fase 4 del ROADMAP - COMPLETADA).
   - Modo de Estudio: Práctica (Fase 5 del ROADMAP - COMPLETADA).
   - Flashcards y Repetición Espaciada (Fase 6 del ROADMAP - COMPLETADA).
+  - Estadísticas y Aprendizaje Adaptativo (Fase 7 del ROADMAP - COMPLETADA).
 - **Parcialmente terminadas / pendientes:**
   - Generación de cuestionarios (pendiente).
-  - Aprendizaje adaptativo (pendiente).
+  - Soporte PDF y DOCX (pendiente).
 
 ## Problemas conocidos
 
@@ -70,17 +72,16 @@ _(Sin problemas conocidos activos al momento de esta actualización.)_
 
 ## Próxima tarea
 
-- **Fase 7 del ROADMAP — Estadísticas y Aprendizaje Adaptativo:**
-  - Crear `src/services/adaptive-learning/adaptive-engine.ts`.
-  - Crear `src/pages/Statistics.tsx`.
-  - Componentes: `TopicMasteryChart`, `WeakPointsList`.
-  - **Criterio de finalización:** Gráficos que muestran el dominio por tema basado en el historial de aciertos.
+- **Fase 8 del ROADMAP — Soporte PDF y DOCX:**
+  - Crear `src/services/material-parser/pdf-parser.ts`.
+  - Crear `src/services/material-parser/docx-parser.ts`.
+  - **Dependencias:** `pdfjs-dist`, `mammoth`.
+  - **Criterio de finalización:** El sistema procesa archivos PDF/DOCX extrayendo el texto correctamente.
 
 ## Próximos Pasos (orden según ROADMAP.md)
 
-1. Completar **Fase 7 - Estadísticas y Aprendizaje Adaptativo**.
-2. Continuar con **Fase 8 - Soporte PDF y DOCX**.
-3. Continuar con **Fase 9 - Pulido de UI, Modo Oscuro y Optimización**.
+1. Completar **Fase 8 - Soporte PDF y DOCX**.
+2. Continuar con **Fase 9 - Pulido de UI, Modo Oscuro y Optimización**.
 
 > Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
 
@@ -99,11 +100,12 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Completada la generación y persistencia de preguntas Verdadero/Falso (Fase 4).
 - 2025-02-23: Completado el Modo de Estudio: Práctica (Fase 5).
 - 2025-02-23: Completada la implementación de Flashcards y Repetición Espaciada (Fase 6).
+- 2025-02-23: Completada la implementación de Estadísticas y Aprendizaje Adaptativo (Fase 7).
 
 ## ⚠️ Funcionalidades Pendientes
 
-- Estadísticas y Aprendizaje Adaptativo (Fase 7).
 - Soporte PDF y DOCX (Fase 8).
+- Pulido de UI, Modo Oscuro y Optimización (Fase 9).
 - Escritura de pruebas unitarias adicionales para componentes críticos.
 - Documentación final del proyecto (README, diagramas).
 

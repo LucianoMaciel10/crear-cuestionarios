@@ -4,6 +4,7 @@ import Dashboard from "../pages/Dashboard";
 import MaterialsPage from "../pages/MaterialsPage";
 import QuizPlayer from "../pages/QuizPlayer";
 import Flashcards from "../pages/Flashcards";
+import Statistics from "../pages/Statistics";
 import NotFoundPage from "../pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
       {
         path: "flashcards",
         element: <Flashcards />,
+      },
+      {
+        path: "estadisticas",
+        element: <Statistics />,
       },
       {
         path: "*",
