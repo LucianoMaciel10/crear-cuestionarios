@@ -1,6 +1,7 @@
-// src/services/material.service.ts
-import { db } from '../data/db/dexie-db';
-import type { IMaterial } from '../data/models/material.model';
+import { db } from "../data/db/dexie-db";
+import type { IMaterial } from "../data/models/material.model";
+import { parseText } from "./material-parser/text-parser";
+import { processText } from "./material-parser/text-processor";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -18,21 +19,20 @@ export async function getAll(): Promise<IMaterial[]> {
  */
 export async function add(
   nombre: string,
-  tipo: 'texto' | 'pdf' | 'docx' | 'txt' | 'md',
-  contenidoOriginal?: string | ArrayBuffer
+  tipo: "texto" | "pdf" | "docx" | "txt" | "md",
+  contenidoOriginal?: string | ArrayBuffer,
 ): Promise<string> {
   const id = crypto.randomUUID();
+  const textoPlano = await parseText(contenidoOriginal ?? "");
+  const contenidoProcesado = await processText(textoPlano);
+
   const nuevoMaterial: IMaterial = {
     id,
     nombre,
     tipo,
     contenidoOriginal,
-    contenidoProcesado: {
-      conceptos: [],
-      definiciones: [],
-      relaciones: []
-    },
-    fechaCarga: new Date()
+    contenidoProcesado,
+    fechaCarga: new Date(),
   };
 
   await db.materiales.add(nuevoMaterial);
