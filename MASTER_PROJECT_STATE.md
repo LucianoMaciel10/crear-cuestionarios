@@ -4,8 +4,8 @@
 
 Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción básica) funcional e infraestructura de navegación completa.
 
-- **Fase actual:** Fase 8 (Soporte PDF y DOCX) - COMPLETADA
-- **Avance aproximado:** 70%
+- **Fase actual:** Fase 9 (Pulido de UI, Modo Oscuro y Optimización) - COMPLETADA
+- **Avance aproximado:** 75%
 
 ## Arquitectura
 
@@ -14,7 +14,8 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 ### Árbol Principal
 
 - `src/components/`: common, domain, layout
-- `src/hooks/`: useMaterials, useSubjects, useQuizEngine
+- `src/contexts/`: ThemeContext, theme-utils
+- `src/hooks/`: useMaterials, useSubjects, useQuizEngine, useTheme
 - `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement, QuizPlayer, Flashcards, Statistics
 - `src/routes/`: index.tsx (Router configuración)
 - `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/
@@ -60,9 +61,9 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
   - Flashcards y Repetición Espaciada (Fase 6 del ROADMAP - COMPLETADA).
   - Estadísticas y Aprendizaje Adaptativo (Fase 7 del ROADMAP - COMPLETADA).
   - Soporte PDF y DOCX (Fase 8 del ROADMAP - COMPLETADA).
+  - Pulido de UI, Modo Oscuro y Optimización (Fase 9 del ROADMAP - COMPLETADA).
 - **Parcialmente terminadas / pendientes:**
   - Generación de cuestionarios (pendiente).
-  - Pulido de UI, Modo Oscuro y Optimización (pendiente).
 
 ## Problemas conocidos
 
@@ -75,13 +76,14 @@ _(Sin problemas conocidos activos al momento de esta actualización.)_
 
 ## Próxima tarea
 
-- **Fase 9 del ROADMAP — Pulido de UI, Modo Oscuro y Optimización:**
-  - Crear `src/contexts/ThemeContext.tsx`.
-  - **Criterio de finalización:** Interfaz profesional, responsiva, con soporte de modo oscuro y tiempos de carga optimizados.
+- **Pruebas y Documentación Final:**
+  - Escribir pruebas unitarias para los nuevos componentes y servicios.
+  - Actualizar la documentación del proyecto (README, diagramas).
+  - **Criterio de finalización:** Cobertura de pruebas razonable y documentación actualizada.
 
 ## Próximos Pasos (orden según ROADMAP.md)
 
-1. Completar **Fase 9 - Pulido de UI, Modo Oscuro y Optimización**.
+1. Completar **Pruebas y Documentación Final**.
 
 > Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
 
@@ -102,10 +104,10 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Completada la implementación de Flashcards y Repetición Espaciada (Fase 6).
 - 2025-02-23: Completada la implementación de Estadísticas y Aprendizaje Adaptativo (Fase 7).
 - 2025-02-23: Completada la implementación de Soporte PDF y DOCX (Fase 8).
+- 2025-02-23: Completada la implementación de Pulido de UI, Modo Oscuro y Optimización (Fase 9).
 
 ## ⚠️ Funcionalidades Pendientes
 
-- Pulido de UI, Modo Oscuro y Optimización (Fase 9).
 - Escritura de pruebas unitarias adicionales para componentes críticos.
 - Documentación final del proyecto (README, diagramas).
 

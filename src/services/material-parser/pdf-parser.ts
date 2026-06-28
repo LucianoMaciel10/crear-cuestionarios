@@ -1,5 +1,5 @@
 // src/services/material-parser/pdf-parser.ts
-import { getDocument, type PDFDocumentProxy, type TextItem } from "pdfjs-dist";
+import { getDocument, type PDFDocumentProxy } from "pdfjs-dist";
 
 /**
  * Extrae texto de un archivo PDF.
@@ -16,7 +16,7 @@ export async function parsePDF(file: ArrayBuffer): Promise<string> {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       const pageText = content.items
-        .map((item: TextItem) => item.str)
+        .map((item: { str?: string }) => item.str || "")
         .join(" ");
       text += pageText + "\n";
     }
