@@ -1,11 +1,18 @@
 import { Dexie } from "dexie";
-import type { IMaterial, IMateria, IEtiqueta, IQuestion } from "../models";
+import type {
+  IMaterial,
+  IMateria,
+  IEtiqueta,
+  IQuestion,
+  ISpacedRepetitionData,
+} from "../models";
 
 class CuestionarioDB extends Dexie {
   materiales!: Dexie.Table<IMaterial, string>;
   materias!: Dexie.Table<IMateria, string>;
   etiquetas!: Dexie.Table<IEtiqueta, string>;
   questions!: Dexie.Table<IQuestion, string>;
+  flashcards!: Dexie.Table<ISpacedRepetitionData, string>;
 
   constructor() {
     super("CuestionarioDB");
@@ -21,6 +28,14 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty",
+    });
+
+    this.version(3).stores({
+      materiales: "id, nombre, tipo, fechaCarga",
+      materias: "id, nombre",
+      etiquetas: "id, nombre",
+      questions: "id, topic, difficulty",
+      flashcards: "id, concept, nextReviewDate",
     });
   }
 }

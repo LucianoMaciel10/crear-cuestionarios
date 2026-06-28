@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/MainLayout";
 import Dashboard from "../pages/Dashboard";
 import MaterialsPage from "../pages/MaterialsPage";
 import QuizPlayer from "../pages/QuizPlayer";
+import Flashcards from "../pages/Flashcards";
 import NotFoundPage from "../pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
       {
         path: "cuestionario",
         element: <QuizPlayer />,
+      },
+      {
+        path: "flashcards",
+        element: <Flashcards />,
       },
       {
         path: "*",
