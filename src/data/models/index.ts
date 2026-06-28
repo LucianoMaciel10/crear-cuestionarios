@@ -4,3 +4,4 @@
 export type { IMaterial, IRelacion } from './material.model';
 export type { IMateria } from './materia.model';
 export type { IEtiqueta } from './etiqueta.model';
+export type { IQuestion } from './question.model';

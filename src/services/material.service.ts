@@ -15,12 +15,14 @@ export async function getAll(): Promise<IMaterial[]> {
  * @param nombre - Nombre del material.
  * @param tipo - Tipo de archivo.
  * @param contenidoOriginal - Contenido opcional (string o ArrayBuffer).
+ * @param idMateria - Identificador de la materia.
  * @returns El identificador generado.
  */
 export async function add(
   nombre: string,
   tipo: "texto" | "pdf" | "docx" | "txt" | "md",
   contenidoOriginal?: string | ArrayBuffer,
+  idMateria?: string
 ): Promise<string> {
   const id = crypto.randomUUID();
   const textoPlano = await parseText(contenidoOriginal ?? "");
@@ -33,6 +35,7 @@ export async function add(
     contenidoOriginal,
     contenidoProcesado,
     fechaCarga: new Date(),
+    idMateria
   };
 
   await db.materiales.add(nuevoMaterial);

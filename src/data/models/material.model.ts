@@ -11,6 +11,7 @@ export interface IMaterial {
     relaciones: IRelacion[];
   };
   fechaCarga: Date;
+  idMateria?: string;
 }
 
 export interface IRelacion {

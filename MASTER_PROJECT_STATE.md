@@ -2,10 +2,10 @@
 
 ## Estado General
 
-Proyecto en desarrollo activo. Pipeline de procesamiento de texto funcional e infraestructura de navegación completa.
+Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción básica) funcional e infraestructura de navegación completa.
 
-- **Fase actual:** Fase 2 (Procesamiento de Materiales)
-- **Avance aproximado:** 45%
+- **Fase actual:** Fase 4 (Banco de Preguntas y Generación Automática - V/F) - COMPLETADA
+- **Avance aproximado:** 50%
 
 ## Arquitectura
 
@@ -15,13 +15,13 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 - `src/components/`: common, domain, layout
 - `src/hooks/`: useMaterials, useSubjects
-- `src/pages/`: Dashboard, MaterialsPage, NotFoundPage
+- `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement
 - `src/routes/`: index.tsx (Router configuración)
-- `src/services/`: material.service, material-parser/
+- `src/services/`: material.service, material-parser/, question.service, question-generator/
 
 ### Modelos de datos
 
-- `IMaterial`, `IMateria`, `IEtiqueta`, `IRelacion`
+- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`
 
 ### Hooks
 
@@ -34,6 +34,8 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 - `material.service`: Orquestador de pipeline (parseText -> processText -> Dexie).
 - `material-parser/text-parser`: Extracción de texto plano.
 - `material-parser/text-processor`: Análisis NLP básico.
+- `question.service`: Gestión persistencia preguntas.
+- `question-generator/boolean-generator`: Generación de preguntas Verdadero/Falso.
 
 ### Flujo de procesamiento
 
@@ -41,12 +43,20 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 ## Funcionalidades
 
-- **Terminadas:** Gestión de materias (CRUD), Sistema de rutas (Router), Visualización de materiales, Pipeline de procesamiento (MVP).
-- **Parcialmente terminadas:** Generación de cuestionarios (pendiente), Aprendizaje adaptativo (pendiente).
+- **Terminadas:**
+  - Gestión de materias (CRUD).
+  - Sistema de rutas (Router).
+  - Visualización de materiales.
+  - Carga de material de texto (Fase 2 del ROADMAP).
+  - Procesamiento/extracción básica de conceptos (Fase 3 del ROADMAP - MVP).
+  - Banco de preguntas y generación automática V/F (Fase 4 del ROADMAP - COMPLETADA).
+- **Parcialmente terminadas / pendientes:**
+  - Generación de cuestionarios (pendiente).
+  - Aprendizaje adaptativo (pendiente).
 
 ## Problemas conocidos
 
-- Problema visual en renderizado de listas en `MaterialCard` (texto blanco sobre fondo claro). Requiere inspección de estilos CSS/Tailwind.
+_(Sin problemas conocidos activos al momento de esta actualización.)_
 
 ## Decisiones técnicas
 
@@ -55,46 +65,41 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 ## Próxima tarea
 
-- Implementar Banco de Preguntas Básico (Fase 2).
+- **Fase 5 del ROADMAP — Modo de Estudio: Práctica:**
+  - Crear `src/pages/QuizPlayer.tsx`.
+  - Crear `src/components/domain/QuestionCard.tsx`.
+  - Crear `src/hooks/useQuizEngine.ts`.
+  - **Criterio de finalización:** Flujo completo de responder pregunta -> ver corrección -> pasar a la siguiente.
 
-## Estado Actual del Proyecto
+## Próximos Pasos (orden según ROADMAP.md)
 
-El proyecto ha completado:
+1. Completar **Fase 5 - Modo de Estudio: Práctica**.
+2. Continuar con **Fase 6 - Flashcards y Repetición Espaciada (Básico)**.
+3. Continuar con **Fase 7 - Estadísticas y Aprendizaje Adaptativo**.
 
-1. **Diseño de Arquitectura** (aprobado en ARCHITECTURE.md)
-2. **Planificación de Implementación** (documentada en ROADMAP.md)
-3. **Reglas de Desarrollo** (establecidas en DEVELOPMENT_RULES.md)
-4. **Fase 0 - Configuración Base**
-5. **Fase 1 - Gestión de Materias y Navegación** (incluyendo configuración de Vitest)
-   - ✅ Configuración de Vitest completada
-   - ✅ Pruebas unitarias básicas configuradas
+> Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
 
-## Próximos Pasos
+## Pendiente de decisión
 
-Iniciar **Fase 2 - Carga y Almacenamiento de Material (Texto/TXT)** y **Banco de Preguntas Básico** según ROADMAP.md
+_(Sin items pendientes al momento de esta actualización. Usar esta sección para registrar cualquier ambigüedad o conflicto entre documentos que surja durante el desarrollo, hasta que se resuelva explícitamente.)_
 
 ## Historial de Cambios
 
 - 2025-02-23: Configuración de scripts de test (Vitest) en `package.json` completada.
-- 2023-11-20: Instalación de dependencias completada
-- 2023-11-20: Verificación de compilación y type-check exitosos
-- 2023-11-20: Completados modelos de datos y configuración DB
-- 2023-11-20: Configuración inicial de TailwindCSS
-- 2023-11-19: Aprobación final de arquitectura
+- 2023-11-20: Instalación de dependencias completada.
+- 2023-11-20: Verificación de compilación y type-check exitosos.
+- 2023-11-20: Completados modelos de datos y configuración DB.
+- 2023-11-20: Configuración inicial de TailwindCSS.
+- 2023-11-19: Aprobación final de arquitectura.
+- 2025-02-23: Completada la generación y persistencia de preguntas Verdadero/Falso (Fase 4).
 
 ## ⚠️ Funcionalidades Pendientes
 
+- Modo de Estudio: Práctica (Fase 5).
+- Flashcards y Repetición Espaciada (Fase 6).
 - Escritura de pruebas unitarias adicionales para componentes críticos.
 - Documentación final del proyecto (README, diagramas).
 
-## 🔜 Próximas Tareas (Fase 2)
-
-- **Módulo de Material:** Carga de texto manual y archivos TXT/Markdown. Extracción básica de conceptos y definiciones.
-- **Módulo de Cuestionarios:** CRUD de cuestionarios (crear, editar, eliminar, duplicar). Organización por materia y etiquetas.
-- **Banco de Preguntas Básico:** Generación de preguntas de Verdadero/Falso y Opción Única simples a partir de conceptos/definiciones.
-- **Persistencia:** Configuración inicial de IndexedDB para Material, Cuestionarios y Preguntas.
-- **UI/UX:** Diseño base, componentes reutilizables, navegación principal.
-- **Modo de Estudio:** Implementación del "Modo Práctica" (sin tiempo, corrección inmediata).
-- **Resultados:** Visualización básica de puntaje y aciertos/errores.
-
 ## ❗ Problemas Conocidos
+
+_(Sin problemas conocidos activos.)_
