@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Button from "./common/Button";
 
 type MaterialType = "texto" | "pdf" | "docx" | "txt" | "md";
@@ -16,30 +16,55 @@ type AddMaterialModalProps = {
 function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
   const [nombre, setNombre] = useState("");
   const [tipo, setTipo] = useState<MaterialType>("texto");
-  const [contenido, setContenido] = useState(""); // Nuevo estado para el contenido
+  const [contenido, setContenido] = useState(""); // Para texto, TXT, MD
+  const [file, setFile] = useState<File | null>(null); // Para PDF, DOCX
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
+  };
 
   const handleGuardar = async () => {
     if (nombre.trim() === "") return;
 
-    const contenidoParaEnviar =
-      tipo === "texto" || tipo === "txt" || tipo === "md"
-        ? contenido.trim() || undefined // Usar undefined si está vacío
-        : undefined; // Pasar undefined para tipos no soportados en el MVP
+    let contenidoParaEnviar: string | ArrayBuffer | undefined;
+
+    if (tipo === "texto" || tipo === "txt" || tipo === "md") {
+      contenidoParaEnviar = contenido.trim() || undefined;
+    } else if (tipo === "pdf" || tipo === "docx") {
+      if (file) {
+        contenidoParaEnviar = await file.arrayBuffer();
+      } else {
+        alert("Por favor, selecciona un archivo.");
+        return;
+      }
+    }
 
     await onAdd(nombre, tipo, contenidoParaEnviar);
 
+    // Limpiar estados
     setNombre("");
     setTipo("texto");
-    setContenido(""); // Limpiar el estado del contenido
+    setContenido("");
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     onClose();
   };
 
   const handleCancelar = () => {
     setNombre("");
     setTipo("texto");
-    setContenido(""); // Limpiar el estado del contenido
+    setContenido("");
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     onClose();
   };
 
@@ -66,7 +91,10 @@ function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
             onChange={(e) => {
               const newTipo = e.target.value as MaterialType;
               setTipo(newTipo);
-              // El contenido ya se limpia en Guardar/Cancelar, no es necesario aquí.
+              setFile(null);
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
             }}
             className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -78,7 +106,7 @@ function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
           </select>
         </label>
 
-        {(tipo === "texto" || tipo === "txt" || tipo === "md") && (
+        {tipo === "texto" || tipo === "txt" || tipo === "md" ? (
           <label className="block mb-6">
             <span className="text-sm font-medium text-gray-700">Contenido</span>
             <textarea
@@ -88,6 +116,22 @@ function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
               placeholder="Introduce el contenido del material aquí..."
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
             />
+          </label>
+        ) : (
+          <label className="block mb-6">
+            <span className="text-sm font-medium text-gray-700">Archivo</span>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept={tipo === "pdf" ? ".pdf" : ".docx"}
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {file && (
+              <p className="mt-2 text-sm text-gray-600">
+                Archivo seleccionado: {file.name}
+              </p>
+            )}
           </label>
         )}
 

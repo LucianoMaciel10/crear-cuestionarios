@@ -4,8 +4,8 @@
 
 Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción básica) funcional e infraestructura de navegación completa.
 
-- **Fase actual:** Fase 7 (Estadísticas y Aprendizaje Adaptativo) - COMPLETADA
-- **Avance aproximado:** 65%
+- **Fase actual:** Fase 8 (Soporte PDF y DOCX) - COMPLETADA
+- **Avance aproximado:** 70%
 
 ## Arquitectura
 
@@ -35,6 +35,8 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 - `material.service`: Orquestador de pipeline (parseText -> processText -> Dexie).
 - `material-parser/text-parser`: Extracción de texto plano.
 - `material-parser/text-processor`: Análisis NLP básico.
+- `material-parser/pdf-parser`: Extracción de texto de PDF.
+- `material-parser/docx-parser`: Extracción de texto de DOCX.
 - `question.service`: Gestión persistencia preguntas.
 - `question-generator/boolean-generator`: Generación de preguntas Verdadero/Falso.
 - `flashcard.service`: Gestión persistencia flashcards.
@@ -57,9 +59,10 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
   - Modo de Estudio: Práctica (Fase 5 del ROADMAP - COMPLETADA).
   - Flashcards y Repetición Espaciada (Fase 6 del ROADMAP - COMPLETADA).
   - Estadísticas y Aprendizaje Adaptativo (Fase 7 del ROADMAP - COMPLETADA).
+  - Soporte PDF y DOCX (Fase 8 del ROADMAP - COMPLETADA).
 - **Parcialmente terminadas / pendientes:**
   - Generación de cuestionarios (pendiente).
-  - Soporte PDF y DOCX (pendiente).
+  - Pulido de UI, Modo Oscuro y Optimización (pendiente).
 
 ## Problemas conocidos
 
@@ -72,16 +75,13 @@ _(Sin problemas conocidos activos al momento de esta actualización.)_
 
 ## Próxima tarea
 
-- **Fase 8 del ROADMAP — Soporte PDF y DOCX:**
-  - Crear `src/services/material-parser/pdf-parser.ts`.
-  - Crear `src/services/material-parser/docx-parser.ts`.
-  - **Dependencias:** `pdfjs-dist`, `mammoth`.
-  - **Criterio de finalización:** El sistema procesa archivos PDF/DOCX extrayendo el texto correctamente.
+- **Fase 9 del ROADMAP — Pulido de UI, Modo Oscuro y Optimización:**
+  - Crear `src/contexts/ThemeContext.tsx`.
+  - **Criterio de finalización:** Interfaz profesional, responsiva, con soporte de modo oscuro y tiempos de carga optimizados.
 
 ## Próximos Pasos (orden según ROADMAP.md)
 
-1. Completar **Fase 8 - Soporte PDF y DOCX**.
-2. Continuar con **Fase 9 - Pulido de UI, Modo Oscuro y Optimización**.
+1. Completar **Fase 9 - Pulido de UI, Modo Oscuro y Optimización**.
 
 > Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
 
@@ -101,10 +101,10 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Completado el Modo de Estudio: Práctica (Fase 5).
 - 2025-02-23: Completada la implementación de Flashcards y Repetición Espaciada (Fase 6).
 - 2025-02-23: Completada la implementación de Estadísticas y Aprendizaje Adaptativo (Fase 7).
+- 2025-02-23: Completada la implementación de Soporte PDF y DOCX (Fase 8).
 
 ## ⚠️ Funcionalidades Pendientes
 
-- Soporte PDF y DOCX (Fase 8).
 - Pulido de UI, Modo Oscuro y Optimización (Fase 9).
 - Escritura de pruebas unitarias adicionales para componentes críticos.
 - Documentación final del proyecto (README, diagramas).
