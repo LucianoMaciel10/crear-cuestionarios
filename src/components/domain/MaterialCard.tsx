@@ -38,7 +38,7 @@ function MaterialCard({ material, onDelete }: MaterialCardProps) {
           <div>
             <h4 className="font-semibold text-gray-800">Conceptos</h4>
             {conceptos.length > 0 ? (
-              <ul className="list-disc list-inside">
+              <ul className="list-disc list-inside text-gray-500">
                 {conceptos.map((c) => (
                   <li key={c}>{c}</li>
                 ))}
@@ -50,7 +50,7 @@ function MaterialCard({ material, onDelete }: MaterialCardProps) {
           <div>
             <h4 className="font-semibold text-gray-800">Definiciones</h4>
             {definiciones.length > 0 ? (
-              <ul className="list-disc list-inside">
+              <ul className="list-disc list-inside text-gray-500">
                 {definiciones.map((d) => (
                   <li key={d.concepto}>
                     {d.concepto}: {d.definicion}
@@ -64,7 +64,7 @@ function MaterialCard({ material, onDelete }: MaterialCardProps) {
           <div>
             <h4 className="font-semibold text-gray-800">Relaciones</h4>
             {relaciones.length > 0 ? (
-              <ul className="list-disc list-inside">
+              <ul className="list-disc list-inside text-gray-600">
                 {relaciones.map((r) => (
                   <li key={r.id}>
                     {r.origen} - {r.destino} ({r.tipo})
