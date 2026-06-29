@@ -1,5 +1,6 @@
-import type { IMateria } from '../../data/models/materia.model';
-import Button from '../common/Button';
+import type { IMateria } from "../../data/models/materia.model";
+import Button from "../common/Button";
+import Card from "../common/Card";
 
 type SubjectCardProps = {
   subject: IMateria;
@@ -8,16 +9,18 @@ type SubjectCardProps = {
 
 function SubjectCard({ subject, onDelete }: SubjectCardProps) {
   return (
-    <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-      <h3 className="text-lg font-medium text-gray-900">{subject.nombre}</h3>
-      <Button 
+    <Card className="p-4 flex items-center justify-between">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-50">
+        {subject.nombre}
+      </h3>
+      <Button
         variant="secondary"
         onClick={() => void onDelete(subject.id)}
-        className="text-sm py-2 px-4"
+        size="sm"
       >
         Eliminar
       </Button>
-    </div>
+    </Card>
   );
 }
 

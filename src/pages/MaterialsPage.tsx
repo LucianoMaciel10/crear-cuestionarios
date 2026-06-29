@@ -20,7 +20,7 @@ function MaterialsPage() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-gray-500 dark:text-gray-400">
         Cargando materiales...
       </div>
     );
@@ -28,9 +28,30 @@ function MaterialsPage() {
 
   return (
     <div className="max-w-4xl p-6 mx-auto">
-      <header className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Mis Materiales</h1>
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">
+            Mis Materiales
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            Gestiona tus materiales de estudio
+          </p>
+        </div>
         <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
           Añadir material
         </Button>
       </header>
@@ -45,8 +66,22 @@ function MaterialsPage() {
             />
           ))
         ) : (
-          <div className="p-12 text-center border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="text-gray-500">
+          <div className="p-12 text-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 mx-auto mb-4 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+            <p className="text-gray-500 dark:text-gray-400">
               Todavía no hay materiales. Crea el primero para comenzar.
             </p>
           </div>

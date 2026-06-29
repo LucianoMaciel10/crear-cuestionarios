@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import Button from './common/Button';
+import { useState } from "react";
+import Button from "./common/Button";
+import Modal from "./common/Modal";
 
 type AddSubjectModalProps = {
   isOpen: boolean;
@@ -8,44 +9,45 @@ type AddSubjectModalProps = {
 };
 
 function AddSubjectModal({ isOpen, onClose, onAdd }: AddSubjectModalProps) {
-  const [nombre, setNombre] = useState('');
-
-  if (!isOpen) return null;
+  const [nombre, setNombre] = useState("");
 
   const handleGuardar = async () => {
-    if (nombre.trim() === '') return;
+    if (nombre.trim() === "") return;
     await onAdd(nombre);
-    setNombre('');
+    setNombre("");
     onClose();
   };
 
   const handleCancelar = () => {
-    setNombre('');
+    setNombre("");
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-xl">
-        <h2 className="mb-4 text-xl font-bold text-gray-900">Nueva Materia</h2>
+    <Modal isOpen={isOpen} onClose={onClose} title="Nueva Materia" size="sm">
+      <div className="space-y-4">
         <input
           autoFocus
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           placeholder="Nombre de la materia"
-          className="w-full px-3 py-2 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
         />
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={handleCancelar}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={() => void handleGuardar()} disabled={nombre.trim() === ''}>
-            Guardar
-          </Button>
-        </div>
       </div>
-    </div>
+      <div className="flex justify-end gap-3 mt-6">
+        <Button variant="secondary" onClick={handleCancelar}>
+          Cancelar
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => void handleGuardar()}
+          disabled={nombre.trim() === ""}
+        >
+          Guardar
+        </Button>
+      </div>
+    </Modal>
   );
 }
 

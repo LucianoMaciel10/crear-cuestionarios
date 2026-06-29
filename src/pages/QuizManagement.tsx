@@ -5,6 +5,8 @@ import * as questionService from "../services/question.service";
 import type { IQuestion } from "../data/models";
 import QuestionList from "../components/domain/QuestionList";
 import GenerateQuestionsButton from "../components/domain/GenerateQuestionsButton";
+import Button from "../components/common/Button";
+import Card from "../components/common/Card";
 
 interface QuizManagementProps {
   subjectId: string;
@@ -44,12 +46,40 @@ const QuizManagement: React.FC<QuizManagementProps> = ({ subjectId }) => {
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Cuestionarios</h1>
-      <div className="mb-4">
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+          Gestión de Cuestionarios
+        </h1>
         <GenerateQuestionsButton onClick={handleGenerateQuestions} />
       </div>
-      <QuestionList questions={questions} />
+
+      {questions.length > 0 ? (
+        <QuestionList questions={questions} />
+      ) : (
+        <Card className="p-6 text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 mx-auto mb-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1}
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            No hay preguntas generadas aún.
+          </p>
+          <Button onClick={handleGenerateQuestions} variant="primary">
+            Generar Preguntas
+          </Button>
+        </Card>
+      )}
     </div>
   );
 };

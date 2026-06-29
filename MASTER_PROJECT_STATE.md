@@ -5,7 +5,7 @@
 Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción básica) funcional e infraestructura de navegación completa.
 
 - **Fase actual:** Fase 9 (Pulido de UI, Modo Oscuro y Optimización) - COMPLETADA
-- **Avance aproximado:** 75%
+- **Avance aproximado:** 85% (rediseño de UI completado)
 
 ## Arquitectura
 
@@ -73,6 +73,110 @@ _(Sin problemas conocidos activos al momento de esta actualización.)_
 
 - Uso de `crypto.randomUUID()` para generación de IDs nativos.
 - Implementación de un pipeline secuencial centralizado en `material.service`.
+- Sistema de diseño coherente con TailwindCSS y componentes reutilizables.
+
+## Diseño Visual (Rediseño Fase 9)
+
+### Sistema de Diseño Implementado
+
+**Paleta de Colores:**
+
+- Primaria: Indigo (600-500 para dark mode)
+- Secundaria: Grises (200-800 para dark mode)
+- Éxito: Verde (600-500 para dark mode)
+- Peligro: Rojo (600-500 para dark mode)
+- Advertencia: Amarillo (600-500 para dark mode)
+
+**Tipografía:**
+
+- Títulos: 3xl (1.875rem), 2xl (1.5rem), lg (1.125rem) - Font bold
+- Texto principal: base (1rem) - Font medium
+- Texto secundario: sm (0.875rem) - Font normal
+- Jerarquía clara con colores adaptados para dark mode
+
+**Espaciado:**
+
+- Sistema basado en 4px (1rem = 16px)
+- Padding consistente: p-4, p-6 para cards
+- Margenes: mb-4, mb-6, mb-8 para separación de secciones
+- Gaps: gap-2, gap-3, gap-4 para elementos internos
+
+**Componentes Rediseñados:**
+
+1. **Button.tsx**:
+   - Variantes: primary, secondary, danger, success, warning
+   - Tamaños: sm, md, lg
+   - Estados: hover, focus, disabled, loading
+   - Soporte completo para dark mode
+
+2. **Card.tsx** (Nuevo):
+   - Componentes base reutilizable
+   - Variantes: default, elevated
+   - Sombras consistentes
+   - Dark mode integrado
+
+3. **Modal.tsx** (Nuevo):
+   - Estructura estándar con header, body, footer
+   - Tamaños: sm, md, lg
+   - Animaciones suaves
+   - Accesibilidad mejorada
+
+4. **Navbar.tsx**:
+   - Enlaces con estados activos/hover
+   - Dark mode completo
+   - Espaciado consistente
+
+5. **ThemeToggle.tsx**:
+   - Iconos mejorados
+   - Estados de focus visibles
+   - Transiciones suaves
+
+**Páginas Actualizadas:**
+
+1. **Dashboard.tsx**:
+   - Tarjetas de materias con diseño consistente
+   - Empty state con iconos y mensajes claros
+   - Botón de acción destacado
+
+2. **MaterialsPage.tsx**:
+   - Tarjetas de materiales con jerarquía visual
+   - Empty state mejorado
+   - Información organizada
+
+3. **QuizPlayer.tsx**:
+   - Visualización de progreso con gráfico circular
+   - Tarjetas de preguntas con feedback visual
+   - Resultados con métricas claras
+
+4. **Flashcards.tsx**:
+   - Diseño de tarjetas con animación de flip
+   - Sistema de calificación visual
+   - Navegación clara
+
+5. **Statistics.tsx**:
+   - Visualización de datos con barras de progreso
+   - Tarjetas de resumen con iconos
+   - Diseño responsive
+
+6. **QuizManagement.tsx**:
+   - Lista de preguntas con etiquetas
+   - Empty state con llamado a acción
+   - Botón de generación destacado
+
+### Mejoras de Accesibilidad:
+
+- Contraste mejorado en todos los componentes (WCAG AA compliant)
+- Estados de focus visibles para navegación por teclado
+- Atributos ARIA en botones y modales
+- HTML semántico
+- Navegación por teclado funcional
+
+### Mejoras de Dark Mode:
+
+- Soporte completo en todos los componentes
+- Colores adaptados para mejor legibilidad
+- Transiciones suaves entre modos
+- Consistencia en toda la aplicación
 
 ## Próxima tarea
 
@@ -105,6 +209,7 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Completada la implementación de Estadísticas y Aprendizaje Adaptativo (Fase 7).
 - 2025-02-23: Completada la implementación de Soporte PDF y DOCX (Fase 8).
 - 2025-02-23: Completada la implementación de Pulido de UI, Modo Oscuro y Optimización (Fase 9).
+- 2025-02-23: Rediseño completo de UI con sistema de diseño coherente, mejoras de accesibilidad y dark mode completo.
 
 ## ⚠️ Funcionalidades Pendientes
 
@@ -114,3 +219,38 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 ## ❗ Problemas Conocidos
 
 _(Sin problemas conocidos activos.)_
+
+## 🎨 Mejoras de Diseño (Fase 9 - Rediseño)
+
+### Componentes Rediseñados:
+
+- `Button.tsx`: Variantes, tamaños, estados completos
+- `Card.tsx`: Nuevo componente base reutilizable
+- `Modal.tsx`: Nuevo componente con estructura estándar
+- `Navbar.tsx`: Enlaces con estados mejorados
+- `ThemeToggle.tsx`: Iconos y transiciones mejoradas
+- `SubjectCard.tsx`: Diseño consistente con Card base
+- `MaterialCard.tsx`: Jerarquía visual mejorada
+- `QuestionCard.tsx`: Feedback visual y estados
+- `FlashcardFlip.tsx`: Animaciones y dark mode
+- `QualityButtons.tsx`: Colores semánticos
+- `TopicMasteryChart.tsx`: Visualización mejorada
+- `WeakPointsList.tsx`: Diseño consistente
+- `QuestionList.tsx`: Tarjetas con etiquetas
+
+### Páginas Actualizadas:
+
+- `Dashboard.tsx`: Empty states y diseño mejorado
+- `MaterialsPage.tsx`: Tarjetas consistentes
+- `QuizPlayer.tsx`: Visualización de resultados
+- `Flashcards.tsx`: Diseño de tarjetas
+- `Statistics.tsx`: Visualización de datos
+- `QuizManagement.tsx`: Empty state mejorado
+
+### Decisiones de Diseño:
+
+- Paleta de colores basada en Indigo con soporte completo para dark mode
+- Tipografía con jerarquía clara (títulos, texto, secundario)
+- Espaciado consistente basado en 4px
+- Estados interactivos visibles (hover, focus, active, disabled)
+- Accesibilidad mejorada en todos los componentes

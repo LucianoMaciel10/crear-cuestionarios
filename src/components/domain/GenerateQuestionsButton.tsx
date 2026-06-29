@@ -1,17 +1,19 @@
-import React from 'react';
+import React from "react";
+import Button from "../common/Button";
 
 interface GenerateQuestionsButtonProps {
   onClick: () => void;
+  isLoading?: boolean;
 }
 
-const GenerateQuestionsButton: React.FC<GenerateQuestionsButtonProps> = ({ onClick }) => {
+const GenerateQuestionsButton: React.FC<GenerateQuestionsButtonProps> = ({
+  onClick,
+  isLoading = false,
+}) => {
   return (
-    <button
-      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      onClick={onClick}
-    >
+    <Button onClick={onClick} variant="primary" isLoading={isLoading}>
       Generar Preguntas
-    </button>
+    </Button>
   );
 };
 

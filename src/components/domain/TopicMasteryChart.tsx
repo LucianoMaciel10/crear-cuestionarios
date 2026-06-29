@@ -1,41 +1,65 @@
 // src/components/domain/TopicMasteryChart.tsx
-import React from 'react';
-import type { ITopicMastery } from '../../services/adaptive-learning/adaptive-engine';
+import React from "react";
+import type { ITopicMastery } from "../../services/adaptive-learning/adaptive-engine";
+import Card from "../common/Card";
 
 interface TopicMasteryChartProps {
   topicMastery: ITopicMastery[];
 }
 
-const TopicMasteryChart: React.FC<TopicMasteryChartProps> = ({ topicMastery }) => {
+const TopicMasteryChart: React.FC<TopicMasteryChartProps> = ({
+  topicMastery,
+}) => {
   return (
-    <div className="p-4 border rounded-lg shadow-sm bg-white">
-      <h2 className="text-lg font-semibold mb-4">Dominio por Tema</h2>
+    <Card className="p-6">
+      <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-50">
+        Dominio por Tema
+      </h2>
       {topicMastery.length === 0 ? (
-        <p className="text-gray-600">No hay datos de dominio disponibles.</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          No hay datos de dominio disponibles.
+        </p>
       ) : (
-        <div className="space-y-4">
-          {topicMastery.map((topic) => (
-            <div key={topic.topic} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-              <div className="flex-1">
-                <h3 className="font-medium">{topic.topic}</h3>
-                <p className="text-sm text-gray-600">
-                  {topic.correctAnswers} de {topic.totalQuestions} correctas
-                </p>
+        <div className="space-y-3">
+          {topicMastery.map((topic) => {
+            const percentage = Math.round(topic.masteryLevel * 100);
+            const barColor =
+              percentage >= 70
+                ? "bg-green-500"
+                : percentage >= 40
+                  ? "bg-yellow-500"
+                  : "bg-red-500";
+
+            return (
+              <div
+                key={topic.topic}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg"
+              >
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900 dark:text-gray-50">
+                    {topic.topic}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {topic.correctAnswers} de {topic.totalQuestions} correctas
+                  </p>
+                </div>
+                <div className="w-24 h-3 bg-gray-200 dark:bg-gray-600 rounded-full mx-3">
+                  <div
+                    className={`h-3 ${barColor} rounded-full`}
+                    style={{ width: `${percentage}%` }}
+                  ></div>
+                </div>
+                <span
+                  className={`font-medium ${percentage >= 70 ? "text-green-600 dark:text-green-400" : percentage >= 40 ? "text-yellow-600 dark:text-yellow-400" : "text-red-600 dark:text-red-400"}`}
+                >
+                  {percentage}%
+                </span>
               </div>
-              <div className="w-32 h-4 bg-gray-200 rounded-full mx-4">
-                <div
-                  className="h-4 bg-blue-500 rounded-full"
-                  style={{ width: `${topic.masteryLevel * 100}%` }}
-                ></div>
-              </div>
-              <span className="font-medium text-blue-600">
-                {(topic.masteryLevel * 100).toFixed(0)}%
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

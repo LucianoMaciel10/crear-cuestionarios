@@ -1,6 +1,8 @@
 // src/components/domain/QuestionCard.tsx
 import React, { useState } from "react";
 import type { IQuestion } from "../../data/models";
+import Card from "../common/Card";
+import Button from "../common/Button";
 
 interface QuestionCardProps {
   question: IQuestion;
@@ -30,20 +32,22 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const isIncorrect = showFeedback && selectedAnswer !== question.correctAnswer;
 
   return (
-    <div className="p-4 border rounded-lg shadow-sm bg-white">
-      <h2 className="text-lg font-semibold mb-4">{question.question}</h2>
-      <div className="mb-4">
+    <Card className="p-4">
+      <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-50">
+        {question.question}
+      </h2>
+      <div className="mb-4 space-y-2">
         {question.options?.map((option) => (
           <button
             key={option.id}
-            className={`block w-full p-2 mb-2 border rounded ${
+            className={`block w-full p-3 text-left border rounded-lg transition-colors duration-200 ${
               selectedAnswer === option.id
                 ? isCorrect
-                  ? "bg-green-100 border-green-500"
+                  ? "bg-green-100 border-green-500 dark:bg-green-900/20 dark:border-green-500"
                   : isIncorrect
-                    ? "bg-red-100 border-red-500"
-                    : "bg-blue-100 border-blue-500"
-                : "bg-gray-50 border-gray-300"
+                    ? "bg-red-100 border-red-500 dark:bg-red-900/20 dark:border-red-500"
+                    : "bg-primary-100 border-primary-500 dark:bg-primary-900/20 dark:border-primary-500"
+                : "bg-gray-50 border-gray-300 dark:bg-gray-700/30 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
             onClick={() => handleAnswer(option.id)}
             disabled={showFeedback}
@@ -53,24 +57,25 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         ))}
       </div>
       {showFeedback && (
-        <div className="mt-4 p-2 bg-gray-100 rounded">
+        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
           <p
-            className={`font-medium ${isCorrect ? "text-green-700" : "text-red-700"}`}
+            className={`font-medium ${isCorrect ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"}`}
           >
             {isCorrect ? "¡Correcto!" : "Incorrecto"}
           </p>
-          <p className="text-sm text-gray-600 mt-1">{question.explanation}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {question.explanation}
+          </p>
         </div>
       )}
       {!showFeedback && selectedAnswer && (
-        <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={onNext}
-        >
-          Siguiente
-        </button>
+        <div className="mt-4 flex justify-end">
+          <Button onClick={onNext} variant="primary">
+            Siguiente
+          </Button>
+        </div>
       )}
-    </div>
+    </Card>
   );
 };
 

@@ -2,6 +2,15 @@
 import { getDocument, type PDFDocumentProxy } from "pdfjs-dist";
 
 /**
+ * Verifica si un elemento tiene la propiedad 'str'.
+ * @param item - Elemento a verificar.
+ * @returns true si el elemento tiene la propiedad 'str'.
+ */
+function hasStr(item: unknown): item is { str: string } {
+  return typeof item === "object" && item !== null && "str" in item;
+}
+
+/**
  * Extrae texto de un archivo PDF.
  * @param file - Archivo PDF como ArrayBuffer.
  * @returns Texto extraído del PDF.
@@ -16,7 +25,7 @@ export async function parsePDF(file: ArrayBuffer): Promise<string> {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       const pageText = content.items
-        .map((item: { str?: string }) => item.str || "")
+        .map((item: unknown) => (hasStr(item) ? item.str : ""))
         .join(" ");
       text += pageText + "\n";
     }

@@ -1,8 +1,10 @@
 // src/pages/QuizPlayer.tsx
-import React from 'react';
-import { useQuizEngine } from '../hooks/useQuizEngine';
-import QuestionCard from '../components/domain/QuestionCard';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useQuizEngine } from "../hooks/useQuizEngine";
+import QuestionCard from "../components/domain/QuestionCard";
+import { useNavigate } from "react-router-dom";
+import Button from "../components/common/Button";
+import Card from "../components/common/Card";
 
 const QuizPlayer: React.FC = () => {
   const {
@@ -22,7 +24,9 @@ const QuizPlayer: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-lg text-gray-600">Cargando preguntas...</p>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
+          Cargando preguntas...
+        </p>
       </div>
     );
   }
@@ -30,38 +34,89 @@ const QuizPlayer: React.FC = () => {
   if (questions.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-lg text-gray-600">No hay preguntas disponibles.</p>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
+          No hay preguntas disponibles.
+        </p>
       </div>
     );
   }
 
   if (isQuizComplete) {
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-white border rounded-lg shadow-sm">
-        <h1 className="text-2xl font-bold mb-4">Resultados del Cuestionario</h1>
-        <div className="mb-4">
-          <p className="text-lg">
-            <span className="font-semibold">Correctas:</span> {results.correct}
-          </p>
-          <p className="text-lg">
-            <span className="font-semibold">Incorrectas:</span> {results.incorrect}
-          </p>
-          <p className="text-lg">
-            <span className="font-semibold">Total:</span> {questions.length}
-          </p>
-        </div>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
-          onClick={resetQuiz}
-        >
-          Reiniciar Cuestionario
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-          onClick={() => navigate('/')}
-        >
-          Volver al Inicio
-        </button>
+      <div className="max-w-2xl mx-auto p-6">
+        <Card className="p-6">
+          <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-50">
+            Resultados del Cuestionario
+          </h1>
+          <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="relative w-32 h-32">
+                <svg
+                  className="w-32 h-32 transform -rotate-90"
+                  viewBox="0 0 36 36"
+                >
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="3"
+                    strokeDasharray={`${(results.correct / questions.length) * 100}, 100`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    {Math.round((results.correct / questions.length) * 100)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {results.correct}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Correctas
+                </p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  {results.incorrect}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Incorrectas
+                </p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                  {questions.length}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Total
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button onClick={resetQuiz} variant="primary" className="w-full">
+              Reiniciar Cuestionario
+            </Button>
+            <Button
+              onClick={() => navigate("/")}
+              variant="secondary"
+              className="w-full"
+            >
+              Volver al Inicio
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -70,9 +125,11 @@ const QuizPlayer: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Cuestionario</h1>
-        <p className="text-gray-600">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+          Cuestionario
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
           Pregunta {currentQuestionIndex + 1} de {questions.length}
         </p>
       </div>
@@ -84,12 +141,11 @@ const QuizPlayer: React.FC = () => {
         userAnswer={answers[currentQuestion.id]}
       />
       {currentQuestionIndex === questions.length - 1 && (
-        <button
-          className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          onClick={submitQuiz}
-        >
-          Finalizar Cuestionario
-        </button>
+        <div className="mt-6">
+          <Button onClick={submitQuiz} variant="success" className="w-full">
+            Finalizar Cuestionario
+          </Button>
+        </div>
       )}
     </div>
   );
