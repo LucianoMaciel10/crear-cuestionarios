@@ -10,10 +10,12 @@
     {
       "src": "/api/extract-concepts",
       "dest": "api/extract-concepts.ts"
-    },
+    }
+  ],
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
