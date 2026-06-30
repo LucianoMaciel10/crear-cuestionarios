@@ -24,16 +24,21 @@ export async function extractConceptsWithAI(
 
     // Verificar respuesta
     if (!response.ok) {
-      try {
-        const errorData = await response.json();
-        console.error("Error detallado de la API:", {
-          status: response.status,
-          error: errorData.error,
-          details: errorData.details,
-          solution: errorData.solution,
-        });
-      } catch (parseError) {
-        console.error("Error al parsear respuesta de error:", parseError);
+      // En desarrollo local, la API puede no estar disponible (404)
+      if (import.meta.env.DEV && response.status === 404) {
+        console.warn("API no disponible en desarrollo local, usando fallback");
+      } else {
+        try {
+          const errorData = await response.json();
+          console.error("Error detallado de la API:", {
+            status: response.status,
+            error: errorData.error,
+            details: errorData.details,
+            solution: errorData.solution,
+          });
+        } catch (parseError) {
+          console.error("Error al parsear respuesta de error:", parseError);
+        }
       }
       return null;
     }

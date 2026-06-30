@@ -1,0 +1,11 @@
+# Archivos y directorios a ignorar durante el despliegue
+dist/
+node_modules/
+.coverage/
+*.log
+*.md
+*.txt
+.DS_Store
+.env*
+!.env.local
+vercel-dev.js
