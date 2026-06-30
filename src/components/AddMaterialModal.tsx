@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import Button from "./common/Button";
 import Modal from "./common/Modal";
+import { useToast } from "../hooks/useToast";
 
 type MaterialType = "texto" | "pdf" | "docx" | "txt" | "md";
 
@@ -19,7 +20,9 @@ function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
   const [tipo, setTipo] = useState<MaterialType>("texto");
   const [contenido, setContenido] = useState(""); // Para texto, TXT, MD
   const [file, setFile] = useState<File | null>(null); // Para PDF, DOCX
+  const [isLoading, setIsLoading] = useState(false); // Estado de carga
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showToast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -30,30 +33,42 @@ function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
   const handleGuardar = async () => {
     if (nombre.trim() === "") return;
 
-    let contenidoParaEnviar: string | ArrayBuffer | undefined;
+    setIsLoading(true);
 
-    if (tipo === "texto" || tipo === "txt" || tipo === "md") {
-      contenidoParaEnviar = contenido.trim() || undefined;
-    } else if (tipo === "pdf" || tipo === "docx") {
-      if (file) {
-        contenidoParaEnviar = await file.arrayBuffer();
-      } else {
-        alert("Por favor, selecciona un archivo.");
-        return;
+    try {
+      let contenidoParaEnviar: string | ArrayBuffer | undefined;
+
+      if (tipo === "texto" || tipo === "txt" || tipo === "md") {
+        contenidoParaEnviar = contenido.trim() || undefined;
+      } else if (tipo === "pdf" || tipo === "docx") {
+        if (file) {
+          contenidoParaEnviar = await file.arrayBuffer();
+        } else {
+          showToast("Por favor, selecciona un archivo", "error");
+          return;
+        }
       }
-    }
 
-    await onAdd(nombre, tipo, contenidoParaEnviar);
+      showToast("Procesando material con IA...", "info");
 
-    // Limpiar estados
-    setNombre("");
-    setTipo("texto");
-    setContenido("");
-    setFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      await onAdd(nombre, tipo, contenidoParaEnviar);
+      showToast("Material creado exitosamente", "success");
+
+      // Limpiar estados
+      setNombre("");
+      setTipo("texto");
+      setContenido("");
+      setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      onClose();
+    } catch (error) {
+      showToast("Error al crear el material", "error");
+      console.error("Error al crear material:", error);
+    } finally {
+      setIsLoading(false);
     }
-    onClose();
   };
 
   const handleCancelar = () => {
@@ -141,15 +156,20 @@ function AddMaterialModal({ isOpen, onClose, onAdd }: AddMaterialModalProps) {
         )}
       </div>
       <div className="flex justify-end gap-3 mt-6">
-        <Button variant="secondary" onClick={handleCancelar}>
+        <Button
+          variant="secondary"
+          onClick={handleCancelar}
+          disabled={isLoading}
+        >
           Cancelar
         </Button>
         <Button
           variant="primary"
           onClick={() => void handleGuardar()}
-          disabled={nombre.trim() === ""}
+          disabled={nombre.trim() === "" || isLoading}
+          isLoading={isLoading}
         >
-          Guardar
+          {isLoading ? "Procesando..." : "Guardar"}
         </Button>
       </div>
     </Modal>

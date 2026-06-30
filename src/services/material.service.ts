@@ -51,8 +51,42 @@ export async function add(
 
   let contenidoProcesado;
   if (textoPlano !== "") {
+    // Intentar con IA primero
     const aiResult = await extractConceptsWithAI(textoPlano);
-    contenidoProcesado = aiResult || (await processText(textoPlano));
+
+    if (aiResult) {
+      console.log("Extracción con IA exitosa", {
+        conceptos: aiResult.conceptos.length,
+        definiciones: aiResult.definiciones.length,
+        relaciones: aiResult.relaciones.length,
+      });
+
+      // Mapear relaciones de Mistral API al modelo local
+      const relacionesMapeadas = (
+        aiResult.relaciones as unknown as Array<{
+          concepto1: string;
+          concepto2: string;
+          tipo: string;
+          descripcion: string;
+        }>
+      ).map((r) => ({
+        id: crypto.randomUUID(),
+        tipo: r.tipo,
+        origen: r.concepto1,
+        destino: r.concepto2,
+        descripcion: r.descripcion,
+      }));
+
+      contenidoProcesado = {
+        ...aiResult,
+        relaciones: relacionesMapeadas,
+      };
+    } else {
+      console.warn(
+        "IA no disponible, usando motor de expresiones regulares como fallback",
+      );
+      contenidoProcesado = await processText(textoPlano);
+    }
   } else {
     contenidoProcesado = await processText(textoPlano);
   }

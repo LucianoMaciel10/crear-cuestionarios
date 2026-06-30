@@ -76,6 +76,7 @@ function MaterialsPage() {
               key={material.id}
               material={material}
               onDelete={removeMaterial}
+              showDebugInfo={false} // Ocultar info de desarrollo en producción
             />
           ))
         ) : (

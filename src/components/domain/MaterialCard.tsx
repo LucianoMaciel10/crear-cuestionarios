@@ -5,9 +5,14 @@ import Card from "../common/Card";
 type MaterialCardProps = {
   material: IMaterial;
   onDelete: (id: string) => void | Promise<void>;
+  showDebugInfo?: boolean; // Solo para desarrollo
 };
 
-function MaterialCard({ material, onDelete }: MaterialCardProps) {
+function MaterialCard({
+  material,
+  onDelete,
+  showDebugInfo = false,
+}: MaterialCardProps) {
   const { conceptos, definiciones, relaciones } = material.contenidoProcesado;
 
   return (
@@ -32,65 +37,68 @@ function MaterialCard({ material, onDelete }: MaterialCardProps) {
           </Button>
         </div>
 
-        <details className="p-3 bg-gray-50 rounded-md text-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <summary className="cursor-pointer font-medium text-gray-700 dark:text-gray-300">
-            Ver datos procesados
-          </summary>
-          <div className="mt-3 space-y-4">
-            <div>
-              <h4 className="font-semibold text-gray-800 dark:text-gray-200">
-                Conceptos
-              </h4>
-              {conceptos.length > 0 ? (
-                <ul className="list-disc list-inside text-gray-500 dark:text-gray-400">
-                  {conceptos.map((c) => (
-                    <li key={c}>{c}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Sin datos procesados.
-                </p>
-              )}
+        {/* Solo mostrar datos procesados en modo desarrollo */}
+        {showDebugInfo && (
+          <details className="p-3 bg-gray-50 rounded-md text-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <summary className="cursor-pointer font-medium text-gray-700 dark:text-gray-300">
+              Ver datos procesados (solo desarrollo)
+            </summary>
+            <div className="mt-3 space-y-4">
+              <div>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                  Conceptos
+                </h4>
+                {conceptos.length > 0 ? (
+                  <ul className="list-disc list-inside text-gray-500 dark:text-gray-400">
+                    {conceptos.map((c) => (
+                      <li key={c}>{c}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Sin datos procesados.
+                  </p>
+                )}
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                  Definiciones
+                </h4>
+                {definiciones.length > 0 ? (
+                  <ul className="list-disc list-inside text-gray-500 dark:text-gray-400">
+                    {definiciones.map((d) => (
+                      <li key={d.concepto}>
+                        {d.concepto}: {d.definicion}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Sin datos procesados.
+                  </p>
+                )}
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                  Relaciones
+                </h4>
+                {relaciones.length > 0 ? (
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
+                    {relaciones.map((r, index) => (
+                      <li key={index}>
+                        {r.origen} - {r.destino} ({r.tipo}): {r.descripcion}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Sin datos procesados.
+                  </p>
+                )}
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold text-gray-800 dark:text-gray-200">
-                Definiciones
-              </h4>
-              {definiciones.length > 0 ? (
-                <ul className="list-disc list-inside text-gray-500 dark:text-gray-400">
-                  {definiciones.map((d) => (
-                    <li key={d.concepto}>
-                      {d.concepto}: {d.definicion}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Sin datos procesados.
-                </p>
-              )}
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-800 dark:text-gray-200">
-                Relaciones
-              </h4>
-              {relaciones.length > 0 ? (
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
-                  {relaciones.map((r) => (
-                    <li key={r.id}>
-                      {r.origen} - {r.destino} ({r.tipo})
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Sin datos procesados.
-                </p>
-              )}
-            </div>
-          </div>
-        </details>
+          </details>
+        )}
       </div>
     </Card>
   );

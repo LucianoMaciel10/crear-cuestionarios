@@ -32,11 +32,18 @@ export default async function handler(
     // Validar API key
     const apiKey = process.env.MISTRAL_API_KEY;
     if (!apiKey) {
+      console.error("MISTRAL_API_KEY no configurada");
       res.status(500).json({
         error: "MISTRAL_API_KEY no configurada en el servidor.",
+        solution:
+          "Configura la variable de entorno MISTRAL_API_KEY en Vercel o en tu archivo .env.local",
+        docs: "https://vercel.com/docs/environment-variables",
       });
       return;
     }
+
+    console.log("Llamando a Mistral API con modelo:", MISTRAL_MODEL);
+    console.log("Longitud del texto:", truncatedText.length);
 
     // Llamar a la API de Mistral
     const response = await fetch(MISTRAL_API_URL, {
@@ -51,31 +58,59 @@ export default async function handler(
           {
             role: "system",
             content: `
-              Eres un extractor de conceptos y definiciones académicas. 
-              Analiza el texto proporcionado y extrae conceptos clave junto con sus definiciones. 
-              Responde EXCLUSIVAMENTE con un JSON válido, sin texto adicional ni bloques de código markdown. 
-              Formato esperado: 
-              { 
-                "conceptos": string[], 
-                "definiciones": { "concepto": string, "definicion": string }[] 
+              Eres un extractor avanzado de conceptos académicos. 
+              REGLAS ESTRICTAS:
+              1. NO uses backticks o triple comillas
+              2. NO uses formato Markdown
+              3. Responde SOLO con JSON válido, sin texto adicional
+              4. El JSON debe ser parseable directamente por JSON.parse()
+              
+              Analiza el texto y extrae:
+              - Conceptos clave
+              - Sus definiciones precisas
+              - Relaciones entre conceptos (si existen)
+              
+              Formato EXACTO requerido:
+              {
+                "conceptos": ["concepto1", "concepto2"],
+                "definiciones": [
+                  {"concepto": "concepto1", "definicion": "definición..."}
+                ],
+                "relaciones": [
+                  {"concepto1": "A", "concepto2": "B", "tipo": "relación", "descripcion": "descripción..."}
+                ]
               }
+
+              Para relaciones: identifica cómo se relacionan los conceptos (ej: "es un tipo de", "se usa en", "incluye", etc.)
+              Si no hay relaciones claras, devuelve: "relaciones": []
+              
+              IMPORTANTE: Tu respuesta DEBE ser parseable por JSON.parse() sin modificaciones.
             `,
           },
           {
             role: "user",
-            content: truncatedText,
+            content: `Texto a analizar: ${truncatedText}`,
           },
         ],
       }),
     });
 
+    console.log("Respuesta de Mistral - Status:", response.status);
+
     // Verificar respuesta de Mistral
     if (!response.ok) {
-      res.status(502).json({ error: "Error al llamar a la API de Mistral." });
+      const errorText = await response.text();
+      console.error("Error de Mistral API:", response.status, errorText);
+      res.status(502).json({
+        error: "Error al llamar a la API de Mistral.",
+        status: response.status,
+        details: errorText,
+      });
       return;
     }
 
     const data = await response.json();
+    console.log("Respuesta de Mistral:", JSON.stringify(data, null, 2));
 
     // Validar estructura de la respuesta
     if (
@@ -84,20 +119,39 @@ export default async function handler(
       !data.choices[0].message ||
       !data.choices[0].message.content
     ) {
-      res
-        .status(502)
-        .json({ error: "Respuesta inválida de la API de Mistral." });
+      console.error("Respuesta inválida de Mistral - Estructura:", data);
+      res.status(502).json({
+        error: "Respuesta inválida de la API de Mistral.",
+        details: "Estructura de respuesta inesperada",
+        received: data,
+      });
       return;
     }
 
     // Parsear el contenido como JSON
     let result: unknown;
     try {
-      result = JSON.parse(data.choices[0].message.content);
-    } catch {
-      res
-        .status(502)
-        .json({ error: "La respuesta de Mistral no es un JSON válido." });
+      let content = data.choices[0].message.content;
+      console.log("Contenido crudo de Mistral:", content);
+
+      // Intentar limpiar si Mistral devolvió Markdown
+      if (content.startsWith("```")) {
+        // Eliminar backticks y triple comillas si existen
+        content = content.replace(/```(json)?/g, "").trim();
+      }
+
+      result = JSON.parse(content);
+    } catch (parseError) {
+      console.error("Error al parsear JSON de Mistral:", parseError);
+      res.status(502).json({
+        error: "La respuesta de Mistral no es un JSON válido.",
+        details:
+          parseError instanceof Error
+            ? parseError.message
+            : "Error desconocido",
+        suggestion:
+          "Mistral puede estar devolviendo Markdown. Revisar el prompt.",
+      });
       return;
     }
 
@@ -107,18 +161,24 @@ export default async function handler(
       result === null ||
       !("conceptos" in result) ||
       !("definiciones" in result) ||
+      !("relaciones" in result) ||
       !Array.isArray(result.conceptos) ||
-      !Array.isArray(result.definiciones)
+      !Array.isArray(result.definiciones) ||
+      !Array.isArray(result.relaciones)
     ) {
-      res
-        .status(502)
-        .json({ error: "Estructura de respuesta inválida de Mistral." });
+      console.error("Estructura de respuesta inválida:", result);
+      res.status(502).json({
+        error: "Estructura de respuesta inválida de Mistral.",
+        expected: "{ conceptos: string[], definiciones: [], relaciones: [] }",
+        received: result,
+      });
       return;
     }
 
     // Validar tipos de los elementos
     const conceptos = result.conceptos as unknown[];
     const definiciones = result.definiciones as unknown[];
+    const relaciones = result.relaciones as unknown[]; // New line for 'relaciones'
 
     if (
       !conceptos.every((c) => typeof c === "string") ||
@@ -130,25 +190,51 @@ export default async function handler(
           "definicion" in d &&
           typeof d.concepto === "string" &&
           typeof d.definicion === "string",
+      ) ||
+      !relaciones.every(
+        // New check for 'relaciones' array elements
+        (r) =>
+          typeof r === "object" &&
+          r !== null &&
+          "concepto1" in r &&
+          "concepto2" in r &&
+          "tipo" in r &&
+          "descripcion" in r &&
+          typeof r.concepto1 === "string" &&
+          typeof r.concepto2 === "string" &&
+          typeof r.tipo === "string" &&
+          typeof r.descripcion === "string",
       )
     ) {
+      console.error("Tipos de datos inválidos:", {
+        conceptos,
+        definiciones,
+        relaciones,
+      });
       res.status(502).json({
         error: "Tipos de datos inválidos en la respuesta de Mistral.",
+        details:
+          "Conceptos, definiciones y relaciones tienen tipos incorrectos",
       });
       return;
     }
+
+    console.log("Extracción exitosa - Conceptos:", conceptos);
+    console.log("Extracción exitosa - Definiciones:", definiciones.length);
+    console.log("Extracción exitosa - Relaciones:", relaciones.length); // New line
 
     // Responder con éxito
     res.status(200).json({
       conceptos,
       definiciones,
-      relaciones: [],
+      relaciones, // Changed from `relaciones: []` to `relaciones`
     });
   } catch (error) {
     // Manejar errores inesperados
-    console.error("Error en extract-concepts:", error);
-    res
-      .status(502)
-      .json({ error: "Error inesperado al procesar la solicitud." });
+    console.error("Error inesperado en extract-concepts:", error);
+    res.status(502).json({
+      error: "Error inesperado al procesar la solicitud.",
+      details: error instanceof Error ? error.message : "Error desconocido",
+    });
   }
 }

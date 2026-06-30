@@ -64,6 +64,15 @@ class CuestionarioDB extends Dexie {
       flashcards: "id, concept, nextReviewDate, idMateria",
       quizAttempts: "id, questionId, idMateria, topic, answeredAt",
     });
+
+    this.version(7).stores({
+      materiales: "id, nombre, tipo, fechaCarga, idMateria",
+      materias: "id, nombre",
+      etiquetas: "id, nombre",
+      questions: "id, topic, difficulty, idMateria",
+      flashcards: "id, concept, nextReviewDate, idMateria",
+      quizAttempts: "id, questionId, idMateria, topic, answeredAt",
+    });
   }
 }
 
