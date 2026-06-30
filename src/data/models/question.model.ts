@@ -7,4 +7,5 @@ export interface IQuestion {
   explanation?: string;
   difficulty: 'easy' | 'medium' | 'hard';
   topic: string;
+  idMateria?: string;
 }

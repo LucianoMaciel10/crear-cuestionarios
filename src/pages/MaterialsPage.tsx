@@ -3,17 +3,25 @@ import { useMaterials } from "../hooks/useMaterials";
 import MaterialCard from "../components/domain/MaterialCard";
 import AddMaterialModal from "../components/AddMaterialModal";
 import Button from "../components/common/Button";
+import { useParams, useNavigate } from "react-router-dom";
 
 function MaterialsPage() {
-  const { materials, addMaterial, removeMaterial, loading } = useMaterials();
+  const { subjectId } = useParams<{ subjectId: string }>();
+  const navigate = useNavigate();
+  const { materials, addMaterial, removeMaterial, loading } =
+    useMaterials(subjectId);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  if (!subjectId) {
+    return <p>Materia no encontrada.</p>;
+  }
 
   const handleAddMaterial = async (
     nombre: string,
     tipo: "texto" | "pdf" | "docx" | "txt" | "md",
     contenidoOriginal?: string | ArrayBuffer,
   ): Promise<string> => {
-    const id = await addMaterial(nombre, tipo, contenidoOriginal);
+    const id = await addMaterial(nombre, tipo, contenidoOriginal, subjectId);
     setIsModalOpen(false);
     return id;
   };
@@ -37,23 +45,28 @@ function MaterialsPage() {
             Gestiona tus materiales de estudio
           </p>
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Añadir material
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="secondary" onClick={() => navigate("/")}>
+            ← Volver
+          </Button>
+          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+            Añadir material
+          </Button>
+        </div>
       </header>
 
       <section className="grid gap-4">

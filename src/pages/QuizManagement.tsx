@@ -7,43 +7,52 @@ import QuestionList from "../components/domain/QuestionList";
 import GenerateQuestionsButton from "../components/domain/GenerateQuestionsButton";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
+import { useParams, useNavigate } from "react-router-dom";
 
-interface QuizManagementProps {
-  subjectId: string;
-}
-
-const QuizManagement: React.FC<QuizManagementProps> = ({ subjectId }) => {
+const QuizManagement: React.FC = () => {
+  const { subjectId } = useParams<{ subjectId: string }>();
+  const navigate = useNavigate();
   const { materials } = useMaterials(subjectId);
   const [questions, setQuestions] = useState<IQuestion[]>([]);
 
+  useEffect(() => {
+    // Load existing questions from the database
+    const loadQuestions = async () => {
+      if (subjectId) {
+        const existingQuestions =
+          await questionService.getQuestionsBySubject(subjectId);
+        setQuestions(existingQuestions);
+      }
+    };
+    loadQuestions();
+  }, [subjectId]);
+
+  if (!subjectId) {
+    return <p>Materia no encontrada.</p>;
+  }
+
   const handleGenerateQuestions = async () => {
     if (materials.length > 0) {
-      const concepts = materials.flatMap(
-        (material) =>
-          material.contenidoProcesado?.conceptos.map((concept) => ({
-            concept,
-            definition:
-              material.contenidoProcesado?.definiciones.find(
-                (def) => def.concepto === concept,
-              )?.definicion || "",
-          })) || [],
-      );
-      const generatedQuestions = generateBooleanQuestions(concepts);
+      const concepts = materials
+        .flatMap(
+          (material) =>
+            material.contenidoProcesado?.conceptos.map((concept) => ({
+              concept,
+              definition:
+                material.contenidoProcesado?.definiciones.find(
+                  (def) => def.concepto === concept,
+                )?.definicion || "",
+            })) || [],
+        )
+        .filter((c) => c.definition !== "");
+
+      const generatedQuestions = generateBooleanQuestions(concepts, subjectId);
       setQuestions(generatedQuestions);
 
       // Save questions to the database
       await questionService.saveQuestions(generatedQuestions);
     }
   };
-
-  useEffect(() => {
-    // Load existing questions from the database
-    const loadQuestions = async () => {
-      const existingQuestions = await questionService.getAllQuestions();
-      setQuestions(existingQuestions);
-    };
-    loadQuestions();
-  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -80,6 +89,18 @@ const QuizManagement: React.FC<QuizManagementProps> = ({ subjectId }) => {
           </Button>
         </Card>
       )}
+      <div className="flex gap-3 mt-6">
+        <Button variant="secondary" onClick={() => navigate("/")}>
+          ← Volver a Materias
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => navigate(`/cuestionario/${subjectId}`)}
+          disabled={questions.length === 0}
+        >
+          Iniciar práctica
+        </Button>
+      </div>
     </div>
   );
 };

@@ -2,11 +2,14 @@
 import React from "react";
 import { useQuizEngine } from "../hooks/useQuizEngine";
 import QuestionCard from "../components/domain/QuestionCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
 
 const QuizPlayer: React.FC = () => {
+  const { subjectId } = useParams<{ subjectId: string }>();
+  const navigate = useNavigate();
+
   const {
     questions,
     currentQuestionIndex,
@@ -18,8 +21,11 @@ const QuizPlayer: React.FC = () => {
     nextQuestion,
     submitQuiz,
     resetQuiz,
-  } = useQuizEngine();
-  const navigate = useNavigate();
+  } = useQuizEngine(subjectId || "");
+
+  if (!subjectId) {
+    return <p>Materia no encontrada.</p>;
+  }
 
   if (loading) {
     return (
@@ -137,7 +143,7 @@ const QuizPlayer: React.FC = () => {
         question={currentQuestion}
         onAnswer={answerQuestion}
         onNext={nextQuestion}
-        showFeedback={false}
+        showFeedback={answers[currentQuestion.id] !== undefined}
         userAnswer={answers[currentQuestion.id]}
       />
       {currentQuestionIndex === questions.length - 1 && (

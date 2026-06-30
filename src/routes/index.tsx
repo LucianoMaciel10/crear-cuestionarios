@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/MainLayout";
 import Dashboard from "../pages/Dashboard";
 import MaterialsPage from "../pages/MaterialsPage";
 import QuizPlayer from "../pages/QuizPlayer";
+import QuizManagement from "../pages/QuizManagement";
 import Flashcards from "../pages/Flashcards";
 import Statistics from "../pages/Statistics";
 import NotFoundPage from "../pages/NotFoundPage";
@@ -17,12 +18,16 @@ export const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "materiales",
+        path: "materiales/:subjectId",
         element: <MaterialsPage />,
       },
       {
-        path: "cuestionario",
+        path: "cuestionario/:subjectId",
         element: <QuizPlayer />,
+      },
+      {
+        path: "cuestionario-gestion/:subjectId",
+        element: <QuizManagement />,
       },
       {
         path: "flashcards",

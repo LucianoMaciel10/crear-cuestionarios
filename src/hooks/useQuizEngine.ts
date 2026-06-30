@@ -11,7 +11,7 @@ interface QuizState {
   isQuizComplete: boolean;
 }
 
-export function useQuizEngine() {
+export function useQuizEngine(subjectId: string) {
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -20,11 +20,13 @@ export function useQuizEngine() {
     isQuizComplete: false,
   });
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const questions = await questionService.getAllQuestions();
+        const questions =
+          await questionService.getQuestionsBySubject(subjectId);
         setQuizState((prev) => ({ ...prev, questions }));
       } catch (error) {
         console.error("Failed to load questions:", error);
@@ -34,7 +36,7 @@ export function useQuizEngine() {
     };
 
     loadQuestions();
-  }, []);
+  }, [subjectId, refreshKey]);
 
   const answerQuestion = (questionId: string, userAnswer: string) => {
     setQuizState((prev) => {
@@ -48,7 +50,7 @@ export function useQuizEngine() {
     if (!question) return false;
 
     // Comparar la respuesta del usuario con la respuesta correcta
-    return userAnswer === question.correctAnswer;
+    return userAnswer === String(question.correctAnswer);
   };
 
   const nextQuestion = () => {
@@ -94,6 +96,7 @@ export function useQuizEngine() {
       isQuizComplete: false,
     });
     setLoading(true);
+    setRefreshKey((prev) => prev + 1);
   };
 
   return {

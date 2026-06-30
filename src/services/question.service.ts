@@ -32,3 +32,7 @@ export async function removeQuestionsByTopic(topic: string): Promise<void> {
 export async function removeQuestion(id: string): Promise<void> {
   await db.questions.delete(id);
 }
+
+export async function getQuestionsBySubject(subjectId: string): Promise<IQuestion[]> {
+  return db.questions.where('idMateria').equals(subjectId).toArray();
+}

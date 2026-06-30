@@ -20,14 +20,6 @@ function Navbar() {
         Materias
       </NavLink>
       <NavLink
-        to="/materiales"
-        className={({ isActive }) =>
-          `${baseLinkStyles} ${isActive ? activeLinkStyles : inactiveLinkStyles}`
-        }
-      >
-        Materiales
-      </NavLink>
-      <NavLink
         to="/flashcards"
         className={({ isActive }) =>
           `${baseLinkStyles} ${isActive ? activeLinkStyles : inactiveLinkStyles}`
