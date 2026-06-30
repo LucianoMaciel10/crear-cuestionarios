@@ -1,7 +1,6 @@
 // src/services/adaptive-learning/adaptive-engine.ts
-import type { IQuestion } from '../../data/models/question.model';
-import type { ISpacedRepetitionData } from '../../data/models/spaced-repetition.model';
-
+import type { ISpacedRepetitionData } from "../../data/models/spaced-repetition.model";
+import type { IQuizAttempt } from "../../data/models/question.model";
 /**
  * Interfaz para representar el dominio de un tema.
  */
@@ -24,23 +23,21 @@ export interface IWeakPoint {
 
 /**
  * Calcula el dominio por tema basado en el historial de respuestas.
- * @param questions - Lista de preguntas respondidas.
+ * @param attempts - Lista de intentos de quiz.
  * @returns Lista de temas con su nivel de dominio.
  */
-export function calculateTopicMastery(questions: IQuestion[]): ITopicMastery[] {
+export function calculateTopicMastery(
+  attempts: IQuizAttempt[],
+): ITopicMastery[] {
   const topicStats: Record<string, { correct: number; total: number }> = {};
 
-  questions.forEach((question) => {
-    // Verificar si la pregunta tiene un tema y una respuesta correcta
-    if (question.topic && question.correctAnswer !== undefined) {
-      if (!topicStats[question.topic]) {
-        topicStats[question.topic] = { correct: 0, total: 0 };
-      }
-      topicStats[question.topic].total++;
-      // Aquí asumimos que la respuesta del usuario está almacenada en algún campo
-      // Para este ejemplo, asumiremos que la respuesta es correcta si el usuario respondió correctamente
-      // En una implementación real, esto debería basarse en el historial de respuestas del usuario
-      topicStats[question.topic].correct++;
+  attempts.forEach((attempt) => {
+    if (!topicStats[attempt.topic]) {
+      topicStats[attempt.topic] = { correct: 0, total: 0 };
+    }
+    topicStats[attempt.topic].total++;
+    if (attempt.isCorrect) {
+      topicStats[attempt.topic].correct++;
     }
   });
 
@@ -69,7 +66,7 @@ export function detectWeakPoints(topicMastery: ITopicMastery[]): IWeakPoint[] {
     .map((topic) => ({
       topic: topic.topic,
       masteryLevel: topic.masteryLevel,
-      difficulty: topic.masteryLevel < 0.3 ? 'high' : 'medium',
+      difficulty: topic.masteryLevel < 0.3 ? "high" : "medium",
     }));
 
   // Ordenar por nivel de dominio (de menor a mayor)
@@ -83,7 +80,9 @@ export function detectWeakPoints(topicMastery: ITopicMastery[]): IWeakPoint[] {
  * @param flashcards - Lista de flashcards repasadas.
  * @returns Lista de temas con su nivel de dominio.
  */
-export function calculateFlashcardMastery(flashcards: ISpacedRepetitionData[]): ITopicMastery[] {
+export function calculateFlashcardMastery(
+  flashcards: ISpacedRepetitionData[],
+): ITopicMastery[] {
   const topicStats: Record<string, { correct: number; total: number }> = {};
 
   flashcards.forEach((flashcard) => {

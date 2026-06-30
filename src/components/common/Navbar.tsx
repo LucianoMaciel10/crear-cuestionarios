@@ -19,14 +19,6 @@ function Navbar() {
       >
         Materias
       </NavLink>
-      <NavLink
-        to="/estadisticas"
-        className={({ isActive }) =>
-          `${baseLinkStyles} ${isActive ? activeLinkStyles : inactiveLinkStyles}`
-        }
-      >
-        Estadísticas
-      </NavLink>
       <div className="ml-auto">
         <ThemeToggle />
       </div>

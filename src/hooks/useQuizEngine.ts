@@ -1,7 +1,7 @@
 // src/hooks/useQuizEngine.ts
 import { useState, useEffect } from "react";
 import * as questionService from "../services/question.service";
-import type { IQuestion } from "../data/models";
+import type { IQuestion, IQuizAttempt } from "../data/models";
 
 interface QuizState {
   questions: IQuestion[];
@@ -65,20 +65,35 @@ export function useQuizEngine(subjectId: string) {
     }
   };
 
-  const submitQuiz = () => {
+  const submitQuiz = async () => {
     let correct = 0;
     let incorrect = 0;
+    const attempts: IQuizAttempt[] = [];
 
     quizState.questions.forEach((question) => {
       const userAnswer = quizState.answers[question.id];
       if (userAnswer !== undefined) {
-        if (checkAnswer(question.id, userAnswer)) {
+        const isCorrect = checkAnswer(question.id, userAnswer);
+        if (isCorrect) {
           correct++;
         } else {
           incorrect++;
         }
+
+        attempts.push({
+          id: crypto.randomUUID(),
+          questionId: question.id,
+          idMateria: subjectId,
+          topic: question.topic,
+          isCorrect,
+          answeredAt: new Date(),
+        });
       }
     });
+
+    if (attempts.length > 0) {
+      await questionService.saveQuizAttempts(attempts);
+    }
 
     setQuizState((prev) => ({
       ...prev,

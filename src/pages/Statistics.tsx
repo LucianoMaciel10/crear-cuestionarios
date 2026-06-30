@@ -1,10 +1,10 @@
 // src/pages/Statistics.tsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import * as questionService from "../services/question.service";
-import * as flashcardService from "../services/flashcard.service";
+import { useNavigate, useParams } from "react-router-dom";
+import { getQuizAttemptsBySubject } from "../services/question.service";
+import { getFlashcardsBySubject } from "../services/flashcard.service";
 import * as adaptiveEngine from "../services/adaptive-learning/adaptive-engine";
-import type { IQuestion } from "../data/models/question.model";
+import type { IQuizAttempt } from "../data/models/question.model";
 import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
 import TopicMasteryChart from "../components/domain/TopicMasteryChart";
 import WeakPointsList from "../components/domain/WeakPointsList";
@@ -12,7 +12,8 @@ import Button from "../components/common/Button";
 import Card from "../components/common/Card";
 
 const Statistics: React.FC = () => {
-  const [questions, setQuestions] = useState<IQuestion[]>([]);
+  const { subjectId } = useParams<{ subjectId: string }>();
+  const [attempts, setAttempts] = useState<IQuizAttempt[]>([]);
   const [flashcards, setFlashcards] = useState<ISpacedRepetitionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
@@ -20,10 +21,12 @@ const Statistics: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const loadedQuestions = await questionService.getAllQuestions();
-        const loadedFlashcards = await flashcardService.getAllFlashcards();
-        setQuestions(loadedQuestions);
-        setFlashcards(loadedFlashcards);
+        if (subjectId) {
+          const loadedAttempts = await getQuizAttemptsBySubject(subjectId);
+          const loadedFlashcards = await getFlashcardsBySubject(subjectId);
+          setAttempts(loadedAttempts);
+          setFlashcards(loadedFlashcards);
+        }
       } catch (error) {
         console.error("Failed to load data:", error);
       } finally {
@@ -32,7 +35,22 @@ const Statistics: React.FC = () => {
     };
 
     loadData();
-  }, []);
+  }, [subjectId]);
+
+  if (!subjectId) {
+    return <p>Materia no encontrada.</p>;
+  }
+
+  // Calcular dominio por tema
+  const questionMastery = adaptiveEngine.calculateTopicMastery(attempts);
+  const flashcardMastery = adaptiveEngine.calculateFlashcardMastery(flashcards);
+  const combinedMastery = adaptiveEngine.combineMastery(
+    questionMastery,
+    flashcardMastery,
+  );
+
+  // Detectar puntos débiles
+  const weakPoints = adaptiveEngine.detectWeakPoints(combinedMastery);
 
   if (loading) {
     return (
@@ -44,17 +62,6 @@ const Statistics: React.FC = () => {
     );
   }
 
-  // Calcular dominio por tema
-  const questionMastery = adaptiveEngine.calculateTopicMastery(questions);
-  const flashcardMastery = adaptiveEngine.calculateFlashcardMastery(flashcards);
-  const combinedMastery = adaptiveEngine.combineMastery(
-    questionMastery,
-    flashcardMastery,
-  );
-
-  // Detectar puntos débiles
-  const weakPoints = adaptiveEngine.detectWeakPoints(combinedMastery);
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -62,7 +69,7 @@ const Statistics: React.FC = () => {
           Estadísticas de Aprendizaje
         </h1>
         <Button onClick={() => navigate("/")} variant="secondary">
-          Volver al Inicio
+          ← Volver a Materias
         </Button>
       </div>
 
@@ -91,7 +98,7 @@ const Statistics: React.FC = () => {
                 Preguntas respondidas
               </p>
               <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
-                {questions.length}
+                {attempts.length}
               </p>
             </div>
           </div>
@@ -143,7 +150,7 @@ const Statistics: React.FC = () => {
                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                 <path
                   fillRule="evenodd"
-                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-18 0 4 4 0 0118 0z"
                   clipRule="evenodd"
                 />
               </svg>

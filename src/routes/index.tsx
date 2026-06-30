@@ -34,7 +34,7 @@ export const router = createBrowserRouter([
         element: <Flashcards />,
       },
       {
-        path: "estadisticas",
+        path: "estadisticas/:subjectId",
         element: <Statistics />,
       },
       {

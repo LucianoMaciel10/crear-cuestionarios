@@ -1,6 +1,6 @@
 // src/services/question.service.ts
-import { db } from '../data/db/dexie-db';
-import type { IQuestion } from '../data/models';
+import { db } from "../data/db/dexie-db";
+import type { IQuestion, IQuizAttempt } from "../data/models";
 
 /**
  * Obtiene todas las preguntas almacenadas.
@@ -22,7 +22,7 @@ export async function saveQuestions(questions: IQuestion[]): Promise<void> {
  * @param topic - Tema de las preguntas a eliminar.
  */
 export async function removeQuestionsByTopic(topic: string): Promise<void> {
-  await db.questions.where('topic').equals(topic).delete();
+  await db.questions.where("topic").equals(topic).delete();
 }
 
 /**
@@ -33,6 +33,20 @@ export async function removeQuestion(id: string): Promise<void> {
   await db.questions.delete(id);
 }
 
-export async function getQuestionsBySubject(subjectId: string): Promise<IQuestion[]> {
-  return db.questions.where('idMateria').equals(subjectId).toArray();
+export async function getQuestionsBySubject(
+  subjectId: string,
+): Promise<IQuestion[]> {
+  return db.questions.where("idMateria").equals(subjectId).toArray();
+}
+
+export async function saveQuizAttempts(
+  attempts: IQuizAttempt[],
+): Promise<void> {
+  await db.quizAttempts.bulkAdd(attempts);
+}
+
+export async function getQuizAttemptsBySubject(
+  subjectId: string,
+): Promise<IQuizAttempt[]> {
+  return db.quizAttempts.where("idMateria").equals(subjectId).toArray();
 }
