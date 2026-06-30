@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/extract-concepts.ts": {
-      "runtime": "@vercel/node@3.0.28"
+      "runtime": "@vercel/node@3.0.28",
+      "nodeVersion": "20.x"
     }
   },
   "rewrites": [
