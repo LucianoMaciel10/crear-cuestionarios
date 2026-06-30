@@ -5,6 +5,7 @@ import { processText } from "./material-parser/text-processor";
 import { parsePDF } from "./material-parser/pdf-parser";
 import { parseDOCX } from "./material-parser/docx-parser";
 import { saveFlashcardsFromDefinitions } from "./flashcard.service";
+import { extractConceptsWithAI } from "./ai/concept-extraction.service";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -48,7 +49,13 @@ export async function add(
     }
   }
 
-  const contenidoProcesado = await processText(textoPlano);
+  let contenidoProcesado;
+  if (textoPlano !== "") {
+    const aiResult = await extractConceptsWithAI(textoPlano);
+    contenidoProcesado = aiResult || (await processText(textoPlano));
+  } else {
+    contenidoProcesado = await processText(textoPlano);
+  }
 
   if (idMateria && contenidoProcesado.definiciones.length > 0) {
     await saveFlashcardsFromDefinitions(

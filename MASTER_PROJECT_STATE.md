@@ -201,7 +201,6 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2023-11-20: Instalación de dependencias completada.
 - 2023-11-20: Verificación de compilación y type-check exitosos.
 - 2023-11-20: Completados modelos de datos y configuración DB.
-- 2023-11-20: Configuración inicial de TailwindCSS.
 - 2023-11-19: Aprobación final de arquitectura.
 - 2025-02-23: Completada la generación y persistencia de preguntas Verdadero/Falso (Fase 4).
 - 2025-02-23: Completado el Modo de Estudio: Práctica (Fase 5).
@@ -212,6 +211,7 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Rediseño completo de UI con sistema de diseño coherente, mejoras de accesibilidad y dark mode completo.
 - 2025-02-23: Persistencia real de intentos de quiz (IQuizAttempt), corrección del cálculo de dominio por tema en adaptive-engine para usar datos reales en lugar de asumir siempre respuesta correcta, y scopeo de Estadísticas por materia.
 - 2025-02-23: Prevención de preguntas duplicadas al regenerar contenido, y agregado del generador de preguntas de opción múltiple junto al booleano existente.
+- 2025-02-23: Incorporación de extracción de conceptos y definiciones asistida por IA (Mistral, Devstral Medium) mediante función serverless de Vercel como proxy seguro de la API key, con fallback automático al motor regex existente cuando no hay conexión a internet o la IA falla.
 
 ## ⚠️ Funcionalidades Pendientes
 
