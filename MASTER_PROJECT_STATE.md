@@ -211,6 +211,7 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Completada la implementación de Pulido de UI, Modo Oscuro y Optimización (Fase 9).
 - 2025-02-23: Rediseño completo de UI con sistema de diseño coherente, mejoras de accesibilidad y dark mode completo.
 - 2025-02-23: Persistencia real de intentos de quiz (IQuizAttempt), corrección del cálculo de dominio por tema en adaptive-engine para usar datos reales en lugar de asumir siempre respuesta correcta, y scopeo de Estadísticas por materia.
+- 2025-02-23: Prevención de preguntas duplicadas al regenerar contenido, y agregado del generador de preguntas de opción múltiple junto al booleano existente.
 
 ## ⚠️ Funcionalidades Pendientes
 

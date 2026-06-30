@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useMaterials } from "../hooks/useMaterials";
 import { generateBooleanQuestions } from "../services/question-generator/boolean-generator";
+import { generateMultipleChoiceQuestions } from "../services/question-generator/multiple-choice-generator";
 import * as questionService from "../services/question.service";
 import type { IQuestion } from "../data/models";
 import QuestionList from "../components/domain/QuestionList";
@@ -33,6 +34,9 @@ const QuizManagement: React.FC = () => {
 
   const handleGenerateQuestions = async () => {
     if (materials.length > 0) {
+      const existingTopics =
+        await questionService.getExistingTopicsBySubject(subjectId);
+
       const concepts = materials
         .flatMap(
           (material) =>
@@ -44,13 +48,22 @@ const QuizManagement: React.FC = () => {
                 )?.definicion || "",
             })) || [],
         )
-        .filter((c) => c.definition !== "");
+        .filter(
+          (c) =>
+            c.definition !== "" && !existingTopics.has(c.concept.toLowerCase()),
+        );
 
-      const generatedQuestions = generateBooleanQuestions(concepts, subjectId);
-      setQuestions(generatedQuestions);
+      const booleanQuestions = generateBooleanQuestions(concepts, subjectId);
+      const multipleChoiceQuestions = generateMultipleChoiceQuestions(
+        concepts,
+        subjectId,
+      );
+      const allNewQuestions = [...booleanQuestions, ...multipleChoiceQuestions];
 
-      // Save questions to the database
-      await questionService.saveQuestions(generatedQuestions);
+      if (allNewQuestions.length > 0) {
+        await questionService.saveQuestions(allNewQuestions);
+        setQuestions((prev) => [...prev, ...allNewQuestions]);
+      }
     }
   };
 

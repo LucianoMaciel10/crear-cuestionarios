@@ -50,3 +50,10 @@ export async function getQuizAttemptsBySubject(
 ): Promise<IQuizAttempt[]> {
   return db.quizAttempts.where("idMateria").equals(subjectId).toArray();
 }
+
+export async function getExistingTopicsBySubject(
+  subjectId: string,
+): Promise<Set<string>> {
+  const questions = await getQuestionsBySubject(subjectId);
+  return new Set(questions.map((q) => q.topic.toLowerCase()));
+}
