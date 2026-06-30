@@ -142,7 +142,11 @@ const QuizPlayer: React.FC = () => {
       <QuestionCard
         question={currentQuestion}
         onAnswer={answerQuestion}
-        onNext={nextQuestion}
+        onNext={
+          currentQuestionIndex === questions.length - 1
+            ? undefined
+            : nextQuestion
+        }
         showFeedback={answers[currentQuestion.id] !== undefined}
         userAnswer={answers[currentQuestion.id]}
       />

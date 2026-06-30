@@ -1,15 +1,17 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/extract-concepts.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "api/extract-concepts.ts": {
+      "runtime": "@vercel/node"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/extract-concepts",
-      "dest": "api/extract-concepts.ts"
+      "source": "/api/extract-concepts",
+      "destination": "/api/extract-concepts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

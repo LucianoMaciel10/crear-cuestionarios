@@ -7,7 +7,7 @@ import Button from "../common/Button";
 interface QuestionCardProps {
   question: IQuestion;
   onAnswer: (questionId: string, answer: string) => void;
-  onNext: () => void;
+  onNext?: () => void;
   showFeedback?: boolean;
   userAnswer?: string;
 }
@@ -68,7 +68,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           </p>
         </div>
       )}
-      {!showFeedback && selectedAnswer && (
+      {!showFeedback && selectedAnswer && onNext && (
         <div className="mt-4 flex justify-end">
           <Button onClick={onNext} variant="primary">
             Siguiente

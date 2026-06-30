@@ -59,9 +59,6 @@ export function useQuizEngine(subjectId: string) {
         ...prev,
         currentQuestionIndex: prev.currentQuestionIndex + 1,
       }));
-    } else {
-      // Quiz completo
-      setQuizState((prev) => ({ ...prev, isQuizComplete: true }));
     }
   };
 
