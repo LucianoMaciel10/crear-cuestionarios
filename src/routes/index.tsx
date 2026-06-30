@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
         element: <QuizManagement />,
       },
       {
-        path: "flashcards",
+        path: "flashcards/:subjectId",
         element: <Flashcards />,
       },
       {

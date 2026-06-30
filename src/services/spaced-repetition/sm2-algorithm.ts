@@ -57,12 +57,14 @@ export function calculateNextReview(
  * @param concept - Concepto de la flashcard.
  * @param definition - Definición del concepto.
  * @param explanation - Explicación opcional.
+ * @param idMateria - Identificador de la materia.
  * @returns Nueva flashcard con datos de repetición espaciada.
  */
 export function createNewFlashcard(
   concept: string,
   definition: string,
   explanation?: string,
+  idMateria?: string,
 ): ISpacedRepetitionData {
   return {
     id: crypto.randomUUID(),
@@ -74,5 +76,6 @@ export function createNewFlashcard(
     lastReviewDate: null, // No se ha revisado aún
     nextReviewDate: null, // No se ha calculado aún
     repetitionCount: 0, // No se ha repasado aún
+    idMateria,
   };
 }

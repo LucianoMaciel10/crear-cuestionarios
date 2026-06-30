@@ -13,4 +13,5 @@ export interface ISpacedRepetitionData {
   lastReviewDate: Date | null; // Fecha de la última revisión
   nextReviewDate: Date | null; // Fecha de la próxima revisión
   repetitionCount: number; // Número de repasos realizados
+  idMateria?: string;
 }

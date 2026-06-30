@@ -36,3 +36,32 @@ export async function updateFlashcard(
 export async function removeFlashcard(id: string): Promise<void> {
   await db.flashcards.delete(id);
 }
+
+export async function getFlashcardsBySubject(
+  subjectId: string,
+): Promise<ISpacedRepetitionData[]> {
+  return db.flashcards.where("idMateria").equals(subjectId).toArray();
+}
+
+export async function saveFlashcardsFromDefinitions(
+  definitions: { concepto: string; definicion: string }[],
+  idMateria: string,
+): Promise<void> {
+  const existingFlashcards = await getFlashcardsBySubject(idMateria);
+  const existingConcepts = new Set(
+    existingFlashcards.map((c) => c.concept.toLowerCase()),
+  );
+
+  const { createNewFlashcard } =
+    await import("./spaced-repetition/sm2-algorithm");
+
+  const newFlashcards = definitions
+    .filter((def) => !existingConcepts.has(def.concepto.toLowerCase()))
+    .map((def) =>
+      createNewFlashcard(def.concepto, def.definicion, undefined, idMateria),
+    );
+
+  if (newFlashcards.length > 0) {
+    await db.flashcards.bulkAdd(newFlashcards);
+  }
+}

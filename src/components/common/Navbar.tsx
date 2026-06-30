@@ -20,14 +20,6 @@ function Navbar() {
         Materias
       </NavLink>
       <NavLink
-        to="/flashcards"
-        className={({ isActive }) =>
-          `${baseLinkStyles} ${isActive ? activeLinkStyles : inactiveLinkStyles}`
-        }
-      >
-        Flashcards
-      </NavLink>
-      <NavLink
         to="/estadisticas"
         className={({ isActive }) =>
           `${baseLinkStyles} ${isActive ? activeLinkStyles : inactiveLinkStyles}`

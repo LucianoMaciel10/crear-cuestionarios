@@ -1,6 +1,6 @@
 // src/pages/Flashcards.tsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as flashcardService from "../services/flashcard.service";
 import * as sm2Algorithm from "../services/spaced-repetition/sm2-algorithm";
 import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
@@ -8,6 +8,7 @@ import FlashcardFlip from "../components/domain/FlashcardFlip";
 import Button from "../components/common/Button";
 
 const Flashcards: React.FC = () => {
+  const { subjectId } = useParams<{ subjectId: string }>();
   const [flashcards, setFlashcards] = useState<ISpacedRepetitionData[]>([]);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -16,26 +17,9 @@ const Flashcards: React.FC = () => {
   useEffect(() => {
     const loadFlashcards = async () => {
       try {
-        const cards = await flashcardService.getAllFlashcards();
-        if (cards.length === 0) {
-          // Si no hay flashcards, crear algunas de ejemplo
-          const exampleCards = [
-            sm2Algorithm.createNewFlashcard(
-              "Fotosíntesis",
-              "Proceso mediante el cual las plantas convierten la luz solar en energía química.",
-              "Ocurre en los cloroplastos de las células vegetales.",
-            ),
-            sm2Algorithm.createNewFlashcard(
-              "Mitosis",
-              "Proceso de división celular que resulta en dos células hijas genéticamente idénticas.",
-              "Ocurre en cuatro fases: profase, metafase, anafase y telofase.",
-            ),
-          ];
-          for (const card of exampleCards) {
-            await flashcardService.saveFlashcard(card);
-          }
-          setFlashcards(exampleCards);
-        } else {
+        if (subjectId) {
+          const cards =
+            await flashcardService.getFlashcardsBySubject(subjectId);
           setFlashcards(cards);
         }
       } catch (error) {
@@ -46,7 +30,11 @@ const Flashcards: React.FC = () => {
     };
 
     loadFlashcards();
-  }, []);
+  }, [subjectId]);
+
+  if (!subjectId) {
+    return <p>Materia no encontrada.</p>;
+  }
 
   const handleQualityRating = async (quality: number) => {
     if (currentFlashcardIndex >= flashcards.length) return;
@@ -84,7 +72,8 @@ const Flashcards: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-lg text-gray-600 dark:text-gray-400">
-          No hay flashcards disponibles.
+          No hay flashcards para esta materia. Cargá materiales con definiciones
+          para generarlas automáticamente.
         </p>
       </div>
     );

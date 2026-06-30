@@ -4,6 +4,7 @@ import type { IMaterial } from "../data/models/material.model";
 import { processText } from "./material-parser/text-processor";
 import { parsePDF } from "./material-parser/pdf-parser";
 import { parseDOCX } from "./material-parser/docx-parser";
+import { saveFlashcardsFromDefinitions } from "./flashcard.service";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -48,6 +49,13 @@ export async function add(
   }
 
   const contenidoProcesado = await processText(textoPlano);
+
+  if (idMateria && contenidoProcesado.definiciones.length > 0) {
+    await saveFlashcardsFromDefinitions(
+      contenidoProcesado.definiciones,
+      idMateria,
+    );
+  }
 
   const nuevoMaterial: IMaterial = {
     id,

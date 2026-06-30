@@ -45,6 +45,14 @@ class CuestionarioDB extends Dexie {
       questions: "id, topic, difficulty, idMateria",
       flashcards: "id, concept, nextReviewDate",
     });
+
+    this.version(5).stores({
+      materiales: "id, nombre, tipo, fechaCarga",
+      materias: "id, nombre",
+      etiquetas: "id, nombre",
+      questions: "id, topic, difficulty, idMateria",
+      flashcards: "id, concept, nextReviewDate, idMateria",
+    });
   }
 }
 
@@ -54,4 +62,3 @@ export const db = new CuestionarioDB();
 db.open()
   .then(() => console.log("Database opened successfully"))
   .catch((err) => console.error("Failed to open db:", err));
-

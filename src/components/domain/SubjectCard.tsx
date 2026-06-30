@@ -33,6 +33,13 @@ function SubjectCard({ subject, onDelete }: SubjectCardProps) {
         </Button>
         <Button
           variant="secondary"
+          onClick={() => navigate(`/flashcards/${subject.id}`)}
+          size="sm"
+        >
+          Flashcards
+        </Button>
+        <Button
+          variant="secondary"
           onClick={() => void onDelete(subject.id)}
           size="sm"
         >
