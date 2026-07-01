@@ -64,7 +64,7 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
     - Integración con material.service.ts para generación automática
     - Migración de base de datos a versión 8 con nueva tabla knowledgeNodes
     - Coexistencia con arquitectura actual
-  - **Knowledge Engine - Fase 2 (NUEVO):**
+  - \*\*Knowledge Engine - Fase 2 (NUEVO):
     - Migración completa del Question Generator a KnowledgeNodes
     - Generadores de preguntas actualizados para aceptar ambos formatos
     - QuizManagement usa KnowledgeNodes como fuente principal
