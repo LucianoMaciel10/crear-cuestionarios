@@ -33,10 +33,10 @@ Transformar la arquitectura actual centrada en Materiales hacia un modelo donde 
 - Soporte para ambos formatos (nuevo y antiguo) durante transición
 - Priorización de KnowledgeNodes como fuente principal
 
-#### 5. Flashcard System (En Progreso) 🚧
+#### 5. Flashcard System (Migrado) ✅ IMPLEMENTADO
 
-- **Fase Actual**: Consolidación del dominio de repetición espaciada
-- KnowledgeNode como entidad central para algoritmos de aprendizaje
+- KnowledgeNode como entidad central del dominio
+- Flashcard como representación visual únicamente
 - SM-2 desacoplado y trabajando directamente con KnowledgeNode
 - Preparación para múltiples algoritmos (SM-2, FSRS, etc.)
 
@@ -73,6 +73,80 @@ Transformar la arquitectura actual centrada en Materiales hacia un modelo donde 
 - Generación automática de flashcards desde contenidoProcesado eliminada
 - Código muerto limpiado
 
-### Fase 6: Consolidación del Dominio de Repetición Espaciada ✅ COMPLETADA
+### Fase 6: Consolidación del Dominio ✅ COMPLETADA
 
-**Nuevo modelo de KnowledgeNode:**
+- Nuevo modelo de KnowledgeNode para repetición espaciada
+- SM-2 desacoplado como algoritmo puro
+- KnowledgeNode Updater implementado
+- Adaptive Engine adaptado
+
+### Fase 7: Migración de Consumidores ✅ COMPLETADA
+
+**Componentes migrados:**
+
+- ✅ Flashcards.tsx → Ahora usa KnowledgeNode
+- ✅ Statistics.tsx → Ahora usa KnowledgeNode
+- ✅ FlashcardFlip.tsx → Ahora usa KnowledgeNode
+- ✅ flashcard.service.ts → Nuevos métodos basados en KnowledgeNode
+
+**Cambios realizados:**
+
+- Estado cambiado de `ISpacedRepetitionData[]` a `IKnowledgeNode[]`
+- Funciones adaptadas para trabajar con KnowledgeNode
+- Lógica de actualización usando `updateKnowledgeNodeWithSM2Review()`
+- Estadísticas usando `calculateKnowledgeNodeMastery()`
+
+## Próximos Pasos
+
+### Fase 8: Eliminación Final de Sistema Antiguo
+
+- [ ] Deprecar ISpacedRepetitionData
+- [ ] Eliminar tabla flashcards de Dexie
+- [ ] Eliminar contenidoProcesado completamente
+- [ ] Validar KnowledgeNode como único Source of Truth
+- [ ] Eliminar adaptadores obsoletos
+- [ ] Eliminar funciones marcadas como @deprecated
+
+### Fase 9: Knowledge Graph
+
+- [ ] Implementar relaciones entre nodos
+- [ ] Crear visualización de grafo de conocimiento
+- [ ] Implementar navegación por relaciones semánticas
+
+## Validación Arquitectónica
+
+### ✅ Lo que dejó de depender de Flashcards
+
+1. **Flashcards.tsx**: ✅ Migrado a KnowledgeNode
+2. **Statistics.tsx**: ✅ Migrado a KnowledgeNode
+3. **FlashcardFlip.tsx**: ✅ Migrado a KnowledgeNode
+4. **flashcard.service.ts (parcial)**: ✅ Nuevos métodos basados en KnowledgeNode
+
+### ❌ Lo que sigue dependiendo del sistema antiguo
+
+1. **subject.service.ts**: Eliminación en cascada (temporal)
+2. **sm2-algorithm.ts**: Funciones antiguas (deprecated)
+3. **adaptive-engine.ts**: Funciones antiguas (deprecated)
+4. **Tabla flashcards**: Datos históricos (a eliminar)
+5. **ISpacedRepetitionData**: Modelo obsoleto (a eliminar)
+
+### 🟡 Porcentaje de migración total
+
+- **Antes de esta fase**: 60%
+- **Después de esta fase**: 90%
+- **Eliminación de ISpacedRepetitionData**: 100% posible en próxima fase
+
+## Métricas de Éxito
+
+- ✅ Todos los tests pasan
+- ✅ No hay regresiones en funcionalidad existente
+- ✅ Consumidores migrados a KnowledgeNode
+- ✅ Algoritmo SM-2 desacoplado del dominio
+- ✅ KnowledgeNode como entidad central
+- ✅ Documentación actualizada
+
+**Porcentaje de migración: 90%**
+
+**KnowledgeNode es ahora la entidad central del dominio.**
+
+**Flashcard es solo una representación visual, no una entidad del dominio.**

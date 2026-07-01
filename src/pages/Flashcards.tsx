@@ -1,36 +1,40 @@
 // src/pages/Flashcards.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import * as flashcardService from "../services/flashcard.service";
-import * as sm2Algorithm from "../services/spaced-repetition/sm2-algorithm";
-import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
+import * as knowledgeNodeService from "../services/knowledge-node.service";
+import * as knowledgeNodeUpdater from "../services/spaced-repetition/knowledge-node-updater";
+import type { IKnowledgeNode } from "../data/models/knowledge-node.model";
 import FlashcardFlip from "../components/domain/FlashcardFlip";
 import Button from "../components/common/Button";
 
 const Flashcards: React.FC = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
-  const [flashcards, setFlashcards] = useState<ISpacedRepetitionData[]>([]);
-  const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState<number>(0);
+  const [knowledgeNodes, setKnowledgeNodes] = useState<IKnowledgeNode[]>([]);
+  const [currentNodeIndex, setCurrentNodeIndex] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadFlashcards = async () => {
+    const loadKnowledgeNodes = async () => {
       try {
         if (subjectId) {
-          // Usar el nuevo método que combina ambos sistemas
-          const cards =
-            await flashcardService.getAllFlashcardsForSubject(subjectId);
-          setFlashcards(cards);
+          const nodes = await knowledgeNodeService.getAllKnowledgeNodes();
+          // Filtrar solo conceptos y definiciones del subjectId
+          const filteredNodes = nodes.filter(
+            (node) =>
+              node.subjectId === subjectId &&
+              (node.type === "concept" || node.type === "definition"),
+          );
+          setKnowledgeNodes(filteredNodes);
         }
       } catch (error) {
-        console.error("Failed to load flashcards:", error);
+        console.error("Failed to load knowledge nodes:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadFlashcards();
+    loadKnowledgeNodes();
   }, [subjectId]);
 
   if (!subjectId) {
@@ -38,24 +42,24 @@ const Flashcards: React.FC = () => {
   }
 
   const handleQualityRating = async (quality: number) => {
-    if (currentFlashcardIndex >= flashcards.length) return;
+    if (currentNodeIndex >= knowledgeNodes.length) return;
 
-    const currentFlashcard = flashcards[currentFlashcardIndex];
-    const updatedFlashcard = sm2Algorithm.calculateNextReview(
-      currentFlashcard,
+    const currentNode = knowledgeNodes[currentNodeIndex];
+    const updatedNode = knowledgeNodeUpdater.updateKnowledgeNodeWithSM2Review(
+      currentNode,
       quality,
     );
 
-    await flashcardService.updateFlashcard(updatedFlashcard);
+    await knowledgeNodeService.updateKnowledgeNode(updatedNode);
 
     // Actualizar el estado local
-    const updatedFlashcards = [...flashcards];
-    updatedFlashcards[currentFlashcardIndex] = updatedFlashcard;
-    setFlashcards(updatedFlashcards);
+    const updatedNodes = [...knowledgeNodes];
+    updatedNodes[currentNodeIndex] = updatedNode;
+    setKnowledgeNodes(updatedNodes);
 
     // Pasar a la siguiente flashcard
-    if (currentFlashcardIndex < flashcards.length - 1) {
-      setCurrentFlashcardIndex(currentFlashcardIndex + 1);
+    if (currentNodeIndex < knowledgeNodes.length - 1) {
+      setCurrentNodeIndex(currentNodeIndex + 1);
     }
   };
 
@@ -69,7 +73,7 @@ const Flashcards: React.FC = () => {
     );
   }
 
-  if (flashcards.length === 0) {
+  if (knowledgeNodes.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-lg text-gray-600 dark:text-gray-400">
@@ -80,7 +84,7 @@ const Flashcards: React.FC = () => {
     );
   }
 
-  const currentFlashcard = flashcards[currentFlashcardIndex];
+  const currentNode = knowledgeNodes[currentNodeIndex];
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -89,11 +93,11 @@ const Flashcards: React.FC = () => {
           Flashcards
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          {currentFlashcardIndex + 1} de {flashcards.length}
+          {currentNodeIndex + 1} de {knowledgeNodes.length}
         </p>
       </div>
       <FlashcardFlip
-        flashcard={currentFlashcard}
+        knowledgeNode={currentNode}
         onQualityRating={handleQualityRating}
       />
       <div className="mt-6">

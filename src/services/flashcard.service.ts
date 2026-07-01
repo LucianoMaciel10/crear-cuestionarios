@@ -1,10 +1,12 @@
 // src/services/flashcard.service.ts
 import { db } from "../data/db/dexie-db";
 import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
+import type { IKnowledgeNode } from "../data/models/knowledge-node.model";
 import { knowledgeNodeToFlashcard } from "./adapters/knowledge-node-adapter";
 
 /**
  * Obtiene todas las flashcards almacenadas.
+ * @deprecated Usar KnowledgeNode directamente
  */
 export async function getAllFlashcards(): Promise<ISpacedRepetitionData[]> {
   return db.flashcards.toArray();
@@ -12,7 +14,7 @@ export async function getAllFlashcards(): Promise<ISpacedRepetitionData[]> {
 
 /**
  * Guarda una flashcard en la base de datos.
- * @param flashcard - Flashcard a guardar.
+ * @deprecated Usar KnowledgeNode directamente
  */
 export async function saveFlashcard(
   flashcard: ISpacedRepetitionData,
@@ -22,7 +24,7 @@ export async function saveFlashcard(
 
 /**
  * Actualiza una flashcard en la base de datos.
- * @param flashcard - Flashcard actualizada.
+ * @deprecated Usar KnowledgeNode directamente
  */
 export async function updateFlashcard(
   flashcard: ISpacedRepetitionData,
@@ -32,12 +34,16 @@ export async function updateFlashcard(
 
 /**
  * Elimina una flashcard por su ID.
- * @param id - Identificador de la flashcard.
+ * @deprecated Usar KnowledgeNode directamente
  */
 export async function removeFlashcard(id: string): Promise<void> {
   await db.flashcards.delete(id);
 }
 
+/**
+ * Obtiene flashcards por materia.
+ * @deprecated Usar getKnowledgeNodesForSubject() en su lugar
+ */
 export async function getFlashcardsBySubject(
   subjectId: string,
 ): Promise<ISpacedRepetitionData[]> {
@@ -52,42 +58,51 @@ export async function saveFlashcardsFromDefinitions(
   const existingConcepts = new Set(
     existingFlashcards.map((c) => c.concept.toLowerCase()),
   );
-
   const { createNewFlashcard } =
     await import("./spaced-repetition/sm2-algorithm");
-
   const newFlashcards = definitions
     .filter((def) => !existingConcepts.has(def.concepto.toLowerCase()))
     .map((def) =>
       createNewFlashcard(def.concepto, def.definicion, undefined, idMateria),
     );
-
   if (newFlashcards.length > 0) {
     await db.flashcards.bulkAdd(newFlashcards);
   }
 }
 
 /**
+ * Obtiene KnowledgeNodes para flashcards por materia.
+ * @param subjectId - Identificador de la materia
+ * @returns Lista de KnowledgeNodes aptos para flashcards
+ */
+export async function getKnowledgeNodesForSubject(
+  subjectId: string,
+): Promise<IKnowledgeNode[]> {
+  const allNodes = await db.knowledgeNodes.toArray();
+  return allNodes.filter(
+    (node) =>
+      node.subjectId === subjectId &&
+      (node.type === "concept" || node.type === "definition"),
+  );
+}
+
+/**
  * Obtiene flashcards desde KnowledgeNodes para una materia específica.
+ * @deprecated Usar getKnowledgeNodesForSubject() directamente
  * @param subjectId - Identificador de la materia
  * @returns Lista de flashcards convertidas desde KnowledgeNodes
  */
 export async function getFlashcardsFromKnowledgeNodes(
   subjectId: string,
 ): Promise<ISpacedRepetitionData[]> {
-  const knowledgeNodes = await db.knowledgeNodes
-    .where("subjectId")
-    .equals(subjectId)
-    .toArray();
+  const knowledgeNodes = await getKnowledgeNodesForSubject(subjectId);
 
-  return knowledgeNodes
-    .filter((node) => node.type === "concept" || node.type === "definition")
-    .map(knowledgeNodeToFlashcard);
+  return knowledgeNodes.map(knowledgeNodeToFlashcard);
 }
 
 /**
  * Obtiene todas las flashcards (combinando ambos sistemas).
- * Prioriza KnowledgeNodes, luego usa flashcards tradicionales.
+ * @deprecated Usar getKnowledgeNodesForSubject() directamente
  * @param subjectId - Identificador de la materia
  * @returns Lista combinada de flashcards
  */

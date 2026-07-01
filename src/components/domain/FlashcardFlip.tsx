@@ -1,16 +1,16 @@
 // src/components/domain/FlashcardFlip.tsx
 import React, { useState } from "react";
-import type { ISpacedRepetitionData } from "../../data/models/spaced-repetition.model";
+import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
 import QualityButtons from "./QualityButtons";
 import Card from "../common/Card";
 
 interface FlashcardFlipProps {
-  flashcard: ISpacedRepetitionData;
+  knowledgeNode: IKnowledgeNode;
   onQualityRating: (quality: number) => void;
 }
 
 const FlashcardFlip: React.FC<FlashcardFlipProps> = ({
-  flashcard,
+  knowledgeNode,
   onQualityRating,
 }) => {
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const FlashcardFlip: React.FC<FlashcardFlipProps> = ({
             style={{ backfaceVisibility: "hidden" }}
           >
             <h3 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-50">
-              {flashcard.concept}
+              {knowledgeNode.content}
             </h3>
           </div>
           <div
@@ -55,11 +55,11 @@ const FlashcardFlip: React.FC<FlashcardFlipProps> = ({
               Definición:
             </h3>
             <p className="text-center mb-4 text-gray-700 dark:text-gray-300">
-              {flashcard.definition}
+              {knowledgeNode.definition || "Sin definición"}
             </p>
-            {flashcard.explanation && (
+            {knowledgeNode.explanation && (
               <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                <strong>Explicación:</strong> {flashcard.explanation}
+                <strong>Explicación:</strong> {knowledgeNode.explanation}
               </p>
             )}
           </div>
@@ -78,7 +78,9 @@ const FlashcardFlip: React.FC<FlashcardFlipProps> = ({
             {quality >= 3 ? "¡Bien hecho!" : "Sigue practicando"}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Próximo repaso: {flashcard.nextReviewDate?.toLocaleDateString()}
+            Próximo repaso:{" "}
+            {knowledgeNode.metadata.spacedRepetition.currentState.nextReviewDate?.toLocaleDateString() ||
+              "N/A"}
           </p>
         </div>
       )}

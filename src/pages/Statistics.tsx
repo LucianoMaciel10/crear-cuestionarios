@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getQuizAttemptsBySubject } from "../services/question.service";
-import * as flashcardService from "../services/flashcard.service";
+import * as knowledgeNodeService from "../services/knowledge-node.service";
 import * as adaptiveEngine from "../services/adaptive-learning/adaptive-engine";
 import type { IQuizAttempt } from "../data/models/question.model";
-import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
+import type { IKnowledgeNode } from "../data/models/knowledge-node.model";
 import TopicMasteryChart from "../components/domain/TopicMasteryChart";
 import WeakPointsList from "../components/domain/WeakPointsList";
 import Button from "../components/common/Button";
@@ -14,7 +14,7 @@ import Card from "../components/common/Card";
 const Statistics: React.FC = () => {
   const { subjectId } = useParams<{ subjectId: string }>();
   const [attempts, setAttempts] = useState<IQuizAttempt[]>([]);
-  const [flashcards, setFlashcards] = useState<ISpacedRepetitionData[]>([]);
+  const [knowledgeNodes, setKnowledgeNodes] = useState<IKnowledgeNode[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
@@ -23,11 +23,13 @@ const Statistics: React.FC = () => {
       try {
         if (subjectId) {
           const loadedAttempts = await getQuizAttemptsBySubject(subjectId);
-          // Usar el nuevo método que combina ambos sistemas
-          const loadedFlashcards =
-            await flashcardService.getAllFlashcardsForSubject(subjectId);
+          const loadedNodes = await knowledgeNodeService.getAllKnowledgeNodes();
+          // Filtrar solo nodos del subjectId
+          const filteredNodes = loadedNodes.filter(
+            (node) => node.subjectId === subjectId,
+          );
           setAttempts(loadedAttempts);
-          setFlashcards(loadedFlashcards);
+          setKnowledgeNodes(filteredNodes);
         }
       } catch (error) {
         console.error("Failed to load data:", error);
@@ -45,10 +47,11 @@ const Statistics: React.FC = () => {
 
   // Calcular dominio por tema
   const questionMastery = adaptiveEngine.calculateTopicMastery(attempts);
-  const flashcardMastery = adaptiveEngine.calculateFlashcardMastery(flashcards);
-  const combinedMastery = adaptiveEngine.combineMastery(
+  const knowledgeNodeMastery =
+    adaptiveEngine.calculateKnowledgeNodeMastery(knowledgeNodes);
+  const combinedMastery = adaptiveEngine.combineQuestionAndKnowledgeNodeMastery(
     questionMastery,
-    flashcardMastery,
+    knowledgeNodeMastery,
   );
 
   // Detectar puntos débiles
@@ -119,7 +122,7 @@ const Statistics: React.FC = () => {
                 Flashcards repasadas
               </p>
               <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
-                {flashcards.length}
+                {knowledgeNodes.length}
               </p>
             </div>
           </div>

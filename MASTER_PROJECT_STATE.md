@@ -215,21 +215,17 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
-- **Fase 7 del Knowledge Engine**: Migrar servicios para usar KnowledgeNode como fuente principal
+- **Fase 8 del Knowledge Engine**: Eliminación final de sistema antiguo
 
 ## Próximos Pasos (orden según KNOWLEDGE_ENGINE_ROADMAP.md)
 
-1. Completar **Fase 7 del Knowledge Engine** (Migración de Servicios):
-   - [ ] Migrar `flashcard.service.ts` para usar KnowledgeNode como fuente principal
-   - [ ] Migrar componentes UI (Flashcards.tsx, Statistics.tsx)
-   - [ ] Eliminar dependencia de ISpacedRepetitionData en servicios
-   - [ ] Mantener compatibilidad durante transición
-
-2. **Fase 8 del Knowledge Engine**: Eliminación Final
+1. Completar **Fase 8 del Knowledge Engine** (Eliminación Final):
    - [ ] Deprecar ISpacedRepetitionData
    - [ ] Eliminar tabla flashcards de Dexie
    - [ ] Eliminar contenidoProcesado completamente
    - [ ] Validar KnowledgeNode como único Source of Truth
+   - [ ] Eliminar adaptadores obsoletos
+   - [ ] Eliminar funciones marcadas como @deprecated
 
 ## Estado del Knowledge Engine
 
@@ -239,23 +235,25 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - ✅ QuizManagement (gestión de cuestionarios)
 - ✅ Knowledge Extraction Service (extracción de conocimiento)
 - ✅ KnowledgeNode Service (gestión de nodos)
-- ✅ Flashcard System (preparación para migración)
+- ✅ Flashcard System (migrado a KnowledgeNode)
 - ✅ SM-2 Algorithm (desacoplado y puro)
 - ✅ KnowledgeNode Updater (actualización de nodos)
+- ✅ Adaptive Engine (adaptado a KnowledgeNode)
 
-### Código legado eliminado:
+### Consumidores migrados:
 
-- ✅ `IFlashcard` (modelo completo eliminado)
-- ✅ `relaciones` en contenidoProcesado (campo eliminado)
-- ✅ Generación automática de flashcards desde contenidoProcesado (eliminada)
-- ✅ Imports y código muerto (limpiado)
+- ✅ Flashcards.tsx → KnowledgeNode
+- ✅ Statistics.tsx → KnowledgeNode
+- ✅ FlashcardFlip.tsx → KnowledgeNode
+- ✅ flashcard.service.ts → Métodos basados en KnowledgeNode
 
 ### Código legado pendiente:
 
-- ❌ `ISpacedRepetitionData` (aún usado en UI y algunos servicios)
-- ❌ `sm2-algorithm.ts` (versión antigua aún en uso)
-- ❌ Componentes UI (basados en modelo antiguo)
-- ❌ Tabla `flashcards` en Dexie (aún tiene datos)
+- ❌ `ISpacedRepetitionData` (modelo obsoleto)
+- ❌ `sm2-algorithm.ts` (funciones antiguas)
+- ❌ `adaptive-engine.ts` (funciones antiguas)
+- ❌ `subject.service.ts` (eliminación en cascada)
+- ❌ Tabla `flashcards` en Dexie
 
 ### Consolidación del Dominio: ✅ COMPLETADA
 
