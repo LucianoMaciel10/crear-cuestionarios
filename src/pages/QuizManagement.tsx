@@ -49,41 +49,19 @@ const QuizManagement: React.FC = () => {
         knowledgeNodes.push(...nodes);
       }
 
-      // Si hay KnowledgeNodes, usarlos como fuente principal
-      // Si no, caer al formato antiguo para compatibilidad
-      const concepts =
-        knowledgeNodes.length > 0
-          ? knowledgeNodes
-              .filter(
-                (node) => node.type === "definition" || node.type === "concept",
-              )
-              .map((node) => {
-                if (node.type === "definition") {
-                  const [concept, definition] = node.content.split(": ");
-                  return { concept, definition };
-                }
-                return { concept: node.content, definition: "" };
-              })
-              .filter(
-                (c) =>
-                  c.concept && !existingTopics.has(c.concept.toLowerCase()),
-              )
-          : materials
-              .flatMap(
-                (material) =>
-                  material.contenidoProcesado?.conceptos.map((concept) => ({
-                    concept,
-                    definition:
-                      material.contenidoProcesado?.definiciones.find(
-                        (def) => def.concepto === concept,
-                      )?.definicion || "",
-                  })) || [],
-              )
-              .filter(
-                (c) =>
-                  c.definition !== "" &&
-                  !existingTopics.has(c.concept.toLowerCase()),
-              );
+      // Usar KnowledgeNodes como fuente principal
+      const concepts = knowledgeNodes
+        .filter((node) => node.type === "definition" || node.type === "concept")
+        .map((node) => {
+          if (node.type === "definition") {
+            const [concept, definition] = node.content.split(": ");
+            return { concept, definition };
+          }
+          return { concept: node.content, definition: "" };
+        })
+        .filter(
+          (c) => c.concept && !existingTopics.has(c.concept.toLowerCase()),
+        );
 
       const booleanQuestions = generateBooleanQuestions(concepts, subjectId);
       const multipleChoiceQuestions = generateMultipleChoiceQuestions(

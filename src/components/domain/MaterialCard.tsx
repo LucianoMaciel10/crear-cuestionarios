@@ -1,6 +1,8 @@
 // src/components/domain/MaterialCard.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { IMaterial } from "../../data/models/material.model";
+import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
+import * as knowledgeNodeService from "../../services/knowledge-node.service";
 import Card from "../common/Card";
 
 interface MaterialCardProps {
@@ -14,7 +16,22 @@ const MaterialCard: React.FC<MaterialCardProps> = ({
   onClick,
   showDebugInfo = false,
 }: MaterialCardProps) => {
-  const { conceptos, definiciones } = material.contenidoProcesado;
+  const [knowledgeNodes, setKnowledgeNodes] = useState<IKnowledgeNode[]>([]);
+
+  useEffect(() => {
+    const loadKnowledgeNodes = async () => {
+      const nodes = await knowledgeNodeService.getKnowledgeNodesByMaterial(
+        material.id,
+      );
+      setKnowledgeNodes(nodes);
+    };
+    loadKnowledgeNodes();
+  }, [material.id]);
+
+  const concepts = knowledgeNodes.filter((node) => node.type === "concept");
+  const definitions = knowledgeNodes.filter(
+    (node) => node.type === "definition",
+  );
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -30,10 +47,10 @@ const MaterialCard: React.FC<MaterialCardProps> = ({
 
         <div className="mb-4">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-            <strong>Conceptos:</strong> {conceptos.length}
+            <strong>Conceptos:</strong> {concepts.length}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            <strong>Definiciones:</strong> {definiciones.length}
+            <strong>Definiciones:</strong> {definitions.length}
           </p>
         </div>
 

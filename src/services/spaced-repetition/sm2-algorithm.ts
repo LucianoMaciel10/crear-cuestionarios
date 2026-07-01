@@ -1,81 +1,101 @@
 // src/services/spaced-repetition/sm2-algorithm.ts
-import type { ISpacedRepetitionData } from "../../data/models/spaced-repetition.model";
+import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
 
 /**
- * Calcula la próxima fecha de repaso utilizando el algoritmo SM-2.
- * @param card - Datos de la flashcard.
- * @param quality - Calidad de la respuesta (0-5).
- * @returns Datos actualizados de la flashcard.
+ * Calcula el próximo estado usando el algoritmo SM-2 para KnowledgeNode
  */
-export function calculateNextReview(
-  card: ISpacedRepetitionData,
+export function calculateNextReviewForKnowledgeNode(
+  node: IKnowledgeNode,
   quality: number,
-): ISpacedRepetitionData {
+): IKnowledgeNode {
   const today = new Date();
-
-  // Asegurarse de que la calidad esté en el rango válido (0-5)
   const clampedQuality = Math.max(0, Math.min(5, quality));
 
-  // Actualizar el factor de facilidad (EF)
+  const currentState = node.metadata.spacedRepetition.currentState;
   const newEaseFactor =
     clampedQuality >= 3
       ? Math.max(
           1.3,
-          card.easeFactor +
+          currentState.easeFactor +
             0.1 -
             (5 - clampedQuality) * (0.08 + (5 - clampedQuality) * 0.02),
         )
-      : Math.max(1.3, card.easeFactor - 0.2);
+      : Math.max(1.3, currentState.easeFactor - 0.2);
 
-  // Calcular el nuevo intervalo de repetición
-  const newRepetitionInterval =
-    card.repetitionCount === 0
+  const newInterval =
+    currentState.repetitionCount === 0
       ? 1
-      : card.repetitionCount === 1
+      : currentState.repetitionCount === 1
         ? 6
-        : Math.ceil(card.repetitionInterval * newEaseFactor);
+        : Math.ceil((currentState.sm2?.interval || 0) * newEaseFactor);
 
-  // Calcular la próxima fecha de repaso
   const nextReviewDate = new Date(today);
-  nextReviewDate.setDate(today.getDate() + newRepetitionInterval);
+  nextReviewDate.setDate(today.getDate() + newInterval);
 
-  // Actualizar el contador de repasos
-  const newRepetitionCount = clampedQuality >= 3 ? card.repetitionCount + 1 : 0;
+  const newRepetitionCount =
+    clampedQuality >= 3 ? currentState.repetitionCount + 1 : 0;
 
   return {
-    ...card,
-    easeFactor: newEaseFactor,
-    repetitionInterval: newRepetitionInterval,
-    lastReviewDate: today,
-    nextReviewDate,
-    repetitionCount: newRepetitionCount,
+    ...node,
+    metadata: {
+      ...node.metadata,
+      spacedRepetition: {
+        ...node.metadata.spacedRepetition,
+        currentState: {
+          ...currentState,
+          easeFactor: newEaseFactor,
+          stability: newInterval,
+          difficulty: newEaseFactor,
+          repetitionCount: newRepetitionCount,
+          lastReviewDate: today,
+          nextReviewDate,
+          sm2: {
+            interval: newInterval,
+          },
+        },
+      },
+    },
   };
 }
 
 /**
- * Crea una nueva flashcard con valores iniciales para el algoritmo SM-2.
- * @param concept - Concepto de la flashcard.
- * @param definition - Definición del concepto.
- * @param explanation - Explicación opcional.
- * @param idMateria - Identificador de la materia.
- * @returns Nueva flashcard con datos de repetición espaciada.
+ * Crea un nuevo KnowledgeNode con valores iniciales para SM-2
  */
-export function createNewFlashcard(
+export function createNewKnowledgeNode(
   concept: string,
   definition: string,
   explanation?: string,
-  idMateria?: string,
-): ISpacedRepetitionData {
+  subjectId?: string,
+): IKnowledgeNode {
   return {
     id: crypto.randomUUID(),
-    concept,
+    type: "concept",
+    content: concept,
     definition,
     explanation,
-    easeFactor: 2.5, // Factor de facilidad inicial
-    repetitionInterval: 0, // Intervalo inicial (0 días)
-    lastReviewDate: null, // No se ha revisado aún
-    nextReviewDate: null, // No se ha calculado aún
-    repetitionCount: 0, // No se ha repasado aún
-    idMateria,
+    subjectId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    metadata: {
+      extraction: {
+        confidence: 1.0,
+        sourceType: "manual",
+      },
+      spacedRepetition: {
+        algorithm: "sm2",
+        currentState: {
+          easeFactor: 2.5,
+          stability: 0,
+          difficulty: 2.5,
+          repetitionCount: 0,
+          lastReviewDate: null,
+          nextReviewDate: null,
+          sm2: {
+            interval: 0,
+          },
+        },
+        reviewHistory: [],
+      },
+    },
   };
 }

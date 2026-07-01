@@ -48,24 +48,18 @@ export async function addMaterial(
   }
 
   // Extraer conocimiento usando el nuevo servicio
-  const extractionResult = await extractKnowledgeFromMaterial(
-    crypto.randomUUID(),
-    textoPlano,
-  );
-  // Extraer contenido procesado del resultado para compatibilidad
-  const contenidoProcesado = extractionResult.legacyContent || {
-    conceptos: [],
-    definiciones: [],
-  };
+  await extractKnowledgeFromMaterial(crypto.randomUUID(), textoPlano, {
+    sourceMaterialId: crypto.randomUUID(),
+    sourceType: "ai",
+  });
 
-  // Crear material
+  // Crear material sin contenidoProcesado
   const id = crypto.randomUUID();
   const material: IMaterial = {
     id,
     nombre,
     tipo,
     contenidoOriginal,
-    contenidoProcesado,
     fechaCarga: new Date(),
     idMateria,
   };

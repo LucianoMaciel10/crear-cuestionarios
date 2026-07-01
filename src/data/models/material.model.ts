@@ -5,7 +5,6 @@ export interface IMaterial {
   nombre: string;
   tipo: "texto" | "pdf" | "docx" | "txt" | "md";
   contenidoOriginal?: string | ArrayBuffer;
-  contenidoProcesado: IContenidoProcesado;
   fechaCarga: Date;
   idMateria?: string;
 }

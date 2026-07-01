@@ -1,10 +1,10 @@
+// src/data/db/dexie-db.ts
 import { Dexie } from "dexie";
 import type {
   IMaterial,
   IMateria,
   IEtiqueta,
   IQuestion,
-  ISpacedRepetitionData,
   IQuizAttempt,
   IKnowledgeNode,
 } from "../models";
@@ -14,7 +14,6 @@ class CuestionarioDB extends Dexie {
   materias!: Dexie.Table<IMateria, string>;
   etiquetas!: Dexie.Table<IEtiqueta, string>;
   questions!: Dexie.Table<IQuestion, string>;
-  flashcards!: Dexie.Table<ISpacedRepetitionData, string>;
   quizAttempts!: Dexie.Table<IQuizAttempt, string>;
   knowledgeNodes!: Dexie.Table<IKnowledgeNode, string>;
 
@@ -39,7 +38,7 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty",
-      flashcards: "id, concept, nextReviewDate",
+      quizAttempts: "id, questionId, idMateria, topic, answeredAt",
     });
 
     this.version(4).stores({
@@ -47,7 +46,7 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty",
-      flashcards: "id, concept, nextReviewDate",
+      quizAttempts: "id, questionId, idMateria, topic, answeredAt",
     });
 
     this.version(5).stores({
@@ -55,7 +54,7 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty, idMateria",
-      flashcards: "id, concept, nextReviewDate, idMateria",
+      quizAttempts: "id, questionId, idMateria, topic, answeredAt",
     });
 
     this.version(6).stores({
@@ -63,7 +62,6 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty, idMateria",
-      flashcards: "id, concept, nextReviewDate, idMateria",
       quizAttempts: "id, questionId, idMateria, topic, answeredAt",
     });
 
@@ -72,7 +70,6 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty, idMateria",
-      flashcards: "id, concept, nextReviewDate, idMateria",
       quizAttempts: "id, questionId, idMateria, topic, answeredAt",
     });
 
@@ -81,7 +78,6 @@ class CuestionarioDB extends Dexie {
       materias: "id, nombre",
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty, idMateria",
-      flashcards: "id, concept, nextReviewDate, idMateria",
       quizAttempts: "id, questionId, idMateria, topic, answeredAt",
       knowledgeNodes: "id, type, content, sourceMaterialId, createdAt",
     });
@@ -90,7 +86,6 @@ class CuestionarioDB extends Dexie {
 
 export const db = new CuestionarioDB();
 
-// Validación de conexión
 db.open()
   .then(() => console.log("Database opened successfully"))
   .catch((err) => console.error("Failed to open db:", err));

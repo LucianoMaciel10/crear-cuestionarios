@@ -42,10 +42,6 @@ export async function remove(id: string): Promise<void> {
     .where("idMateria")
     .equals(id)
     .primaryKeys();
-  const flashcardsIds = await db.flashcards
-    .where("idMateria")
-    .equals(id)
-    .primaryKeys();
   const attemptsIds = await db.quizAttempts
     .where("idMateria")
     .equals(id)
@@ -53,7 +49,6 @@ export async function remove(id: string): Promise<void> {
 
   await db.materiales.bulkDelete(materialesIds as string[]);
   await db.questions.bulkDelete(questionsIds as string[]);
-  await db.flashcards.bulkDelete(flashcardsIds as string[]);
   await db.quizAttempts.bulkDelete(attemptsIds as string[]);
   await db.materias.delete(id);
 }
