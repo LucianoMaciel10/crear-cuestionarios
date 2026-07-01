@@ -18,8 +18,9 @@ const Flashcards: React.FC = () => {
     const loadFlashcards = async () => {
       try {
         if (subjectId) {
+          // Usar el nuevo método que combina ambos sistemas
           const cards =
-            await flashcardService.getFlashcardsBySubject(subjectId);
+            await flashcardService.getAllFlashcardsForSubject(subjectId);
           setFlashcards(cards);
         }
       } catch (error) {

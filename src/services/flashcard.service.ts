@@ -1,6 +1,7 @@
 // src/services/flashcard.service.ts
 import { db } from "../data/db/dexie-db";
 import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
+import { knowledgeNodeToFlashcard } from "./adapters/knowledge-node-adapter";
 
 /**
  * Obtiene todas las flashcards almacenadas.
@@ -64,4 +65,43 @@ export async function saveFlashcardsFromDefinitions(
   if (newFlashcards.length > 0) {
     await db.flashcards.bulkAdd(newFlashcards);
   }
+}
+
+/**
+ * Obtiene flashcards desde KnowledgeNodes para una materia específica.
+ * @param subjectId - Identificador de la materia
+ * @returns Lista de flashcards convertidas desde KnowledgeNodes
+ */
+export async function getFlashcardsFromKnowledgeNodes(
+  subjectId: string,
+): Promise<ISpacedRepetitionData[]> {
+  const knowledgeNodes = await db.knowledgeNodes
+    .where("subjectId")
+    .equals(subjectId)
+    .toArray();
+
+  return knowledgeNodes
+    .filter((node) => node.type === "concept" || node.type === "definition")
+    .map(knowledgeNodeToFlashcard);
+}
+
+/**
+ * Obtiene todas las flashcards (combinando ambos sistemas).
+ * Prioriza KnowledgeNodes, luego usa flashcards tradicionales.
+ * @param subjectId - Identificador de la materia
+ * @returns Lista combinada de flashcards
+ */
+export async function getAllFlashcardsForSubject(
+  subjectId: string,
+): Promise<ISpacedRepetitionData[]> {
+  // Primero intentar obtener desde KnowledgeNodes
+  const knowledgeNodeFlashcards =
+    await getFlashcardsFromKnowledgeNodes(subjectId);
+
+  if (knowledgeNodeFlashcards.length > 0) {
+    return knowledgeNodeFlashcards;
+  }
+
+  // Si no hay KnowledgeNodes, usar el sistema tradicional
+  return getFlashcardsBySubject(subjectId);
 }

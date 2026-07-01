@@ -215,13 +215,54 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
-- **Fase 3 del Knowledge Engine:** Migrar componentes restantes para eliminar dependencias de contenidoProcesado
+- **Fase 4 del Knowledge Engine**: Finalizar migración de flashcards a KnowledgeNodes
 
 ## Próximos Pasos (orden según KNOWLEDGE_ENGINE_ROADMAP.md)
 
-1. Completar **Fase 3 del Knowledge Engine** (Consolidación).
+1. Completar **Fase 4 del Knowledge Engine** (Preparación para Flashcards - En Progreso):
+   - [x] Ampliar IKnowledgeNode con campos necesarios para flashcards
+   - [x] Crear adaptadores bidireccionales entre KnowledgeNodes y flashcards
+   - [x] Actualizar servicios para soportar ambos sistemas
+   - [x] Modificar componentes para usar nuevo sistema (sin breaking changes)
+   - [ ] Implementar sincronización bidireccional entre flashcards y KnowledgeNodes
+   - [ ] Crear servicio de migración para convertir flashcards existentes a KnowledgeNodes
+   - [ ] Actualizar algoritmo SM-2 para trabajar directamente con KnowledgeNodes
 
-   > Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `KNOWLEDGE_ENGINE_ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
+2. **Fase 5 del Knowledge Engine**: Eliminación de sistema antiguo
+   - [ ] Deprecar IFlashcard y ISpacedRepetitionData
+   - [ ] Eliminar tabla flashcards de Dexie
+   - [ ] Actualizar todos los componentes para usar exclusivamente KnowledgeNodes
+
+3. **Fase 6 del Knowledge Engine**: Knowledge Graph
+   - [ ] Implementar relaciones entre nodos
+   - [ ] Crear visualización de grafo de conocimiento
+   - [ ] Implementar navegación por relaciones semánticas
+
+## Estado del Knowledge Engine
+
+### Componentes ya migrados a Knowledge Engine:
+
+- ✅ Question Generator (generación de preguntas)
+- ✅ QuizManagement (gestión de cuestionarios)
+- ✅ Knowledge Extraction Service (extracción de conocimiento)
+- ✅ KnowledgeNode Service (gestión de nodos)
+
+### Componentes en transición:
+
+- 🚧 Flashcard System (50% completado)
+  - Adaptadores creados
+  - Servicios actualizados
+  - Componentes modificados para usar ambos sistemas
+  - Falta sincronización bidireccional y migración de datos
+
+### Componentes aún en sistema antiguo:
+
+- ❌ Statistics (parcialmente migrado - usa ambos sistemas)
+- ❌ Flashcards page (parcialmente migrado - usa ambos sistemas)
+
+### Siguiente fase específica:
+
+**Finalizar la migración del sistema de flashcards para que KnowledgeNodes sea la única fuente de verdad, manteniendo compatibilidad durante la transición.**
 
 ## Pendiente de decisión
 

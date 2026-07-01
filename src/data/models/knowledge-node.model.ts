@@ -10,14 +10,17 @@
  */
 export interface IKnowledgeNode {
   id: string;
-  type: 'concept' | 'definition' | 'relationship' | 'example';
+  type: "concept" | "definition" | "relationship" | "example";
   content: string;
+  definition?: string; // Definición específica para flashcards
+  explanation?: string; // Explicación adicional para flashcards
+  subjectId?: string; // Referencia a la materia
   sourceMaterialId?: string; // Referencia al material original de donde se extrajo
   createdAt: Date;
   updatedAt: Date;
   metadata: {
     confidence: number; // Confianza en la extracción (0-1)
-    sourceType: 'ai' | 'regex' | 'manual'; // Método de extracción
+    sourceType: "ai" | "regex" | "manual"; // Método de extracción
     // Datos para repetición espaciada (reemplaza IFlashcard)
     easeFactor?: number;
     repetitionInterval?: number;

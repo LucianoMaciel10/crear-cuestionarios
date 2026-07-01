@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getQuizAttemptsBySubject } from "../services/question.service";
-import { getFlashcardsBySubject } from "../services/flashcard.service";
+import * as flashcardService from "../services/flashcard.service";
 import * as adaptiveEngine from "../services/adaptive-learning/adaptive-engine";
 import type { IQuizAttempt } from "../data/models/question.model";
 import type { ISpacedRepetitionData } from "../data/models/spaced-repetition.model";
@@ -23,7 +23,9 @@ const Statistics: React.FC = () => {
       try {
         if (subjectId) {
           const loadedAttempts = await getQuizAttemptsBySubject(subjectId);
-          const loadedFlashcards = await getFlashcardsBySubject(subjectId);
+          // Usar el nuevo método que combina ambos sistemas
+          const loadedFlashcards =
+            await flashcardService.getAllFlashcardsForSubject(subjectId);
           setAttempts(loadedAttempts);
           setFlashcards(loadedFlashcards);
         }
