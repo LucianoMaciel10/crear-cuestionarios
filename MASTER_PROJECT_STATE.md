@@ -4,8 +4,8 @@
 
 Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción con IA) funcional e infraestructura de navegación completa.
 
-- **Fase actual:** Fase 10 (Transición a Knowledge Engine - Iniciada)
-- **Avance aproximado:** 87% (Knowledge Engine iniciado, coexistencia con arquitectura actual)
+- **Fase actual:** Fase 11 (Consolidación del Knowledge Engine - Completada)
+- **Avance aproximado:** 90% (Question Generator migrado a KnowledgeNodes)
 
 ## Arquitectura
 
@@ -18,13 +18,13 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 - `src/hooks/`: useMaterials, useSubjects, useQuizEngine, useTheme, useToast
 - `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement, QuizPlayer, Flashcards, Statistics
 - `src/routes/`: index.tsx (Router configuración)
-- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/, ai/, knowledge-node.service (NUEVO)
+- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/, ai/, knowledge-node.service
 - `src/mocks/`: ai-mock.ts
 - `api/`: extract-concepts.ts (función serverless para IA)
 
 ### Modelos de datos
 
-- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`, `IFlashcard`, `ISpacedRepetitionData`, `ITopicMastery`, `IWeakPoint`, `IKnowledgeNode` (NUEVO)
+- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`, `IFlashcard`, `ISpacedRepetitionData`, `ITopicMastery`, `IWeakPoint`, `IKnowledgeNode`
 
 ### Nuevos Componentes
 
@@ -37,7 +37,7 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 - `concept-extraction.service.ts`: Servicio para extracción de conceptos con IA
 - `ai-mock.ts`: Mock para desarrollo local sin dependencias externas
-- `knowledge-node.service.ts`: Servicio para gestión de nodos de conocimiento (NUEVO)
+- `knowledge-node.service.ts`: Servicio para gestión de nodos de conocimiento
 
 ## Funcionalidades
 
@@ -60,43 +60,39 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
     - Fallback automático a expresiones regulares
   - **Knowledge Engine - Fase 1 (NUEVO):**
     - Implementación de IKnowledgeNode como entidad base
-    - Servicio knowledge-node.service.ts para gestión de nodos
+    - Servicio knowledge-node.service.ts con CRUD completo
     - Integración con material.service.ts para generación automática
-    - Migración de base de datos (versión 8 de Dexie)
+    - Migración de base de datos a versión 8 con nueva tabla knowledgeNodes
     - Coexistencia con arquitectura actual
+  - **Knowledge Engine - Fase 2 (NUEVO):**
+    - Migración completa del Question Generator a KnowledgeNodes
+    - Generadores de preguntas actualizados para aceptar ambos formatos
+    - QuizManagement usa KnowledgeNodes como fuente principal
+    - Estrategia de transición limpia con fallback al formato antiguo
+    - Consolidación del Knowledge Engine como nueva fuente de verdad
 
 - **Parcialmente terminadas / pendientes:**
   - Generación de cuestionarios (pendiente).
 
 ## Mejoras Recientes
 
-### Knowledge Engine - Fase 1: Introducción de KnowledgeNode
+### Knowledge Engine - Fase 2: Migración del Question Generator
 
-1. **Nuevo Modelo de Datos** (`src/data/models/knowledge-node.model.ts`):
-   - Interfaz IKnowledgeNode para representar unidades atómicas de conocimiento
-   - Tipos: concept, definition, relationship, example
-   - Metadata para repetición espaciada (reemplazo futuro de IFlashcard)
-   - Confianza y fuente de extracción
+1. **Generadores de Preguntas Actualizados**:
+   - `boolean-generator.ts`: Soporte para KnowledgeNodes y formato antiguo
+   - `multiple-choice-generator.ts`: Normalización de entrada para ambos formatos
+   - Funciones ahora detectan automáticamente el tipo de entrada
 
-2. **Nuevo Servicio** (`src/services/knowledge-node.service.ts`):
-   - CRUD completo para nodos de conocimiento
-   - Funciones para crear nodos desde conceptos y definiciones
-   - Asociaciones con materiales fuente
-   - Eliminación en cascada
-3. **Integración con Material Service**:
-   - Generación automática de KnowledgeNodes al procesar materiales
-   - Asociaciones bidireccionales entre materiales y nodos
-   - Eliminación de nodos al borrar materiales
+2. **QuizManagement Migrado**:
+   - Obtiene KnowledgeNodes asociados a materiales
+   - Prioriza KnowledgeNodes como fuente principal de conocimiento
+   - Fallback automático al formato antiguo si no hay KnowledgeNodes
+   - Compatibilidad total con materiales existentes
 
-4. **Migración de Base de Datos**:
-   - Nueva tabla knowledgeNodes en Dexie.js
-   - Versión 8 de la base de datos
-   - Compatibilidad con datos existentes
-
-5. **Coexistencia con Arquitectura Actual**:
-   - Sistema actual de materiales y flashcards sigue funcionando
-   - KnowledgeNodes se generan en paralelo sin interferir
-   - Preparación para migración incremental
+3. **Estrategia de Transición**:
+   - Ambos sistemas coexisten sin conflictos
+   - Migración incremental sin breaking changes
+   - Preparación para eliminación definitiva del modelo antiguo
 
 ### Sistema de Notificaciones
 
@@ -133,6 +129,7 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - Detección automática de entorno para desarrollo vs producción.
 - Mock local para desarrollo sin dependencias externas.
 - Introducción gradual de Knowledge Engine sin romper funcionalidad existente.
+- Estrategia de transición limpia con soporte para ambos formatos.
 
 ## Diseño Visual (Rediseño Fase 9)
 
@@ -206,7 +203,7 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 3. **QuizPlayer.tsx**: Visualización de resultados
 4. **Flashcards.tsx**: Diseño de tarjetas
 5. **Statistics.tsx**: Visualización de datos
-6. **QuizManagement.tsx**: Empty state mejorado
+6. **QuizManagement.tsx**: Migración a KnowledgeNodes y empty state mejorado
 
 ### Decisiones de Diseño:
 
@@ -218,11 +215,12 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
-- **Fase 2 del Knowledge Engine:** Implementación de KnowledgeGraph para representar relaciones entre nodos
+- **Fase 3 del Knowledge Engine:** Migrar componentes restantes para eliminar dependencias de contenidoProcesado
 
-## Próximos Pasos (orden según ROADMAP.md)
+## Próximos Pasos (orden según KNOWLEDGE_ENGINE_ROADMAP.md)
 
-1. Completar **Fase 2 del Knowledge Engine** (KnowledgeGraph).
+1. Completar **Fase 3 del Knowledge Engine** (Consolidación).
+
    > Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `KNOWLEDGE_ENGINE_ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
 
 ## Pendiente de decisión
@@ -248,12 +246,13 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-06-30: Incorporación de extracción de conceptos y definiciones asistida por IA (Mistral, Devstral Medium) mediante función serverless de Vercel como proxy seguro de la API key, con fallback automático al motor regex existente cuando no hay conexión a internet o la IA falla. Incluye sistema de notificaciones (Toast), manejo de estados de carga, y visualización de relaciones semánticas entre conceptos.
 - 2025-07-01: Corrección de cinco problemas críticos: (1) Implementación de eliminación en cascada en subject.service.ts para evitar datos huérfanos en IndexedDB al borrar materias; (2) Corrección del modelo de Mistral en api/extract-concepts.ts de "mistral-medium" a "devstral-medium-2505"; (3) Simplificación de la detección de entorno en concept-extraction.service.ts eliminando la heurística frágil basada en puerto y usando siempre el endpoint /api/extract-concepts con fallback a regex cuando no hay conexión; (4) Corrección del bug en useQuizEngine.ts donde nextQuestion() marcaba el quiz como completo sin guardar intentos, ahora solo submitQuiz() persiste los intentos; (5) Configuración de SPA routing en vercel.json para evitar 404 en producción al refrescar o navegar directamente a rutas como /materiales/:id.
 - 2025-07-15: **Implementación de Knowledge Engine - Fase 1**: (1) Creación del modelo IKnowledgeNode para representar unidades atómicas de conocimiento con tipos (concept, definition, relationship, example) y metadata para repetición espaciada; (2) Implementación de knowledge-node.service.ts con CRUD completo y funciones para crear nodos desde conceptos/definiciones; (3) Integración con material.service.ts para generación automática de KnowledgeNodes al procesar materiales; (4) Migración de base de datos a versión 8 con nueva tabla knowledgeNodes; (5) Coexistencia con arquitectura actual manteniendo compatibilidad con flashcards y materiales existentes.
+- 2025-07-16: **Implementación de Knowledge Engine - Fase 2**: (1) Migración completa del Question Generator para usar KnowledgeNodes como fuente principal; (2) Actualización de boolean-generator.ts y multiple-choice-generator.ts para aceptar ambos formatos (KnowledgeNodes y formato antiguo); (3) Modificación de QuizManagement.tsx para obtener KnowledgeNodes asociados a materiales y usarlos preferentemente; (4) Implementación de estrategia de transición limpia con fallback automático al formato antiguo cuando no hay KnowledgeNodes; (5) Consolidación del Knowledge Engine como nueva fuente de verdad para la generación de preguntas.
 
 ## ⚠️ Funcionalidades Pendientes
 
 - Escritura de pruebas unitarias adicionales para componentes críticos.
 - Documentación final del proyecto (README, diagramas).
-- Fase 2 del Knowledge Engine: Implementación de KnowledgeGraph.
+- Fase 3 del Knowledge Engine: Migrar componentes restantes para eliminar dependencias de contenidoProcesado.
 
 ## ❗ Problemas Conocidos
 
@@ -284,7 +283,7 @@ _(Sin problemas conocidos activos.)_
 - `QuizPlayer.tsx`: Visualización de resultados
 - `Flashcards.tsx`: Diseño de tarjetas
 - `Statistics.tsx`: Visualización de datos
-- `QuizManagement.tsx`: Empty state mejorado
+- `QuizManagement.tsx`: Migración a KnowledgeNodes y empty state mejorado
 
 ### Decisiones de Diseño:
 

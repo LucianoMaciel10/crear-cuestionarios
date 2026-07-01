@@ -3,7 +3,9 @@ import { useMaterials } from "../hooks/useMaterials";
 import { generateBooleanQuestions } from "../services/question-generator/boolean-generator";
 import { generateMultipleChoiceQuestions } from "../services/question-generator/multiple-choice-generator";
 import * as questionService from "../services/question.service";
+import * as knowledgeNodeService from "../services/knowledge-node.service";
 import type { IQuestion } from "../data/models";
+import type { IKnowledgeNode } from "../data/models/knowledge-node.model";
 import QuestionList from "../components/domain/QuestionList";
 import GenerateQuestionsButton from "../components/domain/GenerateQuestionsButton";
 import Button from "../components/common/Button";
@@ -37,21 +39,51 @@ const QuizManagement: React.FC = () => {
       const existingTopics =
         await questionService.getExistingTopicsBySubject(subjectId);
 
-      const concepts = materials
-        .flatMap(
-          (material) =>
-            material.contenidoProcesado?.conceptos.map((concept) => ({
-              concept,
-              definition:
-                material.contenidoProcesado?.definiciones.find(
-                  (def) => def.concepto === concept,
-                )?.definicion || "",
-            })) || [],
-        )
-        .filter(
-          (c) =>
-            c.definition !== "" && !existingTopics.has(c.concept.toLowerCase()),
-        );
+      // Obtener nodos de conocimiento asociados a los materiales
+      const materialIds = materials.map((m) => m.id);
+      const knowledgeNodes: IKnowledgeNode[] = [];
+
+      for (const materialId of materialIds) {
+        const nodes =
+          await knowledgeNodeService.getKnowledgeNodesByMaterial(materialId);
+        knowledgeNodes.push(...nodes);
+      }
+
+      // Si hay KnowledgeNodes, usarlos como fuente principal
+      // Si no, caer al formato antiguo para compatibilidad
+      const concepts =
+        knowledgeNodes.length > 0
+          ? knowledgeNodes
+              .filter(
+                (node) => node.type === "definition" || node.type === "concept",
+              )
+              .map((node) => {
+                if (node.type === "definition") {
+                  const [concept, definition] = node.content.split(": ");
+                  return { concept, definition };
+                }
+                return { concept: node.content, definition: "" };
+              })
+              .filter(
+                (c) =>
+                  c.concept && !existingTopics.has(c.concept.toLowerCase()),
+              )
+          : materials
+              .flatMap(
+                (material) =>
+                  material.contenidoProcesado?.conceptos.map((concept) => ({
+                    concept,
+                    definition:
+                      material.contenidoProcesado?.definiciones.find(
+                        (def) => def.concepto === concept,
+                      )?.definicion || "",
+                  })) || [],
+              )
+              .filter(
+                (c) =>
+                  c.definition !== "" &&
+                  !existingTopics.has(c.concept.toLowerCase()),
+              );
 
       const booleanQuestions = generateBooleanQuestions(concepts, subjectId);
       const multipleChoiceQuestions = generateMultipleChoiceQuestions(
