@@ -1,15 +1,10 @@
 // src/services/material.service.ts
 import { db } from "../data/db/dexie-db";
 import type { IMaterial } from "../data/models/material.model";
-import { processText } from "./material-parser/text-processor";
 import { parsePDF } from "./material-parser/pdf-parser";
 import { parseDOCX } from "./material-parser/docx-parser";
 import { saveFlashcardsFromDefinitions } from "./flashcard.service";
-import { extractConceptsWithAI } from "./ai/concept-extraction.service";
-import {
-  createKnowledgeNodesFromConcepts,
-  deleteKnowledgeNodesByMaterial,
-} from "./knowledge-node.service";
+import { extractKnowledgeFromMaterial } from "./knowledge-extraction/extraction-service";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -53,58 +48,18 @@ export async function add(
     }
   }
 
-  let contenidoProcesado;
-  let aiResult: Awaited<ReturnType<typeof extractConceptsWithAI>> | null = null;
+  // Delegar extracción de conocimiento al servicio especializado
+  const extractionResult = await extractKnowledgeFromMaterial(id, textoPlano, {
+    preferAI: true,
+    sourceMaterialId: id,
+  });
 
-  if (textoPlano !== "") {
-    // Intentar con IA primero
-    aiResult = await extractConceptsWithAI(textoPlano);
-
-    if (aiResult) {
-      console.log("Extracción con IA exitosa", {
-        conceptos: aiResult.conceptos.length,
-        definiciones: aiResult.definiciones.length,
-        relaciones: aiResult.relaciones.length,
-      });
-
-      // Mapear relaciones de Mistral API al modelo local
-      const relacionesMapeadas = (
-        aiResult.relaciones as unknown as Array<{
-          concepto1: string;
-          concepto2: string;
-          tipo: string;
-          descripcion: string;
-        }>
-      ).map((r) => ({
-        id: crypto.randomUUID(),
-        tipo: r.tipo,
-        origen: r.concepto1,
-        destino: r.concepto2,
-        descripcion: r.descripcion,
-      }));
-
-      contenidoProcesado = {
-        ...aiResult,
-        relaciones: relacionesMapeadas,
-      };
-    } else {
-      console.warn(
-        "IA no disponible, usando motor de expresiones regulares como fallback",
-      );
-      contenidoProcesado = await processText(textoPlano);
-    }
-  } else {
-    contenidoProcesado = await processText(textoPlano);
-  }
-
-  // Crear nodos de conocimiento a partir de los conceptos extraídos
-  const sourceType = aiResult ? "ai" : "regex";
-  await createKnowledgeNodesFromConcepts(
-    contenidoProcesado.conceptos,
-    contenidoProcesado.definiciones,
-    id, // Asociar nodos a este material
-    sourceType,
-  );
+  // Extraer contenido procesado del resultado para compatibilidad
+  const contenidoProcesado = extractionResult.legacyContent || {
+    conceptos: [],
+    definiciones: [],
+    relaciones: [],
+  };
 
   if (idMateria && contenidoProcesado.definiciones.length > 0) {
     await saveFlashcardsFromDefinitions(
@@ -133,6 +88,8 @@ export async function add(
  */
 export async function remove(id: string): Promise<void> {
   // Eliminar nodos de conocimiento asociados
+  const { deleteKnowledgeNodesByMaterial } =
+    await import("./knowledge-node.service");
   await deleteKnowledgeNodesByMaterial(id);
   await db.materiales.delete(id);
 }
