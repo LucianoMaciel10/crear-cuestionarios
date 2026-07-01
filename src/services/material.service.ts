@@ -6,6 +6,10 @@ import { parsePDF } from "./material-parser/pdf-parser";
 import { parseDOCX } from "./material-parser/docx-parser";
 import { saveFlashcardsFromDefinitions } from "./flashcard.service";
 import { extractConceptsWithAI } from "./ai/concept-extraction.service";
+import {
+  createKnowledgeNodesFromConcepts,
+  deleteKnowledgeNodesByMaterial,
+} from "./knowledge-node.service";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -50,9 +54,11 @@ export async function add(
   }
 
   let contenidoProcesado;
+  let aiResult: Awaited<ReturnType<typeof extractConceptsWithAI>> | null = null;
+
   if (textoPlano !== "") {
     // Intentar con IA primero
-    const aiResult = await extractConceptsWithAI(textoPlano);
+    aiResult = await extractConceptsWithAI(textoPlano);
 
     if (aiResult) {
       console.log("Extracción con IA exitosa", {
@@ -91,6 +97,15 @@ export async function add(
     contenidoProcesado = await processText(textoPlano);
   }
 
+  // Crear nodos de conocimiento a partir de los conceptos extraídos
+  const sourceType = aiResult ? "ai" : "regex";
+  await createKnowledgeNodesFromConcepts(
+    contenidoProcesado.conceptos,
+    contenidoProcesado.definiciones,
+    id, // Asociar nodos a este material
+    sourceType,
+  );
+
   if (idMateria && contenidoProcesado.definiciones.length > 0) {
     await saveFlashcardsFromDefinitions(
       contenidoProcesado.definiciones,
@@ -117,5 +132,7 @@ export async function add(
  * @param id - Identificador del material.
  */
 export async function remove(id: string): Promise<void> {
+  // Eliminar nodos de conocimiento asociados
+  await deleteKnowledgeNodesByMaterial(id);
   await db.materiales.delete(id);
 }

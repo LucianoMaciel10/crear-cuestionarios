@@ -4,8 +4,8 @@
 
 Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción con IA) funcional e infraestructura de navegación completa.
 
-- **Fase actual:** Fase 9 (Pulido de UI, Modo Oscuro y Optimización) - COMPLETADA
-- **Avance aproximado:** 85% (rediseño de UI completado, integración con IA funcional)
+- **Fase actual:** Fase 10 (Transición a Knowledge Engine - Iniciada)
+- **Avance aproximado:** 87% (Knowledge Engine iniciado, coexistencia con arquitectura actual)
 
 ## Arquitectura
 
@@ -14,17 +14,17 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 ### Árbol Principal
 
 - `src/components/`: common, domain, layout
-- `src/contexts/`: ThemeContext, theme-utils, ToastContext (nuevo)
-- `src/hooks/`: useMaterials, useSubjects, useQuizEngine, useTheme, useToast (nuevo)
+- `src/contexts/`: ThemeContext, theme-utils, ToastContext
+- `src/hooks/`: useMaterials, useSubjects, useQuizEngine, useTheme, useToast
 - `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement, QuizPlayer, Flashcards, Statistics
 - `src/routes/`: index.tsx (Router configuración)
-- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/, ai/ (nuevo)
-- `src/mocks/`: ai-mock.ts (nuevo para desarrollo)
+- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/, ai/, knowledge-node.service (NUEVO)
+- `src/mocks/`: ai-mock.ts
 - `api/`: extract-concepts.ts (función serverless para IA)
 
 ### Modelos de datos
 
-- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`, `IFlashcard`, `ISpacedRepetitionData`, `ITopicMastery`, `IWeakPoint`
+- `IMaterial`, `IMateria`, `IEtiqueta`, `IQuestion`, `IRelacion`, `IFlashcard`, `ISpacedRepetitionData`, `ITopicMastery`, `IWeakPoint`, `IKnowledgeNode` (NUEVO)
 
 ### Nuevos Componentes
 
@@ -37,6 +37,7 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 - `concept-extraction.service.ts`: Servicio para extracción de conceptos con IA
 - `ai-mock.ts`: Mock para desarrollo local sin dependencias externas
+- `knowledge-node.service.ts`: Servicio para gestión de nodos de conocimiento (NUEVO)
 
 ## Funcionalidades
 
@@ -57,36 +58,45 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
     - Detección automática de entorno (mock en desarrollo, API real en producción)
     - Manejo de relaciones semánticas entre conceptos
     - Fallback automático a expresiones regulares
+  - **Knowledge Engine - Fase 1 (NUEVO):**
+    - Implementación de IKnowledgeNode como entidad base
+    - Servicio knowledge-node.service.ts para gestión de nodos
+    - Integración con material.service.ts para generación automática
+    - Migración de base de datos (versión 8 de Dexie)
+    - Coexistencia con arquitectura actual
 
 - **Parcialmente terminadas / pendientes:**
   - Generación de cuestionarios (pendiente).
 
 ## Mejoras Recientes
 
-### Integración con IA (Mistral Devstral Medium)
+### Knowledge Engine - Fase 1: Introducción de KnowledgeNode
 
-1. **Función Serverless** (`api/extract-concepts.ts`):
-   - Proxy seguro para Mistral API
-   - Validación de API key desde variables de entorno
-   - Manejo de errores robusto
-   - Extracción de conceptos, definiciones y relaciones
+1. **Nuevo Modelo de Datos** (`src/data/models/knowledge-node.model.ts`):
+   - Interfaz IKnowledgeNode para representar unidades atómicas de conocimiento
+   - Tipos: concept, definition, relationship, example
+   - Metadata para repetición espaciada (reemplazo futuro de IFlashcard)
+   - Confianza y fuente de extracción
 
-2. **Servicio Cliente** (`src/services/ai/concept-extraction.service.ts`):
-   - Detección automática de entorno (dev/prod)
-   - Mock local para desarrollo sin API keys
-   - Validación estricta de tipos
-   - Fallback automático
-
+2. **Nuevo Servicio** (`src/services/knowledge-node.service.ts`):
+   - CRUD completo para nodos de conocimiento
+   - Funciones para crear nodos desde conceptos y definiciones
+   - Asociaciones con materiales fuente
+   - Eliminación en cascada
 3. **Integración con Material Service**:
-   - Mapeo de relaciones de Mistral API al modelo local
-   - Logging mejorado
-   - Manejo de estados de carga
+   - Generación automática de KnowledgeNodes al procesar materiales
+   - Asociaciones bidireccionales entre materiales y nodos
+   - Eliminación de nodos al borrar materiales
 
-4. **Experiencia de Usuario**:
-   - Notificaciones visuales (Toast)
-   - Estados de carga en botones
-   - Prevención de múltiples clics
-   - Feedback claro durante procesamiento
+4. **Migración de Base de Datos**:
+   - Nueva tabla knowledgeNodes en Dexie.js
+   - Versión 8 de la base de datos
+   - Compatibilidad con datos existentes
+
+5. **Coexistencia con Arquitectura Actual**:
+   - Sistema actual de materiales y flashcards sigue funcionando
+   - KnowledgeNodes se generan en paralelo sin interferir
+   - Preparación para migración incremental
 
 ### Sistema de Notificaciones
 
@@ -122,6 +132,7 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - Sistema de diseño coherente con TailwindCSS y componentes reutilizables.
 - Detección automática de entorno para desarrollo vs producción.
 - Mock local para desarrollo sin dependencias externas.
+- Introducción gradual de Knowledge Engine sin romper funcionalidad existente.
 
 ## Diseño Visual (Rediseño Fase 9)
 
@@ -185,7 +196,7 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 9. **FlashcardFlip.tsx**: Animaciones y dark mode
 10. **QualityButtons.tsx**: Colores semánticos
 11. **TopicMasteryChart.tsx**: Visualización mejorada
-12. \*\*WeakPointsList.tsx`: Diseño consistente
+12. **WeakPointsList.tsx**: Diseño consistente
 13. **QuestionList.tsx**: Tarjetas con etiquetas
 
 ### Páginas Actualizadas:
@@ -207,16 +218,12 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
-- **Pruebas y Documentación Final:**
-  - Escribir pruebas unitarias para los nuevos componentes y servicios.
-  - Actualizar la documentación del proyecto (README, diagramas).
-  - **Criterio de finalización:** Cobertura de pruebas razonable y documentación actualizada.
+- **Fase 2 del Knowledge Engine:** Implementación de KnowledgeGraph para representar relaciones entre nodos
 
 ## Próximos Pasos (orden según ROADMAP.md)
 
-1. Completar **Pruebas y Documentación Final**.
-
-> Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
+1. Completar **Fase 2 del Knowledge Engine** (KnowledgeGraph).
+   > Nota: el detalle completo de cada fase (archivos a crear, componentes involucrados, criterios de finalización, riesgos) vive únicamente en `KNOWLEDGE_ENGINE_ROADMAP.md`. Este documento no debe repetir ni reinterpretar ese contenido — solo debe indicar en qué fase está el proyecto y qué falta de la fase actual.
 
 ## Pendiente de decisión
 
@@ -240,11 +247,13 @@ _(Sin items pendientes al momento de esta actualización. Usar esta sección par
 - 2025-02-23: Prevención de preguntas duplicadas al regenerar contenido, y agregado del generador de preguntas de opción múltiple junto al booleano existente.
 - 2025-06-30: Incorporación de extracción de conceptos y definiciones asistida por IA (Mistral, Devstral Medium) mediante función serverless de Vercel como proxy seguro de la API key, con fallback automático al motor regex existente cuando no hay conexión a internet o la IA falla. Incluye sistema de notificaciones (Toast), manejo de estados de carga, y visualización de relaciones semánticas entre conceptos.
 - 2025-07-01: Corrección de cinco problemas críticos: (1) Implementación de eliminación en cascada en subject.service.ts para evitar datos huérfanos en IndexedDB al borrar materias; (2) Corrección del modelo de Mistral en api/extract-concepts.ts de "mistral-medium" a "devstral-medium-2505"; (3) Simplificación de la detección de entorno en concept-extraction.service.ts eliminando la heurística frágil basada en puerto y usando siempre el endpoint /api/extract-concepts con fallback a regex cuando no hay conexión; (4) Corrección del bug en useQuizEngine.ts donde nextQuestion() marcaba el quiz como completo sin guardar intentos, ahora solo submitQuiz() persiste los intentos; (5) Configuración de SPA routing en vercel.json para evitar 404 en producción al refrescar o navegar directamente a rutas como /materiales/:id.
+- 2025-07-15: **Implementación de Knowledge Engine - Fase 1**: (1) Creación del modelo IKnowledgeNode para representar unidades atómicas de conocimiento con tipos (concept, definition, relationship, example) y metadata para repetición espaciada; (2) Implementación de knowledge-node.service.ts con CRUD completo y funciones para crear nodos desde conceptos/definiciones; (3) Integración con material.service.ts para generación automática de KnowledgeNodes al procesar materiales; (4) Migración de base de datos a versión 8 con nueva tabla knowledgeNodes; (5) Coexistencia con arquitectura actual manteniendo compatibilidad con flashcards y materiales existentes.
 
 ## ⚠️ Funcionalidades Pendientes
 
 - Escritura de pruebas unitarias adicionales para componentes críticos.
 - Documentación final del proyecto (README, diagramas).
+- Fase 2 del Knowledge Engine: Implementación de KnowledgeGraph.
 
 ## ❗ Problemas Conocidos
 

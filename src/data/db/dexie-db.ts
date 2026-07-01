@@ -6,6 +6,7 @@ import type {
   IQuestion,
   ISpacedRepetitionData,
   IQuizAttempt,
+  IKnowledgeNode,
 } from "../models";
 
 class CuestionarioDB extends Dexie {
@@ -15,6 +16,7 @@ class CuestionarioDB extends Dexie {
   questions!: Dexie.Table<IQuestion, string>;
   flashcards!: Dexie.Table<ISpacedRepetitionData, string>;
   quizAttempts!: Dexie.Table<IQuizAttempt, string>;
+  knowledgeNodes!: Dexie.Table<IKnowledgeNode, string>;
 
   constructor() {
     super("CuestionarioDB");
@@ -72,6 +74,16 @@ class CuestionarioDB extends Dexie {
       questions: "id, topic, difficulty, idMateria",
       flashcards: "id, concept, nextReviewDate, idMateria",
       quizAttempts: "id, questionId, idMateria, topic, answeredAt",
+    });
+
+    this.version(8).stores({
+      materiales: "id, nombre, tipo, fechaCarga, idMateria",
+      materias: "id, nombre",
+      etiquetas: "id, nombre",
+      questions: "id, topic, difficulty, idMateria",
+      flashcards: "id, concept, nextReviewDate, idMateria",
+      quizAttempts: "id, questionId, idMateria, topic, answeredAt",
+      knowledgeNodes: "id, type, content, sourceMaterialId, createdAt",
     });
   }
 }
