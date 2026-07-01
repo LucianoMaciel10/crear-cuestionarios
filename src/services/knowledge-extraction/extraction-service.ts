@@ -7,7 +7,6 @@
  */
 
 import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
-import type { IRelacion } from "../../data/models/material.model";
 import { createKnowledgeNodesFromConcepts } from "../knowledge-node.service";
 import { extractConceptsWithAI } from "../ai/concept-extraction.service";
 import { processText } from "../material-parser/text-processor";
@@ -44,7 +43,6 @@ export interface ExtractionResult {
   legacyContent?: {
     conceptos: string[];
     definiciones: { concepto: string; definicion: string }[];
-    relaciones: IRelacion[];
   };
   /**
    * Estadísticas de la extracción
@@ -53,7 +51,6 @@ export interface ExtractionResult {
     source: "ai" | "regex";
     conceptCount: number;
     definitionCount: number;
-    relationshipCount: number;
   };
 }
 
@@ -101,13 +98,11 @@ export async function extractKnowledgeFromText(
     legacyContent: {
       conceptos: extractionResult.conceptos,
       definiciones: extractionResult.definiciones,
-      relaciones: extractionResult.relaciones,
     },
     stats: {
       source,
       conceptCount: extractionResult.conceptos.length,
       definitionCount: extractionResult.definiciones.length,
-      relationshipCount: extractionResult.relaciones.length,
     },
   };
 }

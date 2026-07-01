@@ -17,7 +17,7 @@ export function mockExtractConcepts(text: string): IContenidoProcesado {
   while ((match = conceptPattern.exec(text)) !== null) {
     const concepto = match[1].trim();
     const definicion = match[2].trim();
-    
+
     if (concepto && definicion && !conceptos.includes(concepto)) {
       conceptos.push(concepto);
       definiciones.push({
@@ -33,9 +33,9 @@ export function mockExtractConcepts(text: string): IContenidoProcesado {
       .split(/\s+/)
       .filter((word) => word.length > 5 && /^[A-Z][a-z]+/.test(word))
       .slice(0, 5);
-    
+
     conceptos.push(...keywords);
-    
+
     // Crear definiciones genéricas para el mock
     conceptos.forEach((concepto) => {
       definiciones.push({
@@ -48,6 +48,5 @@ export function mockExtractConcepts(text: string): IContenidoProcesado {
   return {
     conceptos,
     definiciones,
-    relaciones: [],
   };
 }

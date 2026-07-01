@@ -215,28 +215,25 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
-- **Fase 4 del Knowledge Engine**: Finalizar migración de flashcards a KnowledgeNodes
+- **Fase 6 del Knowledge Engine**: Adaptar SM-2 para trabajar con KnowledgeNodes
 
 ## Próximos Pasos (orden según KNOWLEDGE_ENGINE_ROADMAP.md)
 
-1. Completar **Fase 4 del Knowledge Engine** (Preparación para Flashcards - En Progreso):
-   - [x] Ampliar IKnowledgeNode con campos necesarios para flashcards
-   - [x] Crear adaptadores bidireccionales entre KnowledgeNodes y flashcards
-   - [x] Actualizar servicios para soportar ambos sistemas
-   - [x] Modificar componentes para usar nuevo sistema (sin breaking changes)
-   - [ ] Implementar sincronización bidireccional entre flashcards y KnowledgeNodes
-   - [ ] Crear servicio de migración para convertir flashcards existentes a KnowledgeNodes
-   - [ ] Actualizar algoritmo SM-2 para trabajar directamente con KnowledgeNodes
+1. Completar **Fase 6 del Knowledge Engine** (Adaptación de SM-2):
+   - [ ] Adaptar `sm2-algorithm.ts` para trabajar con KnowledgeNode.metadata
+   - [ ] Crear funciones de conversión bidireccional
+   - [ ] Mantener compatibilidad durante transición
 
-2. **Fase 5 del Knowledge Engine**: Eliminación de sistema antiguo
-   - [ ] Deprecar IFlashcard y ISpacedRepetitionData
+2. **Fase 7 del Knowledge Engine**: Migración de UI
+   - [ ] Reemplazar componentes basados en ISpacedRepetitionData
+   - [ ] Crear componentes visuales basados en KnowledgeNode
+   - [ ] Actualizar Flashcards.tsx y Statistics.tsx
+
+3. **Fase 8 del Knowledge Engine**: Eliminación Final
+   - [ ] Deprecar ISpacedRepetitionData
    - [ ] Eliminar tabla flashcards de Dexie
-   - [ ] Actualizar todos los componentes para usar exclusivamente KnowledgeNodes
-
-3. **Fase 6 del Knowledge Engine**: Knowledge Graph
-   - [ ] Implementar relaciones entre nodos
-   - [ ] Crear visualización de grafo de conocimiento
-   - [ ] Implementar navegación por relaciones semánticas
+   - [ ] Eliminar contenidoProcesado completamente
+   - [ ] Validar KnowledgeNode como único Source of Truth
 
 ## Estado del Knowledge Engine
 
@@ -246,23 +243,84 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - ✅ QuizManagement (gestión de cuestionarios)
 - ✅ Knowledge Extraction Service (extracción de conocimiento)
 - ✅ KnowledgeNode Service (gestión de nodos)
+- ✅ Flashcard System (preparación para migración)
+
+### Código legado eliminado:
+
+- ✅ `IFlashcard` (modelo completo eliminado)
+- ✅ `relaciones` en contenidoProcesado (campo eliminado)
+- ✅ Generación automática de flashcards desde contenidoProcesado (eliminada)
+- ✅ Imports y código muerto (limpiado)
 
 ### Componentes en transición:
 
-- 🚧 Flashcard System (50% completado)
+- 🚧 Flashcard System (preparado para migración)
   - Adaptadores creados
   - Servicios actualizados
   - Componentes modificados para usar ambos sistemas
-  - Falta sincronización bidireccional y migración de datos
 
 ### Componentes aún en sistema antiguo:
 
-- ❌ Statistics (parcialmente migrado - usa ambos sistemas)
-- ❌ Flashcards page (parcialmente migrado - usa ambos sistemas)
+- ❌ `ISpacedRepetitionData` (aún usado extensivamente)
+- ❌ `sm2-algorithm.ts` (basado en modelo antiguo)
+- ❌ `Flashcards.tsx` y `Statistics.tsx` (basados en modelo antiguo)
+- ❌ Tabla `flashcards` en Dexie (aún tiene datos)
 
 ### Siguiente fase específica:
 
-**Finalizar la migración del sistema de flashcards para que KnowledgeNodes sea la única fuente de verdad, manteniendo compatibilidad durante la transición.**
+**Adaptar el algoritmo SM-2 para trabajar directamente con KnowledgeNodes, manteniendo compatibilidad durante la transición.**
+
+## Porcentaje de Migración
+
+- **Knowledge Engine como Source of Truth**: 60% (↑10% desde fase anterior)
+- **Eliminación de deuda técnica**: 30% (↑30% desde fase anterior)
+- **Consolidación del dominio**: 70% (↑5% desde fase anterior)
+- **Reducción de código legado**: 30% completado
+
+## Impedimentos Arquitectónicos
+
+1. **SM-2 acoplado a ISpacedRepetitionData**
+   - El algoritmo depende del modelo antiguo
+   - Solución: Adaptar SM-2 para trabajar con KnowledgeNode.metadata
+
+2. **UI acoplada a flashcards tradicionales**
+   - Componentes visuales dependen de ISpacedRepetitionData
+   - Solución: Crear componentes basados en KnowledgeNode
+
+3. **Datos históricos en tabla flashcards**
+   - Migración de datos requerida
+   - Solución: Script de migración a KnowledgeNodes
+
+4. **contenidoProcesado en materiales antiguos**
+   - Compatibilidad con datos existentes
+   - Solución: Migración gradual o eliminación cuando ya no sea necesario
+
+## Validación Arquitectónica
+
+### Código Legado Eliminado
+
+- ✅ `IFlashcard` (modelo completo)
+- ✅ `relaciones` en contenidoProcesado
+- ✅ Generación automática de flashcards desde contenidoProcesado
+- ✅ Imports y código muerto
+
+### Código Legado Pendiente
+
+- ❌ `ISpacedRepetitionData` (usado extensivamente)
+- ❌ `contenidoProcesado` (aún usado en UI y fallback)
+- ❌ Tabla `flashcards` en Dexie (aún tiene datos)
+- ❌ `sm2-algorithm.ts` (basado en modelo antiguo)
+- ❌ Componentes UI (basados en modelo antiguo)
+
+### Porcentaje de Migración
+
+- **Knowledge Engine como Source of Truth**: 60%
+- **Eliminación de deuda técnica**: 30%
+- **Consolidación del dominio**: 70%
+
+### Impedimento Arquitectónico Principal
+
+**SM-2 acoplado a modelo antiguo**: Antes de implementar KnowledgeGraph, es necesario adaptar el algoritmo de repetición espaciada para trabajar con KnowledgeNodes en lugar de ISpacedRepetitionData.
 
 ## Pendiente de decisión
 

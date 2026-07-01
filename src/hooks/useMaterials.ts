@@ -1,3 +1,4 @@
+// src/hooks/useMaterials.ts
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../data/db/dexie-db";
 import * as materialService from "../services/material.service";
@@ -19,16 +20,19 @@ export function useMaterials(subjectId?: string) {
     contenidoOriginal?: string | ArrayBuffer,
     idMateria?: string,
   ): Promise<string> => {
-    return await materialService.add(
+    const result = await materialService.addMaterial(
       nombre,
+      typeof contenidoOriginal === "string"
+        ? contenidoOriginal
+        : new File([contenidoOriginal as ArrayBuffer], "upload"),
       tipo,
-      contenidoOriginal,
       idMateria,
     );
+    return result.id;
   };
 
   const removeMaterial = async (id: string): Promise<void> => {
-    await materialService.remove(id);
+    await materialService.removeMaterial(id);
   };
 
   return {

@@ -52,10 +52,8 @@ export async function extractConceptsWithAI(
       data === null ||
       !("conceptos" in data) ||
       !("definiciones" in data) ||
-      !("relaciones" in data) ||
       !Array.isArray(data.conceptos) ||
-      !Array.isArray(data.definiciones) ||
-      !Array.isArray(data.relaciones)
+      !Array.isArray(data.definiciones)
     ) {
       console.log("Estructura de respuesta inválida:", data);
       return null;
@@ -88,7 +86,6 @@ export async function extractConceptsWithAI(
         concepto: string;
         definicion: string;
       }[],
-      relaciones: data.relaciones as [],
     };
   } catch (error) {
     // Manejar errores de red

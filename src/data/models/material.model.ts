@@ -1,4 +1,4 @@
-// Modelos para Material y Relaciones según ARCHITECTURE.md
+// src/data/models/material.model.ts
 
 export interface IMaterial {
   id: string;
@@ -10,16 +10,18 @@ export interface IMaterial {
   idMateria?: string;
 }
 
-export interface IRelacion {
+export interface IEtiqueta {
   id: string;
+  nombre: string;
+}
+
+export interface IRelacion {
+  concepto1: string;
   tipo: string;
-  origen: string;
-  destino: string;
-  descripcion?: string;
+  concepto2: string;
 }
 
 export interface IContenidoProcesado {
   conceptos: string[];
   definiciones: { concepto: string; definicion: string }[];
-  relaciones: IRelacion[];
 }

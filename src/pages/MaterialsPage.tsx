@@ -1,3 +1,4 @@
+// src/pages/MaterialsPage.tsx
 import { useState } from "react";
 import { useMaterials } from "../hooks/useMaterials";
 import MaterialCard from "../components/domain/MaterialCard";
@@ -8,8 +9,7 @@ import { useParams, useNavigate } from "react-router-dom";
 function MaterialsPage() {
   const { subjectId } = useParams<{ subjectId: string }>();
   const navigate = useNavigate();
-  const { materials, addMaterial, removeMaterial, loading } =
-    useMaterials(subjectId);
+  const { materials, addMaterial, loading } = useMaterials(subjectId);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (!subjectId) {
@@ -75,7 +75,7 @@ function MaterialsPage() {
             <MaterialCard
               key={material.id}
               material={material}
-              onDelete={removeMaterial}
+              onClick={() => navigate(`/materiales/${material.id}`)}
               showDebugInfo={false} // Ocultar info de desarrollo en producción
             />
           ))
