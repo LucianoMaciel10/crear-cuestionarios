@@ -1,6 +1,8 @@
 // src/services/adaptive-learning/adaptive-engine.ts
 import type { ISpacedRepetitionData } from "../../data/models/spaced-repetition.model";
 import type { IQuizAttempt } from "../../data/models/question.model";
+import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
+
 /**
  * Interfaz para representar el dominio de un tema.
  */
@@ -112,6 +114,52 @@ export function calculateFlashcardMastery(
 }
 
 /**
+ * Calcula el dominio por tema basado en KnowledgeNodes
+ * Usa el historial real de reviews para cálculo preciso
+ * @param knowledgeNodes - Lista de nodos de conocimiento
+ * @returns Lista de temas con su nivel de dominio
+ */
+export function calculateKnowledgeNodeMastery(
+  knowledgeNodes: IKnowledgeNode[],
+): ITopicMastery[] {
+  const topicStats: Record<string, { correct: number; total: number }> = {};
+
+  knowledgeNodes.forEach((node) => {
+    // Solo considerar conceptos y definiciones
+    if (node.type !== "concept" && node.type !== "definition") return;
+
+    const topic = node.content;
+    const reviewHistory = node.metadata.spacedRepetition?.reviewHistory || [];
+
+    if (reviewHistory.length === 0) return;
+
+    if (!topicStats[topic]) {
+      topicStats[topic] = { correct: 0, total: 0 };
+    }
+
+    // Contar reviews exitosas (quality >= 3 para SM-2)
+    const successfulReviews = reviewHistory.filter(
+      (r) => r.quality >= 3,
+    ).length;
+
+    topicStats[topic].correct += successfulReviews;
+    topicStats[topic].total += reviewHistory.length;
+  });
+
+  return Object.keys(topicStats).map((topic) => {
+    const stats = topicStats[topic];
+    const masteryLevel = stats.total > 0 ? stats.correct / stats.total : 0;
+    return {
+      topic,
+      masteryLevel,
+      totalQuestions: stats.total,
+      correctAnswers: stats.correct,
+      incorrectAnswers: stats.total - stats.correct,
+    };
+  });
+}
+
+/**
  * Combina el dominio por tema de preguntas y flashcards.
  * @param questionMastery - Dominio por tema de preguntas.
  * @param flashcardMastery - Dominio por tema de flashcards.
@@ -134,6 +182,49 @@ export function combineMastery(
 
   // Combinar estadísticas de flashcards
   flashcardMastery.forEach((topic) => {
+    if (!combinedStats[topic.topic]) {
+      combinedStats[topic.topic] = { correct: 0, total: 0 };
+    }
+    combinedStats[topic.topic].correct += topic.correctAnswers;
+    combinedStats[topic.topic].total += topic.totalQuestions;
+  });
+
+  return Object.keys(combinedStats).map((topic) => {
+    const stats = combinedStats[topic];
+    const masteryLevel = stats.total > 0 ? stats.correct / stats.total : 0;
+    return {
+      topic,
+      masteryLevel,
+      totalQuestions: stats.total,
+      correctAnswers: stats.correct,
+      incorrectAnswers: stats.total - stats.correct,
+    };
+  });
+}
+
+/**
+ * Combina dominio de preguntas con dominio de KnowledgeNodes
+ * @param questionMastery - Dominio por tema de preguntas
+ * @param knowledgeNodeMastery - Dominio por tema de KnowledgeNodes
+ * @returns Dominio por tema combinado
+ */
+export function combineQuestionAndKnowledgeNodeMastery(
+  questionMastery: ITopicMastery[],
+  knowledgeNodeMastery: ITopicMastery[],
+): ITopicMastery[] {
+  const combinedStats: Record<string, { correct: number; total: number }> = {};
+
+  // Combinar estadísticas de preguntas
+  questionMastery.forEach((topic) => {
+    if (!combinedStats[topic.topic]) {
+      combinedStats[topic.topic] = { correct: 0, total: 0 };
+    }
+    combinedStats[topic.topic].correct += topic.correctAnswers;
+    combinedStats[topic.topic].total += topic.totalQuestions;
+  });
+
+  // Combinar estadísticas de KnowledgeNodes
+  knowledgeNodeMastery.forEach((topic) => {
     if (!combinedStats[topic.topic]) {
       combinedStats[topic.topic] = { correct: 0, total: 0 };
     }

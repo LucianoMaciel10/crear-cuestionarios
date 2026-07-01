@@ -119,7 +119,7 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 ## Problemas conocidos
 
-_(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. El dominio por flashcards sigue siendo una aproximación basada en repeticiones.)_
+_(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. El dominio por flashcards sigue siendo una una aproximación basada en repeticiones.)_
 
 ## Decisiones técnicas
 
@@ -215,21 +215,17 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
-- **Fase 6 del Knowledge Engine**: Adaptar SM-2 para trabajar con KnowledgeNodes
+- **Fase 7 del Knowledge Engine**: Migrar servicios para usar KnowledgeNode como fuente principal
 
 ## Próximos Pasos (orden según KNOWLEDGE_ENGINE_ROADMAP.md)
 
-1. Completar **Fase 6 del Knowledge Engine** (Adaptación de SM-2):
-   - [ ] Adaptar `sm2-algorithm.ts` para trabajar con KnowledgeNode.metadata
-   - [ ] Crear funciones de conversión bidireccional
+1. Completar **Fase 7 del Knowledge Engine** (Migración de Servicios):
+   - [ ] Migrar `flashcard.service.ts` para usar KnowledgeNode como fuente principal
+   - [ ] Migrar componentes UI (Flashcards.tsx, Statistics.tsx)
+   - [ ] Eliminar dependencia de ISpacedRepetitionData en servicios
    - [ ] Mantener compatibilidad durante transición
 
-2. **Fase 7 del Knowledge Engine**: Migración de UI
-   - [ ] Reemplazar componentes basados en ISpacedRepetitionData
-   - [ ] Crear componentes visuales basados en KnowledgeNode
-   - [ ] Actualizar Flashcards.tsx y Statistics.tsx
-
-3. **Fase 8 del Knowledge Engine**: Eliminación Final
+2. **Fase 8 del Knowledge Engine**: Eliminación Final
    - [ ] Deprecar ISpacedRepetitionData
    - [ ] Eliminar tabla flashcards de Dexie
    - [ ] Eliminar contenidoProcesado completamente
@@ -244,6 +240,8 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - ✅ Knowledge Extraction Service (extracción de conocimiento)
 - ✅ KnowledgeNode Service (gestión de nodos)
 - ✅ Flashcard System (preparación para migración)
+- ✅ SM-2 Algorithm (desacoplado y puro)
+- ✅ KnowledgeNode Updater (actualización de nodos)
 
 ### Código legado eliminado:
 
@@ -252,142 +250,13 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - ✅ Generación automática de flashcards desde contenidoProcesado (eliminada)
 - ✅ Imports y código muerto (limpiado)
 
-### Componentes en transición:
+### Código legado pendiente:
 
-- 🚧 Flashcard System (preparado para migración)
-  - Adaptadores creados
-  - Servicios actualizados
-  - Componentes modificados para usar ambos sistemas
-
-### Componentes aún en sistema antiguo:
-
-- ❌ `ISpacedRepetitionData` (aún usado extensivamente)
-- ❌ `sm2-algorithm.ts` (basado en modelo antiguo)
-- ❌ `Flashcards.tsx` y `Statistics.tsx` (basados en modelo antiguo)
-- ❌ Tabla `flashcards` en Dexie (aún tiene datos)
-
-### Siguiente fase específica:
-
-**Adaptar el algoritmo SM-2 para trabajar directamente con KnowledgeNodes, manteniendo compatibilidad durante la transición.**
-
-## Porcentaje de Migración
-
-- **Knowledge Engine como Source of Truth**: 60% (↑10% desde fase anterior)
-- **Eliminación de deuda técnica**: 30% (↑30% desde fase anterior)
-- **Consolidación del dominio**: 70% (↑5% desde fase anterior)
-- **Reducción de código legado**: 30% completado
-
-## Impedimentos Arquitectónicos
-
-1. **SM-2 acoplado a ISpacedRepetitionData**
-   - El algoritmo depende del modelo antiguo
-   - Solución: Adaptar SM-2 para trabajar con KnowledgeNode.metadata
-
-2. **UI acoplada a flashcards tradicionales**
-   - Componentes visuales dependen de ISpacedRepetitionData
-   - Solución: Crear componentes basados en KnowledgeNode
-
-3. **Datos históricos en tabla flashcards**
-   - Migración de datos requerida
-   - Solución: Script de migración a KnowledgeNodes
-
-4. **contenidoProcesado en materiales antiguos**
-   - Compatibilidad con datos existentes
-   - Solución: Migración gradual o eliminación cuando ya no sea necesario
-
-## Validación Arquitectónica
-
-### Código Legado Eliminado
-
-- ✅ `IFlashcard` (modelo completo)
-- ✅ `relaciones` en contenidoProcesado
-- ✅ Generación automática de flashcards desde contenidoProcesado
-- ✅ Imports y código muerto
-
-### Código Legado Pendiente
-
-- ❌ `ISpacedRepetitionData` (usado extensivamente)
-- ❌ `contenidoProcesado` (aún usado en UI y fallback)
-- ❌ Tabla `flashcards` en Dexie (aún tiene datos)
-- ❌ `sm2-algorithm.ts` (basado en modelo antiguo)
+- ❌ `ISpacedRepetitionData` (aún usado en UI y algunos servicios)
+- ❌ `sm2-algorithm.ts` (versión antigua aún en uso)
 - ❌ Componentes UI (basados en modelo antiguo)
+- ❌ Tabla `flashcards` en Dexie (aún tiene datos)
 
-### Porcentaje de Migración
+### Consolidación del Dominio: ✅ COMPLETADA
 
-- **Knowledge Engine como Source of Truth**: 60%
-- **Eliminación de deuda técnica**: 30%
-- **Consolidación del dominio**: 70%
-
-### Impedimento Arquitectónico Principal
-
-**SM-2 acoplado a modelo antiguo**: Antes de implementar KnowledgeGraph, es necesario adaptar el algoritmo de repetición espaciada para trabajar con KnowledgeNodes en lugar de ISpacedRepetitionData.
-
-## Pendiente de decisión
-
-_(Sin items pendientes al momento de esta actualización. Usar esta sección para registrar cualquier ambigüedad o conflicto entre documentos que surja durante el desarrollo, hasta que se resuelva explícitamente.)_
-
-## Historial de Cambios
-
-- 2025-02-23: Configuración de scripts de test (Vitest) en `package.json` completada.
-- 2023-11-20: Instalación de dependencias completada.
-- 2023-11-20: Verificación de compilación y type-check exitosos.
-- 2023-11-20: Completados modelos de datos y configuración DB.
-- 2023-11-19: Aprobación final de arquitectura.
-- 2025-02-23: Completada la generación y persistencia de preguntas Verdadero/Falso (Fase 4).
-- 2025-02-23: Completado el Modo de Estudio: Práctica (Fase 5).
-- 2025-02-23: Completada la implementación de Flashcards y Repetición Espaciada (Fase 6).
-- 2025-02-23: Completada la implementación de Estadísticas y Aprendizaje Adaptativo (Fase 7).
-- 2025-02-23: Completada la implementación de Soporte PDF y DOCX (Fase 8).
-- 2025-02-23: Completada la implementación de Pulido de UI, Modo Oscuro y Optimización (Fase 9).
-- 2025-02-23: Rediseño completo de UI con sistema de diseño coherente, mejoras de accesibilidad y dark mode completo.
-- 2025-02-23: Persistencia real de intentos de quiz (IQuizAttempt), corrección del cálculo de dominio por tema en adaptive-engine para usar datos reales en lugar de asumir siempre respuesta correcta, y scopeo de Estadísticas por materia.
-- 2025-02-23: Prevención de preguntas duplicadas al regenerar contenido, y agregado del generador de preguntas de opción múltiple junto al booleano existente.
-- 2025-06-30: Incorporación de extracción de conceptos y definiciones asistida por IA (Mistral, Devstral Medium) mediante función serverless de Vercel como proxy seguro de la API key, con fallback automático al motor regex existente cuando no hay conexión a internet o la IA falla. Incluye sistema de notificaciones (Toast), manejo de estados de carga, y visualización de relaciones semánticas entre conceptos.
-- 2025-07-01: Corrección de cinco problemas críticos: (1) Implementación de eliminación en cascada en subject.service.ts para evitar datos huérfanos en IndexedDB al borrar materias; (2) Corrección del modelo de Mistral en api/extract-concepts.ts de "mistral-medium" a "devstral-medium-2505"; (3) Simplificación de la detección de entorno en concept-extraction.service.ts eliminando la heurística frágil basada en puerto y usando siempre el endpoint /api/extract-concepts con fallback a regex cuando no hay conexión; (4) Corrección del bug en useQuizEngine.ts donde nextQuestion() marcaba el quiz como completo sin guardar intentos, ahora solo submitQuiz() persiste los intentos; (5) Configuración de SPA routing en vercel.json para evitar 404 en producción al refrescar o navegar directamente a rutas como /materiales/:id.
-- 2025-07-15: **Implementación de Knowledge Engine - Fase 1**: (1) Creación del modelo IKnowledgeNode para representar unidades atómicas de conocimiento con tipos (concept, definition, relationship, example) y metadata para repetición espaciada; (2) Implementación de knowledge-node.service.ts con CRUD completo y funciones para crear nodos desde conceptos/definiciones; (3) Integración con material.service.ts para generación automática de KnowledgeNodes al procesar materiales; (4) Migración de base de datos a versión 8 con nueva tabla knowledgeNodes; (5) Coexistencia con arquitectura actual manteniendo compatibilidad con flashcards y materiales existentes.
-- 2025-07-16: **Implementación de Knowledge Engine - Fase 2**: (1) Migración completa del Question Generator para usar KnowledgeNodes como fuente principal; (2) Actualización de boolean-generator.ts y multiple-choice-generator.ts para aceptar ambos formatos (KnowledgeNodes y formato antiguo); (3) Modificación de QuizManagement.tsx para obtener KnowledgeNodes asociados a materiales y usarlos preferentemente; (4) Implementación de estrategia de transición limpia con fallback automático al formato antiguo cuando no hay KnowledgeNodes; (5) Consolidación del Knowledge Engine como nueva fuente de verdad para la generación de preguntas.
-
-## ⚠️ Funcionalidades Pendientes
-
-- Escritura de pruebas unitarias adicionales para componentes críticos.
-- Documentación final del proyecto (README, diagramas).
-- Fase 3 del Knowledge Engine: Migrar componentes restantes para eliminar dependencias de contenidoProcesado.
-
-## ❗ Problemas Conocidos
-
-_(Sin problemas conocidos activos.)_
-
-## 🎨 Mejoras de Diseño (Fase 9 - Rediseño)
-
-### Componentes Rediseñados:
-
-- `Button.tsx`: Variantes, tamaños, estados completos
-- `Card.tsx`: Nuevo componente base reutilizable
-- `Modal.tsx`: Nuevo componente con estructura estándar
-- `Navbar.tsx`: Enlaces con estados mejorados
-- `ThemeToggle.tsx`: Iconos y transiciones mejoradas
-- `SubjectCard.tsx`: Diseño consistente con Card base
-- `MaterialCard.tsx`: Jerarquía visual mejorada
-- `QuestionCard.tsx`: Feedback visual y estados
-- `FlashcardFlip.tsx`: Animaciones y dark mode
-- `QualityButtons.tsx`: Colores semánticos
-- `TopicMasteryChart.tsx`: Visualización mejorada
-- `WeakPointsList.tsx`: Diseño consistente
-- `QuestionList.tsx`: Tarjetas con etiquetas
-
-### Páginas Actualizadas:
-
-- `Dashboard.tsx`: Empty states y diseño mejorado
-- `MaterialsPage.tsx`: Tarjetas consistentes
-- `QuizPlayer.tsx`: Visualización de resultados
-- `Flashcards.tsx`: Diseño de tarjetas
-- `Statistics.tsx`: Visualización de datos
-- `QuizManagement.tsx`: Migración a KnowledgeNodes y empty state mejorado
-
-### Decisiones de Diseño:
-
-- Paleta de colores basada en Indigo con soporte completo para dark mode
-- Tipografía con jerarquía clara (títulos, texto, secundario)
-- Espaciado consistente basado en 4px
-- Estados interactivos visibles (hover, focus, active, disabled)
-- Accesibilidad mejorada en todos los componentes
+**Nuevo modelo de KnowledgeNode:**

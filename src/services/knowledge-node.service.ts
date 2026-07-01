@@ -16,7 +16,7 @@ export async function getAllKnowledgeNodes(): Promise<IKnowledgeNode[]> {
  * @returns Promesa con array de IKnowledgeNode del tipo especificado
  */
 export async function getKnowledgeNodesByType(
-  type: IKnowledgeNode["type"]
+  type: IKnowledgeNode["type"],
 ): Promise<IKnowledgeNode[]> {
   return db.knowledgeNodes.where("type").equals(type).toArray();
 }
@@ -27,9 +27,12 @@ export async function getKnowledgeNodesByType(
  * @returns Promesa con array de IKnowledgeNode
  */
 export async function getKnowledgeNodesByMaterial(
-  materialId: string
+  materialId: string,
 ): Promise<IKnowledgeNode[]> {
-  return db.knowledgeNodes.where("sourceMaterialId").equals(materialId).toArray();
+  return db.knowledgeNodes
+    .where("sourceMaterialId")
+    .equals(materialId)
+    .toArray();
 }
 
 /**
@@ -38,7 +41,7 @@ export async function getKnowledgeNodesByMaterial(
  * @returns Promesa con el ID del nodo creado
  */
 export async function createKnowledgeNode(
-  node: Omit<IKnowledgeNode, "id" | "createdAt" | "updatedAt">
+  node: Omit<IKnowledgeNode, "id" | "createdAt" | "updatedAt">,
 ): Promise<string> {
   const id = crypto.randomUUID();
   const newNode: IKnowledgeNode = {
@@ -56,9 +59,7 @@ export async function createKnowledgeNode(
  * @param node - Nodo de conocimiento con los datos actualizados
  * @returns Promesa que se resuelve al completar la actualización
  */
-export async function updateKnowledgeNode(
-  node: IKnowledgeNode
-): Promise<void> {
+export async function updateKnowledgeNode(node: IKnowledgeNode): Promise<void> {
   await db.knowledgeNodes.update(node.id, {
     ...node,
     updatedAt: new Date(),
@@ -80,7 +81,7 @@ export async function deleteKnowledgeNode(id: string): Promise<void> {
  * @returns Promesa que se resuelve al completar la eliminación
  */
 export async function deleteKnowledgeNodesByMaterial(
-  materialId: string
+  materialId: string,
 ): Promise<void> {
   const nodes = await db.knowledgeNodes
     .where("sourceMaterialId")
@@ -102,7 +103,7 @@ export async function createKnowledgeNodesFromConcepts(
   concepts: string[],
   definitions: { concepto: string; definicion: string }[],
   sourceMaterialId?: string,
-  sourceType: "ai" | "regex" | "manual" = "ai"
+  sourceType: "ai" | "regex" | "manual" = "ai",
 ): Promise<string[]> {
   const createdIds: string[] = [];
 
@@ -113,8 +114,25 @@ export async function createKnowledgeNodesFromConcepts(
       content: concept,
       sourceMaterialId,
       metadata: {
-        confidence: sourceType === "ai" ? 0.9 : 0.7,
-        sourceType,
+        extraction: {
+          confidence: sourceType === "ai" ? 0.9 : 0.7,
+          sourceType,
+        },
+        spacedRepetition: {
+          algorithm: "sm2",
+          currentState: {
+            easeFactor: 2.5,
+            stability: 0,
+            difficulty: 2.5,
+            repetitionCount: 0,
+            lastReviewDate: null,
+            nextReviewDate: null,
+            sm2: {
+              interval: 0,
+            },
+          },
+          reviewHistory: [],
+        },
       },
     });
     createdIds.push(conceptId);
@@ -127,8 +145,25 @@ export async function createKnowledgeNodesFromConcepts(
       content: `${definition.concepto}: ${definition.definicion}`,
       sourceMaterialId,
       metadata: {
-        confidence: sourceType === "ai" ? 0.85 : 0.65,
-        sourceType,
+        extraction: {
+          confidence: sourceType === "ai" ? 0.85 : 0.65,
+          sourceType,
+        },
+        spacedRepetition: {
+          algorithm: "sm2",
+          currentState: {
+            easeFactor: 2.5,
+            stability: 0,
+            difficulty: 2.5,
+            repetitionCount: 0,
+            lastReviewDate: null,
+            nextReviewDate: null,
+            sm2: {
+              interval: 0,
+            },
+          },
+          reviewHistory: [],
+        },
       },
     });
     createdIds.push(definitionId);

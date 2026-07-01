@@ -8,18 +8,24 @@ import type { ISpacedRepetitionData } from "../../data/models/spaced-repetition.
  * @param node - Nodo de conocimiento
  * @returns Datos de repetición espaciada
  */
-export function knowledgeNodeToFlashcard(node: IKnowledgeNode): ISpacedRepetitionData {
+export function knowledgeNodeToFlashcard(
+  node: IKnowledgeNode,
+): ISpacedRepetitionData {
   return {
     id: node.id,
     concept: node.content,
-    definition: node.definition || '',
+    definition: node.definition || "",
     explanation: node.explanation,
-    easeFactor: node.metadata.easeFactor || 2.5,
-    repetitionInterval: node.metadata.repetitionInterval || 0,
-    lastReviewDate: node.metadata.lastReviewDate || null,
-    nextReviewDate: node.metadata.nextReviewDate || null,
-    repetitionCount: node.metadata.repetitionCount || 0,
-    idMateria: node.subjectId
+    easeFactor: node.metadata.spacedRepetition.currentState.easeFactor,
+    repetitionInterval:
+      node.metadata.spacedRepetition.currentState.sm2?.interval || 0,
+    lastReviewDate:
+      node.metadata.spacedRepetition.currentState.lastReviewDate || null,
+    nextReviewDate:
+      node.metadata.spacedRepetition.currentState.nextReviewDate || null,
+    repetitionCount:
+      node.metadata.spacedRepetition.currentState.repetitionCount,
+    idMateria: node.subjectId,
   };
 }
 
@@ -28,10 +34,12 @@ export function knowledgeNodeToFlashcard(node: IKnowledgeNode): ISpacedRepetitio
  * @param flashcard - Datos de flashcard
  * @returns Nodo de conocimiento
  */
-export function flashcardToKnowledgeNode(flashcard: ISpacedRepetitionData): IKnowledgeNode {
+export function flashcardToKnowledgeNode(
+  flashcard: ISpacedRepetitionData,
+): IKnowledgeNode {
   return {
     id: flashcard.id,
-    type: 'concept',
+    type: "concept",
     content: flashcard.concept,
     definition: flashcard.definition,
     explanation: flashcard.explanation,
@@ -39,13 +47,25 @@ export function flashcardToKnowledgeNode(flashcard: ISpacedRepetitionData): IKno
     createdAt: new Date(),
     updatedAt: new Date(),
     metadata: {
-      confidence: 1.0,
-      sourceType: 'manual',
-      easeFactor: flashcard.easeFactor,
-      repetitionInterval: flashcard.repetitionInterval,
-      lastReviewDate: flashcard.lastReviewDate,
-      nextReviewDate: flashcard.nextReviewDate,
-      repetitionCount: flashcard.repetitionCount
-    }
+      extraction: {
+        confidence: 1.0,
+        sourceType: "manual",
+      },
+      spacedRepetition: {
+        algorithm: "sm2",
+        currentState: {
+          easeFactor: flashcard.easeFactor,
+          stability: flashcard.repetitionInterval,
+          difficulty: flashcard.easeFactor,
+          repetitionCount: flashcard.repetitionCount,
+          lastReviewDate: flashcard.lastReviewDate,
+          nextReviewDate: flashcard.nextReviewDate,
+          sm2: {
+            interval: flashcard.repetitionInterval,
+          },
+        },
+        reviewHistory: [],
+      },
+    },
   };
 }
