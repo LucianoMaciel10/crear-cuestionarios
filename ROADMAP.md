@@ -1,118 +1,142 @@
 # ROADMAP de Implementación
 
-Este documento detalla el plan de ejecución dividido en fases pequeñas y manejables para la construcción del Generador Inteligente de Cuestionarios Académicos.
+Este documento detalla el plan de ejecución completo del Generador Inteligente de Cuestionarios Académicos. Las fases 0–9 corresponden al plan original. Las fases 10–11 son la continuación natural surgida durante el desarrollo.
 
 ---
 
-## Fase 0: Configuración del Proyecto y Estructura Base
+## Fase 0: Configuración del Proyecto y Estructura Base ✅ COMPLETADA
 **Objetivo:** Establecer el entorno de desarrollo, la estructura de carpetas y las dependencias iniciales.
 
-*   **Archivos a crear:**
-    *   `src/styles/globals.css` (Tailwind config).
-    *   `src/data/db/dexie-db.ts` (Configuración de Dexie.js).
-    *   `src/data/models/index.ts` (Definición de interfaces base).
-*   **Componentes involucrados:** `App.tsx`, `main.tsx`.
-*   **Dependencias:** `dexie`, `dexie-react-hook`, `lucide-react`, `clsx`, `tailwind-merge`.
-*   **Criterios de finalización:** Proyecto corriendo en local con Tailwind operativo y base de datos IndexedDB inicializada.
-*   **Riesgos:** Errores de configuración de TypeScript con librerías externas.
+- `src/styles/globals.css`, `src/data/db/dexie-db.ts`, `src/data/models/index.ts`
+- Dependencias: `dexie`, `dexie-react-hooks`, `lucide-react`, `clsx`, `tailwind-merge`
+- **Criterio cumplido:** Proyecto corriendo con Tailwind operativo e IndexedDB inicializada.
 
 ---
 
-## Fase 1: Gestión de Materias y Navegación
+## Fase 1: Gestión de Materias y Navegación ✅ COMPLETADA
 **Objetivo:** Permitir al usuario crear y organizar sus áreas de estudio.
 
-*   **Archivos a crear:**
-    *   `src/components/common/Button.tsx`, `Card.tsx`, `Modal.tsx`.
-    *   `src/pages/Dashboard.tsx`.
-    *   `src/hooks/useSubjects.ts`.
-*   **Componentes involucrados:** `Dashboard`, `SubjectCard`, `AddSubjectModal`.
-*   **Criterios de finalización:** El usuario puede crear, ver y eliminar materias (Persistido en IndexedDB).
+- `Button.tsx`, `Card.tsx`, `Modal.tsx`, `Dashboard.tsx`, `useSubjects.ts`
+- **Criterio cumplido:** CRUD de materias persistido en IndexedDB.
 
 ---
 
-## Fase 2: Carga y Almacenamiento de Material (Texto/TXT)
+## Fase 2: Carga y Almacenamiento de Material (Texto/TXT) ✅ COMPLETADA
 **Objetivo:** Implementar la carga de material simple y su persistencia.
 
-*   **Archivos a crear:**
-    *   `src/services/material-parser/text-parser.ts`.
-    *   `src/pages/AddMaterial.tsx`.
-    *   `src/hooks/useMaterials.ts`.
-*   **Componentes involucrados:** `FileUploadZone`, `TextInputForm`.
-*   **Criterios de finalización:** Guardado exitoso de contenido de texto vinculado a una materia.
+- `text-parser.ts`, `AddMaterial.tsx`, `useMaterials.ts`
+- **Criterio cumplido:** Guardado exitoso de contenido de texto vinculado a una materia.
 
 ---
 
-## Fase 3: Procesamiento de Material y Extracción Básica
+## Fase 3: Procesamiento de Material y Extracción Básica ✅ COMPLETADA
 **Objetivo:** Identificar conceptos y definiciones mediante heurísticas simples.
 
-*   **Archivos a crear:**
-    *   `src/services/material-parser/text-processor.ts` (Lógica de extracción).
-    *   `src/web-workers/parser.worker.ts`.
-*   **Componentes involucrados:** `ProcessingIndicator`.
-*   **Criterios de finalización:** Al cargar un texto, se genera automáticamente una lista de pares concepto-definición en `contenidoProcesado`.
-*   **Riesgos:** Baja precisión inicial en la detección de conceptos.
+- `text-processor.ts`
+- **Criterio cumplido:** Al cargar un texto se genera una lista de pares concepto-definición.
 
 ---
 
-## Fase 4: Banco de Preguntas y Generación Automática (V/F)
+## Fase 4: Banco de Preguntas y Generación Automática (V/F) ✅ COMPLETADA
 **Objetivo:** Generar las primeras preguntas a partir del material procesado.
 
-*   **Archivos a crear:**
-    *   `src/services/question-generator/boolean-generator.ts`.
-    *   `src/pages/QuizManagement.tsx`.
-*   **Componentes involucrados:** `QuestionList`, `GenerateQuestionsButton`.
-*   **Criterios de finalización:** Generación de preguntas Verdadero/Falso persistidas en el banco de preguntas.
+- `boolean-generator.ts`, `QuizManagement.tsx`, `QuestionList`, `GenerateQuestionsButton`
+- **Criterio cumplido:** Generación de preguntas V/F persistidas en el banco de preguntas.
 
 ---
 
-## Fase 5: Modo de Estudio: Práctica
+## Fase 5: Modo de Estudio: Práctica ✅ COMPLETADA
 **Objetivo:** Permitir al usuario responder preguntas con feedback inmediato.
 
-*   **Archivos a crear:**
-    *   `src/pages/QuizPlayer.tsx`.
-    *   `src/components/domain/QuestionCard.tsx`.
-    *   `src/hooks/useQuizEngine.ts`.
-*   **Componentes involucrados:** `QuizPlayer`, `FeedbackAlert`.
-*   **Criterios de finalización:** Flujo completo de responder pregunta -> ver corrección -> pasar a la siguiente.
+- `QuizPlayer.tsx`, `QuestionCard.tsx`, `useQuizEngine.ts`
+- **Criterio cumplido:** Flujo completo responder → corrección → siguiente pregunta.
 
 ---
 
-## Fase 6: Flashcards y Repetición Espaciada (Básico)
-**Objetivo:** Implementar la visualización de flashcards y el algoritmo SM-2 inicial.
+## Fase 6: Flashcards y Repetición Espaciada ✅ COMPLETADA
+**Objetivo:** Implementar la visualización de flashcards y el algoritmo SM-2.
 
-*   **Archivos a crear:**
-    *   `src/services/spaced-repetition/sm2-algorithm.ts`.
-    *   `src/pages/Flashcards.tsx`.
-*   **Componentes involucrados:** `FlashcardFlip`, `QualityButtons` (0-5 rating).
-*   **Criterios de finalización:** Las flashcards muestran fechas de próximo repaso calculadas según la respuesta del usuario.
+- `sm2-algorithm.ts`, `Flashcards.tsx`, `FlashcardFlip`, `QualityButtons`
+- **Criterio cumplido:** Flashcards con fechas de próximo repaso calculadas por SM-2.
 
 ---
 
-## Fase 7: Estadísticas y Aprendizaje Adaptativo
+## Fase 7: Estadísticas y Aprendizaje Adaptativo ✅ COMPLETADA
 **Objetivo:** Visualizar el progreso y detectar temas débiles.
 
-*   **Archivos a crear:**
-    *   `src/services/adaptive-learning/adaptive-engine.ts`.
-    *   `src/pages/Statistics.tsx`.
-*   **Componentes involucrados:** `TopicMasteryChart`, `WeakPointsList`.
-*   **Criterios de finalización:** Gráficos que muestran el dominio por tema basado en el historial de aciertos.
+- `adaptive-engine.ts`, `Statistics.tsx`, `TopicMasteryChart`, `WeakPointsList`
+- **Criterio cumplido:** Gráficos de dominio por tema basados en historial de aciertos.
 
 ---
 
-## Fase 8: Soporte PDF y DOCX
+## Fase 8: Soporte PDF y DOCX ✅ COMPLETADA
 **Objetivo:** Expandir la capacidad de carga de documentos complejos.
 
-*   **Archivos a crear:**
-    *   `src/services/material-parser/pdf-parser.ts`.
-    *   `src/services/material-parser/docx-parser.ts`.
-*   **Dependencias:** `pdfjs-dist`, `mammoth`.
-*   **Criterios de finalización:** El sistema procesa archivos PDF/DOCX extrayendo el texto correctamente.
-*   **Riesgos:** Alto consumo de memoria y complejidad en el parseo de estructuras (tablas, columnas).
+- `pdf-parser.ts`, `docx-parser.ts`
+- Dependencias: `pdfjs-dist`, `mammoth`
+- **Criterio cumplido:** El sistema procesa archivos PDF/DOCX extrayendo texto correctamente.
 
 ---
 
-## Fase 9: Pulido de UI, Modo Oscuro y Optimización
+## Fase 9: Pulido de UI, Modo Oscuro y Optimización ✅ COMPLETADA
 **Objetivo:** Mejorar la experiencia de usuario y el rendimiento final.
 
-*   **Archivos a crear:** `src/contexts/ThemeContext.tsx`.
-*   **Criterios de finalización:** Interfaz profesional, responsiva, con soporte de modo oscuro y tiempos de carga optimizados.
+- `ThemeContext.tsx`, rediseño completo de componentes comunes y páginas.
+- Sistema de diseño: paleta Indigo, escala tipográfica, espaciado consistente en 4px, dark mode con clase `.dark`.
+- **Criterio cumplido:** Interfaz profesional, responsiva, con modo oscuro funcional.
+
+---
+
+## Fase 10: Knowledge Engine y Batch Processing ✅ COMPLETADA
+**Objetivo:** Transformar la arquitectura hacia un modelo centrado en el conocimiento extraído, con procesamiento por lotes de múltiples archivos.
+
+### Lo implementado:
+- `IKnowledgeNode` como entidad central del dominio (reemplaza a `ISpacedRepetitionData` en lógica nueva).
+- `knowledge-node.service.ts`: CRUD completo de nodos de conocimiento.
+- `knowledge-extraction/`: servicio dedicado con proveedores IA (Mistral) y regex como fallback.
+- `sm2-engine.ts`: algoritmo SM-2 desacoplado como función pura.
+- `knowledge-node-updater.ts`: actualización de nodos con reviews de repetición espaciada.
+- `adaptive-engine.ts`: actualizado con `calculateKnowledgeNodeMastery()`.
+- `batch-processor.ts` + `batch-cache.ts` + `markdown-converter.ts`: pipeline de procesamiento por lotes con caché y barra de progreso.
+- `corpus-builder.ts`: corpus unificado por materia para mejor extracción de relaciones.
+- `api/extract-concepts.ts`: función serverless para integración con Mistral AI.
+- Migración de `Flashcards.tsx`, `Statistics.tsx`, `FlashcardFlip.tsx` a KnowledgeNode.
+- **Criterio cumplido:** KnowledgeNode es la entidad central. Batch processing funcional con progreso por etapas.
+
+---
+
+## Fase 11: Eliminación de Código Legado ⏳ PENDIENTE
+**Objetivo:** Eliminar completamente el sistema antiguo de flashcards y `contenidoProcesado`, dejando `KnowledgeNode` como único source of truth.
+
+### Archivos a modificar:
+- `src/data/models/spaced-repetition.model.ts` → eliminar `ISpacedRepetitionData`.
+- `src/data/models/index.ts` → eliminar su exportación.
+- `src/data/db/dexie-db.ts` → eliminar tabla `flashcards`, versionar la migración.
+- `src/services/flashcard.service.ts` → eliminar métodos marcados como `@deprecated`.
+- `src/services/spaced-repetition/sm2-algorithm.ts` → eliminar funciones antiguas basadas en `ISpacedRepetitionData`.
+- `src/services/adaptive-learning/adaptive-engine.ts` → eliminar `calculateFlashcardMastery()` y `combineMastery()` antiguos.
+- `src/services/subject.service.ts` → actualizar eliminación en cascada para usar `knowledgeNodes` en vez de `flashcards`.
+- `src/data/models/material.model.ts` → eliminar campo `contenidoProcesado` de `IMaterial`.
+- Eliminar referencias restantes a `contenidoProcesado` en componentes.
+- Eliminar funciones y adaptadores marcados como `@deprecated`.
+
+### Criterio de finalización:
+- Build, lint y TypeScript sin errores tras la eliminación.
+- La tabla `flashcards` en Dexie ya no existe (se versiona la migración correctamente).
+- No hay referencias a `ISpacedRepetitionData` ni a `contenidoProcesado` en el código activo.
+- **Riesgo:** Migración de datos en Dexie requiere incrementar la versión y escribir una función `upgrade()` correcta para no perder datos de usuarios existentes.
+
+---
+
+## Fase 12: Knowledge Graph ⏳ PENDIENTE
+**Objetivo:** Implementar relaciones semánticas entre nodos de conocimiento y su visualización.
+
+### Archivos a crear:
+- `src/services/knowledge-graph/graph-service.ts`
+- `src/pages/KnowledgeGraph.tsx`
+- `src/components/domain/GraphVisualization.tsx`
+
+### Criterio de finalización:
+- Los KnowledgeNodes pueden tener relaciones entre sí (ya tiene `relatedNodes?: string[]` en el modelo).
+- El usuario puede navegar visualmente el grafo de conocimiento de una materia.
+- **Dependencia:** Fase 11 debe estar completa antes de iniciar esta.
