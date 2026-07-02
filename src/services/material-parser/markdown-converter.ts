@@ -7,9 +7,7 @@
  */
 export function convertToMarkdown(text: string): string {
   // Normalizar saltos de línea
-  let markdown = text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
+  let markdown = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
   // Convertir títulos (líneas que terminan en : o son cortas y en mayúsculas)
   markdown = markdown.replace(/^(.+?):\s*$/gm, (_, title) => {
@@ -20,21 +18,24 @@ export function convertToMarkdown(text: string): string {
   });
 
   // Convertir listas (líneas que empiezan con - o *)
-  markdown = markdown.replace(/^\s*([-*])\s+(.+?)\s*$/gm, (_, bullet, item) => {
+  markdown = markdown.replace(/^\s*([-*])\s+(.+?)\s*$/gm, (_, item) => {
     return `- ${item.trim()}`;
   });
 
   // Convertir párrafos (múltiples líneas con texto)
-  markdown = markdown.replace(/([\w\W]+?)(?=\n\s*\n|\n#|\n##|\n-|$)/g, (paragraph) => {
-    const trimmed = paragraph.trim();
-    if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('-')) {
-      return trimmed + '\n\n';
-    }
-    return paragraph;
-  });
+  markdown = markdown.replace(
+    /([\w\W]+?)(?=\n\s*\n|\n#|\n##|\n-|$)/g,
+    (paragraph) => {
+      const trimmed = paragraph.trim();
+      if (trimmed && !trimmed.startsWith("#") && !trimmed.startsWith("-")) {
+        return trimmed + "\n\n";
+      }
+      return paragraph;
+    },
+  );
 
   // Limpiar múltiples saltos de línea
-  markdown = markdown.replace(/\n{3,}/g, '\n\n');
+  markdown = markdown.replace(/\n{3,}/g, "\n\n");
 
   return markdown.trim();
 }
@@ -45,9 +46,12 @@ export function convertToMarkdown(text: string): string {
  * @param fileName - Nombre del archivo original
  * @returns Markdown con metadata
  */
-export function createStructuredMarkdown(text: string, fileName: string): string {
+export function createStructuredMarkdown(
+  text: string,
+  fileName: string,
+): string {
   const markdownContent = convertToMarkdown(text);
-  
+
   return `---
 title: ${fileName}
 source: ${new Date().toISOString()}

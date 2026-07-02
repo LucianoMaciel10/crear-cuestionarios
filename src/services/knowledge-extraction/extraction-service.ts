@@ -36,6 +36,7 @@ export interface ExtractionOptions {
     importanceScore?: number;
   };
 }
+
 /**
  * Resultado de la extracción de conocimiento
  */
@@ -100,7 +101,6 @@ export async function extractKnowledgeFromText(
     extractionResult.definiciones,
     sourceMaterialId,
     source,
-    options?.context,
   );
 
   // Calcular métricas mejoradas

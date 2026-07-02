@@ -78,7 +78,7 @@ export function generateMultipleChoiceQuestions(
     let explanation = `La definición correcta de "${item.concept}" es: "${item.definition}"`;
 
     // Para preguntas de mayor dificultad
-    if (difficulty === "hard" && options?.includeRelatedConcepts) {
+    if (difficulty === "hard") {
       const relatedConceptIndex = (i + 2) % concepts.length;
       const relatedConcept = concepts[relatedConceptIndex];
 

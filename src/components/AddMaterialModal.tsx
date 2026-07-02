@@ -5,6 +5,13 @@ import { useToast } from "../hooks/useToast";
 
 type MaterialType = "texto" | "pdf" | "docx" | "txt" | "md";
 
+interface ProcessingStage {
+  name: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  progress: number;
+  error?: string;
+}
+
 type AddMaterialModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -16,7 +23,7 @@ type AddMaterialModalProps = {
   // Nueva prop para procesamiento por lotes
   onBatchAdd?: (
     files: File[],
-    onProgress: (stages: any[]) => void,
+    onProgress: (stages: ProcessingStage[]) => void,
   ) => Promise<{
     success: boolean;
     materials: {
@@ -49,7 +56,9 @@ function AddMaterialModal({
   const [file, setFile] = useState<File | null>(null); // Para PDF, DOCX
   const [files, setFiles] = useState<File[]>([]); // Para batch mode
   const [isLoading, setIsLoading] = useState(false);
-  const [processingStages, setProcessingStages] = useState<any[]>([]);
+  const [processingStages, setProcessingStages] = useState<ProcessingStage[]>(
+    [],
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
 

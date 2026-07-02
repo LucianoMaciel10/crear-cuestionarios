@@ -6,6 +6,7 @@ import { parseDOCX } from "./material-parser/docx-parser";
 import { extractKnowledgeFromMaterial } from "./knowledge-extraction/extraction-service";
 import { BatchProcessor } from "./batch-processing/batch-processor";
 import { batchCache } from "./batch-processing/batch-cache";
+import type { ProcessingStage } from "../components/AddMaterialModal";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -83,7 +84,7 @@ export async function processBatchMaterials(
   options: {
     preferAI?: boolean;
     generateQuestions?: boolean;
-    onProgress?: (stages: any[]) => void;
+    onProgress?: (stages: ProcessingStage[]) => void;
   } = {},
 ): Promise<{
   success: boolean;

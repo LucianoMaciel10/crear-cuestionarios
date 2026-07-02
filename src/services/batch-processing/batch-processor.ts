@@ -1,19 +1,13 @@
 // src/services/batch-processing/batch-processor.ts
 import { parsePDF } from "../material-parser/pdf-parser";
 import { parseDOCX } from "../material-parser/docx-parser";
-import {
-  convertToMarkdown,
-  createStructuredMarkdown,
-} from "../material-parser/markdown-converter";
+import { createStructuredMarkdown } from "../material-parser/markdown-converter";
 import { extractKnowledgeFromText } from "../knowledge-extraction/extraction-service";
-import {
-  generateBooleanQuestions,
-  generateMultipleChoiceQuestions,
-} from "../question-generator/boolean-generator";
+import { generateBooleanQuestions } from "../question-generator/boolean-generator";
+import { generateMultipleChoiceQuestions } from "../question-generator/multiple-choice-generator";
 import { saveQuestions } from "../question.service";
 import {
   CorpusBuilder,
-  type SubjectCorpus,
   type CorpusConcept,
 } from "../corpus-processing/corpus-builder";
 
@@ -188,7 +182,7 @@ export class BatchProcessor {
         results.push({ file, content });
       } catch (error) {
         console.error(`Error leyendo archivo ${file.name}:`, error);
-        throw new Error(`Failed to read file ${file.name}`);
+        throw new Error(`Failed to read file ${file.name}`, { cause: error });
       }
     }
 
@@ -210,7 +204,9 @@ export class BatchProcessor {
         results.push({ file, markdown });
       } catch (error) {
         console.error(`Error convirtiendo ${file.name} a Markdown:`, error);
-        throw new Error(`Failed to convert ${file.name} to Markdown`);
+        throw new Error(`Failed to convert ${file.name} to Markdown`, {
+          cause: error,
+        });
       }
     }
 
@@ -233,7 +229,9 @@ export class BatchProcessor {
         await this.corpusBuilder.addFileContent(file.name, markdown);
       } catch (error) {
         console.error(`Error agregando ${file.name} al corpus:`, error);
-        throw new Error(`Failed to add ${file.name} to corpus`);
+        throw new Error(`Failed to add ${file.name} to corpus`, {
+          cause: error,
+        });
       }
     }
 
@@ -285,7 +283,9 @@ export class BatchProcessor {
         });
       } catch (error) {
         console.error(`Error extrayendo conocimiento del chunk ${i}:`, error);
-        throw new Error(`Failed to extract knowledge from chunk ${i}`);
+        throw new Error(`Failed to extract knowledge from chunk ${i}`, {
+          cause: error,
+        });
       }
     }
 
@@ -320,7 +320,9 @@ export class BatchProcessor {
           extractionResult.stats.definitionCount;
       } catch (error) {
         console.error(`Error generando KnowledgeNodes para chunk ${i}:`, error);
-        throw new Error(`Failed to generate KnowledgeNodes for chunk ${i}`);
+        throw new Error(`Failed to generate KnowledgeNodes for chunk ${i}`, {
+          cause: error,
+        });
       }
     }
   }
@@ -347,11 +349,6 @@ export class BatchProcessor {
         // Buscar definición
         const definition = corpus.definitions.find(
           (d) => d.conceptId === concept.id,
-        );
-
-        // Buscar ejemplos
-        const examples = corpus.examples.filter(
-          (e) => e.conceptId === concept.id,
         );
 
         // Buscar conceptos relacionados
@@ -406,6 +403,7 @@ export class BatchProcessor {
         );
         throw new Error(
           `Failed to generate questions for concept ${concept.name}`,
+          { cause: error },
         );
       }
     }
