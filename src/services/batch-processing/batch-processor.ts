@@ -6,10 +6,7 @@ import { extractKnowledgeFromText } from "../knowledge-extraction/extraction-ser
 import { generateBooleanQuestions } from "../question-generator/boolean-generator";
 import { generateMultipleChoiceQuestions } from "../question-generator/multiple-choice-generator";
 import { saveQuestions } from "../question.service";
-import {
-  CorpusBuilder,
-  type CorpusConcept,
-} from "../corpus-processing/corpus-builder";
+import { CorpusBuilder } from "../corpus-processing/corpus-builder";
 
 export interface BatchProcessingOptions {
   subjectId: string;
@@ -328,50 +325,38 @@ export class BatchProcessor {
   }
 
   private async generateQuestionsFromCorpus(): Promise<void> {
-    if (!this.corpusBuilder) {
-      throw new Error("Corpus not built");
+    // Generar preguntas basadas en los KnowledgeNodes extraídos
+    // Usar los conceptos de los materiales procesados
+    const allConcepts: { concept: string; definition: string }[] = [];
+
+    for (const material of this.results.materials) {
+      // Obtener KnowledgeNodes para este material
+      const knowledgeNodes = await import("../knowledge-node.service").then(
+        (service) => service.getKnowledgeNodesByMaterial(material.id),
+      );
+
+      // Extraer conceptos y definiciones de los KnowledgeNodes
+      for (const node of knowledgeNodes) {
+        if (node.type === "definition") {
+          const [concept, definition] = node.content.split(": ");
+          if (concept && definition) {
+            allConcepts.push({ concept, definition });
+          }
+        } else if (node.type === "concept") {
+          allConcepts.push({ concept: node.content, definition: "" });
+        }
+      }
     }
 
-    const corpus = this.corpusBuilder.getCorpus();
-
-    // Generar preguntas basadas en conceptos importantes
-    const importantConcepts = corpus.concepts
-      .filter((c) => c.importanceScore >= 5) // Conceptos importantes
-      .sort((a, b) => b.importanceScore - a.importanceScore);
-
-    // Generar preguntas para cada concepto importante
-    for (let i = 0; i < importantConcepts.length; i++) {
-      const concept = importantConcepts[i];
-      const progress = Math.round(((i + 1) / importantConcepts.length) * 100);
+    // Generar preguntas para cada concepto
+    for (let i = 0; i < allConcepts.length; i++) {
+      const concept = allConcepts[i];
+      const progress = Math.round(((i + 1) / allConcepts.length) * 100);
       this.updateStage("Generación de Preguntas", "processing", progress);
 
       try {
-        // Buscar definición
-        const definition = corpus.definitions.find(
-          (d) => d.conceptId === concept.id,
-        );
-
-        // Buscar conceptos relacionados
-        const relatedConcepts = corpus.relationships
-          .filter(
-            (r) =>
-              r.sourceConceptId === concept.id ||
-              r.targetConceptId === concept.id,
-          )
-          .map((r) => {
-            const relatedId =
-              r.sourceConceptId === concept.id
-                ? r.targetConceptId
-                : r.sourceConceptId;
-            return corpus.concepts.find((c) => c.id === relatedId);
-          })
-          .filter((c): c is CorpusConcept => !!c);
-
         // Crear conjunto de conceptos para generación
-        const conceptsForQuestions = [
-          { concept: concept.name, definition: definition?.definition || "" },
-          ...relatedConcepts.map((c) => ({ concept: c.name, definition: "" })),
-        ];
+        const conceptsForQuestions = [concept];
 
         // Generar preguntas
         const booleanQuestions = generateBooleanQuestions(
@@ -398,11 +383,11 @@ export class BatchProcessor {
         }
       } catch (error) {
         console.error(
-          `Error generando preguntas para concepto ${concept.name}:`,
+          `Error generando preguntas para concepto ${concept.concept}:`,
           error,
         );
         throw new Error(
-          `Failed to generate questions for concept ${concept.name}`,
+          `Failed to generate questions for concept ${concept.concept}`,
           { cause: error },
         );
       }
