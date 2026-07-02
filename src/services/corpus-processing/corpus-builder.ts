@@ -500,38 +500,38 @@ source: ${new Date().toISOString()}
       {
         type: "is-a" as const,
         patterns: [
-          /(.+?)\s+es un(a)?\s+(.+?)(?=\.|,|\n|$)/i,
-          /(.+?)\s+es un tipo de\s+(.+?)(?=\.|,|\n|$)/i,
+          /(.+?)\s+es un(a)?\s+(.+?)(?=\.|,|\n|$)/gi,
+          /(.+?)\s+es un tipo de\s+(.+?)(?=\.|,|\n|$)/gi,
         ],
         reverse: false,
       },
       {
         type: "part-of" as const,
         patterns: [
-          /(.+?)\s+forma parte de\s+(.+?)(?=\.|,|\n|$)/i,
-          /(.+?)\s+es parte de\s+(.+?)(?=\.|,|\n|$)/i,
+          /(.+?)\s+forma parte de\s+(.+?)(?=\.|,|\n|$)/gi,
+          /(.+?)\s+es parte de\s+(.+?)(?=\.|,|\n|$)/gi,
         ],
         reverse: false,
       },
       {
         type: "related-to" as const,
         patterns: [
-          /(.+?)\s+se relaciona con\s+(.+?)(?=\.|,|\n|$)/i,
-          /(.+?)\s+y\s+(.+?)\s+están relacionados(?=\.|,|\n|$)/i,
+          /(.+?)\s+se relaciona con\s+(.+?)(?=\.|,|\n|$)/gi,
+          /(.+?)\s+y\s+(.+?)\s+están relacionados(?=\.|,|\n|$)/gi,
         ],
         reverse: true,
       },
       {
         type: "requires" as const,
         patterns: [
-          /(.+?)\s+requiere\s+(.+?)(?=\.|,|\n|$)/i,
-          /(.+?)\s+necesita\s+(.+?)(?=\.|,|\n|$)/i,
+          /(.+?)\s+requiere\s+(.+?)(?=\.|,|\n|$)/gi,
+          /(.+?)\s+necesita\s+(.+?)(?=\.|,|\n|$)/gi,
         ],
         reverse: false,
       },
       {
         type: "example-of" as const,
-        patterns: [/(.+?)\s+es un ejemplo de\s+(.+?)(?=\.|,|\n|$)/i],
+        patterns: [/(.+?)\s+es un ejemplo de\s+(.+?)(?=\.|,|\n|$)/gi],
         reverse: true,
       },
     ];

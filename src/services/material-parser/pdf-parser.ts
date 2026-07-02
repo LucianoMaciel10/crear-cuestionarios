@@ -6,6 +6,7 @@ import {
 } from "pdfjs-dist";
 
 // Configurar worker para pdf.js usando CDN
+// En producción Vercel, esto debería funcionar correctamente
 GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.js`;
 
 /**
