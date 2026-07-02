@@ -6,4 +6,5 @@ export type { IMateria } from "./materia.model";
 export type { IQuestion, IQuizAttempt } from "./question.model";
 export type { IKnowledgeNode } from "./knowledge-node.model";
 // Exportación marcada como obsoleta para compatibilidad temporal
+// KnowledgeNode es ahora la entidad principal para flashcards
 export type { ISpacedRepetitionData as ISpacedRepetitionData } from "./spaced-repetition.model";

@@ -52,7 +52,7 @@ src/
 
 ### Modelos legado (pendientes de eliminar en Fase 11)
 
-- `ISpacedRepetitionData` (en `spaced-repetition.model.ts`)
+- `ISpacedRepetitionData` (en `spaced-repetition.model.ts`) - Marcado como obsoleto pero mantenido para compatibilidad temporal
 
 ### Tablas Dexie activas
 
@@ -60,7 +60,7 @@ src/
 
 ### Tablas Dexie legado (pendientes de eliminar en Fase 11)
 
-- `flashcards`
+- `flashcards` - Ya eliminada, KnowledgeNode es ahora la entidad principal
 
 ---
 
@@ -93,16 +93,13 @@ src/
 
 ## Próxima Tarea
 
-**Fase 11 — Eliminación de Código Legado.**
+**Fase 12 — Knowledge Graph.**
 
-Orden recomendado de ejecución (para minimizar riesgo de romper funcionalidad):
+Orden recomendado de ejecución:
 
-1. Eliminar funciones `@deprecated` de `flashcard.service.ts`, `sm2-algorithm.ts` y `adaptive-engine.ts`, verificando que ningún archivo los importe.
-2. Actualizar `subject.service.ts`: reemplazar eliminación en cascada de `flashcards` por `knowledgeNodes`.
-3. Eliminar la tabla `flashcards` de `dexie-db.ts` incrementando la versión con una función `upgrade()` vacía (los datos de flashcards ya están migrados a `knowledgeNodes`).
-4. Eliminar `ISpacedRepetitionData` de `spaced-repetition.model.ts` y su exportación en `models/index.ts`.
-5. Eliminar `contenidoProcesado` de `IMaterial` en `material.model.ts` y sus referencias en componentes.
-6. Verificar: `npm run build` + `npx tsc --noEmit` + `npm run lint` sin errores.
+1. Implementar relaciones semánticas entre nodos de conocimiento
+2. Crear visualización de grafo de conocimiento
+3. Permitir navegación visual del grafo por materia
 
 ---
 
@@ -140,6 +137,18 @@ _(Sin items pendientes. Usar esta sección si surge alguna ambigüedad entre doc
 
 ## Historial de Cambios
 
+- 2026-07-03: Implementación completa de funcionalidades pendientes:
+  - Soporte PPTX (reemplazo de DOCX)
+  - Configuración de PDF.js worker
+  - Corrección de errores regex .matchAll()
+  - Rediseño de interfaz de carga de materiales
+  - Edición de materias con soporte de teclas
+  - Confirmación de eliminación con modal
+  - Selección acumulativa de archivos
+  - Indicadores de banco de preguntas
+  - Flujo completo de quiz player
+  - Mensajes claros para flashcards
+  - Progreso real en procesamiento por lotes
 - 2026-07-02: Consolidación de documentación. Se eliminan 11 archivos `.md` de la raíz. ROADMAP.md actualizado con Fases 10-12. MASTER_PROJECT_STATE.md reescrito como única fuente de verdad del estado.
 - 2025-xx-xx: Batch Processing implementado (Fase 10 completada).
 - 2025-xx-xx: Knowledge Engine completo — KnowledgeNode como entidad central, consumidores migrados (Fase 10).

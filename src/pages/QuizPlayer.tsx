@@ -150,11 +150,17 @@ const QuizPlayer: React.FC = () => {
         showFeedback={answers[currentQuestion.id] !== undefined}
         userAnswer={answers[currentQuestion.id]}
       />
-      {currentQuestionIndex === questions.length - 1 && (
+      {answers[currentQuestion.id] !== undefined && (
         <div className="mt-6">
-          <Button onClick={submitQuiz} variant="success" className="w-full">
-            Finalizar Cuestionario
-          </Button>
+          {currentQuestionIndex === questions.length - 1 ? (
+            <Button onClick={submitQuiz} variant="success" className="w-full">
+              Finalizar Cuestionario
+            </Button>
+          ) : (
+            <Button onClick={nextQuestion} variant="primary" className="w-full">
+              Siguiente pregunta
+            </Button>
+          )}
         </div>
       )}
     </div>

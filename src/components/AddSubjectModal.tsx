@@ -23,6 +23,14 @@ function AddSubjectModal({ isOpen, onClose, onAdd }: AddSubjectModalProps) {
     onClose();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && nombre.trim() !== "") {
+      void handleGuardar();
+    } else if (e.key === "Escape") {
+      handleCancelar();
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Nueva Materia" size="sm">
       <div className="space-y-4">
@@ -31,6 +39,7 @@ function AddSubjectModal({ isOpen, onClose, onAdd }: AddSubjectModalProps) {
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Nombre de la materia"
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
         />

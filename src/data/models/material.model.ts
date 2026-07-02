@@ -3,7 +3,7 @@
 export interface IMaterial {
   id: string;
   nombre: string;
-  tipo: "texto" | "pdf" | "docx" | "txt" | "md";
+  tipo: "texto" | "pdf" | "pptx" | "txt" | "md";
   contenidoOriginal?: string | ArrayBuffer;
   fechaCarga: Date;
   idMateria?: string;

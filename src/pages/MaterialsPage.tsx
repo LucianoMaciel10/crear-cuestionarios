@@ -21,7 +21,7 @@ function MaterialsPage() {
 
   const handleAddMaterial = async (
     nombre: string,
-    tipo: "texto" | "pdf" | "docx" | "txt" | "md",
+    tipo: "texto" | "pdf" | "pptx" | "txt" | "md",
     contenidoOriginal?: string | ArrayBuffer,
   ): Promise<string> => {
     const id = await addMaterial(nombre, tipo, contenidoOriginal, subjectId);
@@ -115,7 +115,7 @@ function MaterialsPage() {
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                 />
               </svg>
-              Cargar PDFs/DOCX
+              Subir archivos
             </Button>
           </div>
         </div>

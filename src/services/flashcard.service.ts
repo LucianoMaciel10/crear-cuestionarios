@@ -4,8 +4,9 @@ import type { IKnowledgeNode } from "../data/models/knowledge-node.model";
 
 /**
  * Obtiene KnowledgeNodes para flashcards por materia.
+ * KnowledgeNode es ahora la entidad principal para flashcards, reemplazando al sistema antiguo.
  * @param subjectId - Identificador de la materia
- * @returns Lista de KnowledgeNodes aptos para flashcards
+ * @returns Lista de KnowledgeNodes aptos para flashcards (tipos "concept" y "definition")
  */
 export async function getKnowledgeNodesForSubject(
   subjectId: string,
@@ -20,6 +21,7 @@ export async function getKnowledgeNodesForSubject(
 
 /**
  * Obtiene KnowledgeNodes para flashcards por materia (alternativa a getFlashcardsFromKnowledgeNodes)
+ * @deprecated Usar getKnowledgeNodesForSubject() directamente
  */
 export async function getKnowledgeNodesForFlashcards(
   subjectId: string,

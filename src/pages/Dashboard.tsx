@@ -5,12 +5,17 @@ import AddSubjectModal from "../components/AddSubjectModal";
 import Button from "../components/common/Button";
 
 function Dashboard() {
-  const { subjects, addSubject, removeSubject, loading } = useSubjects();
+  const { subjects, addSubject, removeSubject, editSubject, loading } =
+    useSubjects();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddSubject = async (nombre: string) => {
     await addSubject(nombre);
     setIsModalOpen(false);
+  };
+
+  const handleEditSubject = async (id: string, nombre: string) => {
+    await editSubject(id, nombre);
   };
 
   if (loading) {
@@ -58,6 +63,7 @@ function Dashboard() {
               key={subject.id}
               subject={subject}
               onDelete={removeSubject}
+              onEdit={handleEditSubject}
             />
           ))
         ) : (

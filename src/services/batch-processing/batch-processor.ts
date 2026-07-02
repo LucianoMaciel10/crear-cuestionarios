@@ -1,6 +1,6 @@
 // src/services/batch-processing/batch-processor.ts
 import { parsePDF } from "../material-parser/pdf-parser";
-import { parseDOCX } from "../material-parser/docx-parser";
+import { parsePPTX } from "../material-parser/pptx-parser";
 import { createStructuredMarkdown } from "../material-parser/markdown-converter";
 import { extractKnowledgeFromText } from "../knowledge-extraction/extraction-service";
 import { generateBooleanQuestions } from "../question-generator/boolean-generator";
@@ -172,10 +172,10 @@ export class BatchProcessor {
           content = await parsePDF(arrayBuffer);
         } else if (
           file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation"
         ) {
           const arrayBuffer = await file.arrayBuffer();
-          content = await parseDOCX(arrayBuffer);
+          content = await parsePPTX(arrayBuffer);
         } else {
           content = await file.text();
         }

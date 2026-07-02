@@ -80,9 +80,14 @@ const QuizManagement: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
-          Gestión de Cuestionarios
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+            Gestión de Cuestionarios
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {questions.length} preguntas en el banco
+          </p>
+        </div>
         <GenerateQuestionsButton onClick={handleGenerateQuestions} />
       </div>
 

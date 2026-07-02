@@ -390,10 +390,10 @@ source: ${new Date().toISOString()}
       const definitionPatterns = [
         {
           pattern:
-            /(.*?)\s*(es un|se define como|significa que|consiste en)\s*(.+?)(?=\.|\n|$)/i,
+            /(.*?)\s*(es un|se define como|significa que|consiste en)\s*(.+?)(?=\.|\n|$)/gi,
           groups: [1, 3],
         },
-        { pattern: /(.*?):\s*(.+?)(?=\.|\n|$)/, groups: [1, 2] },
+        { pattern: /(.*?):\s*(.+?)(?=\.|\n|$)/gi, groups: [1, 2] },
       ];
 
       for (const { pattern, groups } of definitionPatterns) {

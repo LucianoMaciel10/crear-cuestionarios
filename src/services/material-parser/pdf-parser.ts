@@ -1,5 +1,12 @@
 // src/services/material-parser/pdf-parser.ts
-import { getDocument, type PDFDocumentProxy } from "pdfjs-dist";
+import {
+  getDocument,
+  type PDFDocumentProxy,
+  GlobalWorkerOptions,
+} from "pdfjs-dist";
+
+// Configurar worker para pdf.js usando CDN
+GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.js`;
 
 /**
  * Verifica si un elemento tiene la propiedad 'str'.

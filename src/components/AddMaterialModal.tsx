@@ -4,7 +4,7 @@ import Modal from "./common/Modal";
 import { useToast } from "../hooks/useToast";
 import type { ProcessingStage } from "../types/shared-types";
 
-type MaterialType = "texto" | "pdf" | "docx" | "txt" | "md";
+type MaterialType = "texto" | "pdf" | "pptx" | "txt" | "md";
 
 type AddMaterialModalProps = {
   isOpen: boolean;
@@ -99,7 +99,7 @@ function AddMaterialModal({
 
         if (tipo === "texto" || tipo === "txt" || tipo === "md") {
           contenidoParaEnviar = contenido.trim() || undefined;
-        } else if (tipo === "pdf" || tipo === "docx") {
+        } else if (tipo === "pdf" || tipo === "pptx") {
           if (file) {
             contenidoParaEnviar = await file.arrayBuffer();
           } else {
@@ -201,7 +201,7 @@ function AddMaterialModal({
             >
               <option value="texto">Texto</option>
               <option value="pdf">PDF</option>
-              <option value="docx">DOCX</option>
+              <option value="pptx">PPTX</option>
               <option value="txt">TXT</option>
               <option value="md">Markdown</option>
             </select>
@@ -211,13 +211,13 @@ function AddMaterialModal({
         {batchMode ? (
           <label className="block">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Archivos (PDF/DOCX)
+              Archivos (PDF/PPTX)
             </span>
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept=".pdf,.docx"
+              accept=".pdf,.pptx"
               multiple
               className="w-full px-3 py-2 mt-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             />
@@ -228,7 +228,25 @@ function AddMaterialModal({
                 </p>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {files.map((f, i) => (
-                    <li key={i}>• {f.name}</li>
+                    <li key={i} className="flex items-center justify-between">
+                      <span>• {f.name}</span>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const newFiles = [...files];
+                          newFiles.splice(i, 1);
+                          setFiles(newFiles);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 ml-2"
+                        title="Eliminar archivo"
+                      >
+                        ×
+                      </button>
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -256,7 +274,7 @@ function AddMaterialModal({
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept={tipo === "pdf" ? ".pdf" : ".docx"}
+              accept={tipo === "pdf" ? ".pdf" : ".pptx"}
               className="w-full px-3 py-2 mt-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             />
             {file && (

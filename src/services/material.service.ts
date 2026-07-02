@@ -2,7 +2,7 @@
 import { db } from "../data/db/dexie-db";
 import type { IMaterial } from "../data/models/material.model";
 import { parsePDF } from "./material-parser/pdf-parser";
-import { parseDOCX } from "./material-parser/docx-parser";
+import { parsePPTX } from "./material-parser/pptx-parser";
 import { extractKnowledgeFromMaterial } from "./knowledge-extraction/extraction-service";
 import { BatchProcessor } from "./batch-processing/batch-processor";
 import { batchCache } from "./batch-processing/batch-cache";
@@ -27,7 +27,7 @@ export async function getMaterialsBySubject(
 export async function addMaterial(
   nombre: string,
   contenido: File | string,
-  tipo: "texto" | "pdf" | "docx" | "txt" | "md",
+  tipo: "texto" | "pdf" | "pptx" | "txt" | "md",
   idMateria?: string,
 ): Promise<IMaterial> {
   let contenidoOriginal: string | ArrayBuffer | undefined;
@@ -43,10 +43,10 @@ export async function addMaterial(
       textoPlano = await parsePDF(contenidoOriginal);
     } else if (
       contenido.type ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation"
     ) {
       contenidoOriginal = await contenido.arrayBuffer();
-      textoPlano = await parseDOCX(contenidoOriginal);
+      textoPlano = await parsePPTX(contenidoOriginal);
     } else {
       contenidoOriginal = await contenido.text();
       textoPlano = contenidoOriginal;

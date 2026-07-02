@@ -3,6 +3,9 @@
 /**
  * Interfaz para representar una flashcard con datos de repetición espaciada.
  * @deprecated Usar IKnowledgeNode en su lugar
+ * Esta interfaz se mantiene temporalmente para compatibilidad con versiones anteriores,
+ * pero ya no se usa en el código activo. Todos los datos de flashcards ahora se almacenan
+ * en KnowledgeNodes con metadata de repetición espaciada.
  */
 export interface ISpacedRepetitionData {
   id: string;

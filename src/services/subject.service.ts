@@ -28,6 +28,16 @@ export async function add(nombre: string): Promise<string> {
 }
 
 /**
+ * Actualiza una materia existente.
+ *
+ * @param id - Identificador de la materia a actualizar.
+ * @param nombre - Nuevo nombre de la materia.
+ */
+export async function update(id: string, nombre: string): Promise<void> {
+  await db.materias.update(id, { nombre });
+}
+
+/**
  * Elimina una materia existente a partir de su ID.
  * Realiza eliminación en cascada de todos los datos asociados.
  *
@@ -46,9 +56,14 @@ export async function remove(id: string): Promise<void> {
     .where("idMateria")
     .equals(id)
     .primaryKeys();
+  const knowledgeNodesIds = await db.knowledgeNodes
+    .where("subjectId")
+    .equals(id)
+    .primaryKeys();
 
   await db.materiales.bulkDelete(materialesIds as string[]);
   await db.questions.bulkDelete(questionsIds as string[]);
   await db.quizAttempts.bulkDelete(attemptsIds as string[]);
+  await db.knowledgeNodes.bulkDelete(knowledgeNodesIds as string[]);
   await db.materias.delete(id);
 }

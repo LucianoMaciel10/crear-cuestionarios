@@ -26,10 +26,20 @@ export function useSubjects() {
     await subjectService.remove(id);
   }
 
+  /**
+   * Actualiza una materia.
+   * @param id Identificador de la materia.
+   * @param nombre Nuevo nombre de la materia.
+   */
+  async function editSubject(id: string, nombre: string): Promise<void> {
+    await subjectService.update(id, nombre);
+  }
+
   return {
     subjects: subjects ?? [],
     addSubject,
     removeSubject,
+    editSubject,
     loading: subjects === undefined,
   };
 }

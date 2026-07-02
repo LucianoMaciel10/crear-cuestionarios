@@ -54,6 +54,14 @@ const MaterialCard: React.FC<MaterialCardProps> = ({
           </p>
         </div>
 
+        {knowledgeNodes.length === 0 && (
+          <div className="mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+              Procesando...
+            </p>
+          </div>
+        )}
+
         {showDebugInfo && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
