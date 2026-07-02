@@ -79,7 +79,18 @@ class CuestionarioDB extends Dexie {
       etiquetas: "id, nombre",
       questions: "id, topic, difficulty, idMateria",
       quizAttempts: "id, questionId, idMateria, topic, answeredAt",
-      knowledgeNodes: "id, type, content, sourceMaterialId, createdAt",
+      knowledgeNodes:
+        "id, type, content, sourceMaterialId, createdAt, subjectId",
+    });
+
+    this.version(9).stores({
+      materiales: "id, nombre, tipo, fechaCarga, idMateria",
+      materias: "id, nombre",
+      etiquetas: "id, nombre",
+      questions: "id, topic, difficulty, idMateria",
+      quizAttempts: "id, questionId, idMateria, topic, answeredAt",
+      knowledgeNodes:
+        "id, type, content, sourceMaterialId, createdAt, subjectId",
     });
   }
 }
