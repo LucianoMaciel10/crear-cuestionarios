@@ -2,10 +2,10 @@
 
 ## Estado General
 
-Proyecto en desarrollo activo. Pipeline de procesamiento de texto (carga + extracción con IA) funcional e infraestructura de navegación completa.
+Proyecto en desarrollo activo con pipeline de procesamiento por lotes implementado. La aplicación ahora soporta carga múltiple de PDFs/DOCX con conversión a Markdown, caché de archivos y procesamiento por etapas con barra de progreso.
 
-- **Fase actual:** Fase 11 (Consolidación del Knowledge Engine - Completada)
-- **Avance aproximado:** 90% (Question Generator migrado a KnowledgeNodes)
+- **Fase actual:** Implementación de Batch Processing (Completada)
+- **Avance aproximado:** 92% (Pipeline de procesamiento por lotes funcional)
 
 ## Arquitectura
 
@@ -18,7 +18,18 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 - `src/hooks/`: useMaterials, useSubjects, useQuizEngine, useTheme, useToast
 - `src/pages/`: Dashboard, MaterialsPage, NotFoundPage, QuizManagement, QuizPlayer, Flashcards, Statistics
 - `src/routes/`: index.tsx (Router configuración)
-- `src/services/`: material.service, material-parser/, question.service, question-generator/, flashcard.service, spaced-repetition/, adaptive-learning/, ai/, knowledge-node.service
+- `src/services/`:
+  - material.service.ts (actualizado con batch processing)
+  - material-parser/ (pdf-parser, docx-parser, markdown-converter)
+  - batch-processing/ (batch-processor, batch-cache)
+  - question.service.ts
+  - question-generator/ (boolean-generator, multiple-choice-generator)
+  - flashcard.service.ts
+  - spaced-repetition/ (sm2-engine, sm2-algorithm, knowledge-node-updater)
+  - adaptive-learning/ (adaptive-engine)
+  - ai/ (concept-extraction.service)
+  - knowledge-node.service.ts
+  - knowledge-extraction/ (extraction-service)
 - `src/mocks/`: ai-mock.ts
 - `api/`: extract-concepts.ts (función serverless para IA)
 
@@ -28,16 +39,15 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
 
 ### Nuevos Componentes
 
-- `Toast.tsx`: Sistema de notificaciones
-- `ToastProvider.tsx`: Proveedor de contexto para toasts
-- `ToastContext.ts`: Contexto para notificaciones
-- `useToast.ts`: Hook para notificaciones
+- `markdown-converter.ts`: Conversión de texto a Markdown estructurado
+- `batch-processor.ts`: Procesamiento por lotes con progreso por etapas
+- `batch-cache.ts`: Sistema de caché para evitar reprocesamientos
 
 ### Nuevos Servicios
 
-- `concept-extraction.service.ts`: Servicio para extracción de conceptos con IA
-- `ai-mock.ts`: Mock para desarrollo local sin dependencias externas
-- `knowledge-node.service.ts`: Servicio para gestión de nodos de conocimiento
+- `processBatchMaterials()`: Procesamiento múltiple de archivos
+- `BatchProcessor`: Clase para manejo de procesamiento por lotes
+- `BatchCache`: Sistema de caché con IndexedDB
 
 ## Funcionalidades
 
@@ -64,62 +74,55 @@ SPA React + TypeScript + Vite + TailwindCSS. Persistencia local mediante Dexie.j
     - Integración con material.service.ts para generación automática
     - Migración de base de datos a versión 8 con nueva tabla knowledgeNodes
     - Coexistencia con arquitectura actual
-  - \*\*Knowledge Engine - Fase 2 (NUEVO):
+  - **Knowledge Engine - Fase 2 (NUEVO):**
     - Migración completa del Question Generator a KnowledgeNodes
     - Generadores de preguntas actualizados para aceptar ambos formatos
     - QuizManagement usa KnowledgeNodes como fuente principal
     - Estrategia de transición limpia con fallback al formato antiguo
     - Consolidación del Knowledge Engine como nueva fuente de verdad
+  - **Batch Processing - Fase 1 (NUEVO):**
+    - Procesamiento por lotes de múltiples archivos
+    - Conversión a Markdown estructurado
+    - Barra de progreso por etapas
+    - Sistema de caché para evitar reprocesamientos
+    - Generación de KnowledgeNodes y preguntas en batch
 
 - **Parcialmente terminadas / pendientes:**
-  - Generación de cuestionarios (pendiente).
+  - Eliminación final de código legado (ISpacedRepetitionData, tabla flashcards)
+  - Implementación de Knowledge Graph
+  - Soporte para algoritmo FSRS
 
 ## Mejoras Recientes
 
-### Knowledge Engine - Fase 2: Migración del Question Generator
+### Batch Processing - Pipeline de Procesamiento por Lotes
 
-1. **Generadores de Preguntas Actualizados**:
-   - `boolean-generator.ts`: Soporte para KnowledgeNodes y formato antiguo
-   - `multiple-choice-generator.ts`: Normalización de entrada para ambos formatos
-   - Funciones ahora detectan automáticamente el tipo de entrada
+1. **Nuevo Flujo de Procesamiento:**
+   - Carga múltiple de PDFs/DOCX
+   - Conversión unificada a Markdown
+   - Almacenamiento en caché con hash de contenido
+   - Procesamiento por etapas con progreso visible
+   - Generación de KnowledgeNodes y preguntas
 
-2. **QuizManagement Migrado**:
-   - Obtiene KnowledgeNodes asociados a materiales
-   - Prioriza KnowledgeNodes como fuente principal de conocimiento
-   - Fallback automático al formato antiguo si no hay KnowledgeNodes
-   - Compatibilidad total con materiales existentes
+2. **Componentes Actualizados:**
+   - `AddMaterialModal.tsx`: Soporte para batch mode
+   - `MaterialsPage.tsx`: Botón para carga múltiple
+   - `material.service.ts`: Nueva función `processBatchMaterials()`
 
-3. **Estrategia de Transición**:
-   - Ambos sistemas coexisten sin conflictos
-   - Migración incremental sin breaking changes
-   - Preparación para eliminación definitiva del modelo antiguo
+3. **Nuevos Servicios:**
+   - `BatchProcessor`: Manejo de procesamiento por lotes
+   - `BatchCache`: Sistema de caché con IndexedDB
+   - `MarkdownConverter`: Conversión a Markdown estructurado
 
-### Sistema de Notificaciones
+4. **Experiencia de Usuario Mejorada:**
+   - Barra de progreso por etapas
 
-- **Toast.tsx**: Componente visual con variantes (info, success, warning, error)
-- **ToastProvider.tsx**: Proveedor de contexto
-- **useToast.ts**: Hook para uso fácil
-- Integración en creación de materiales y otros flujos
-
-### Mejoras de Experiencia de Usuario
-
-- **MaterialCard.tsx**:
-  - Opción para ocultar datos técnicos (`showDebugInfo`)
-  - Visualización correcta de relaciones
-  - Keys únicas para todos los elementos
-
-- **AddMaterialModal.tsx**:
-  - Estado de carga durante procesamiento
-  - Botón deshabilitado para prevenir múltiples clics
-  - Notificaciones de progreso
-
-- **MaterialsPage.tsx**:
-  - Datos técnicos ocultos por defecto
-  - Experiencia limpia para usuarios finales
+- Notificaciones de progreso
+- Manejo de errores mejorado
+- Feedback visual en cada etapa
 
 ## Problemas conocidos
 
-_(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. El dominio por flashcards sigue siendo una una aproximación basada en repeticiones.)_
+_(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. El dominio por flashcards sigue siendo una aproximación basada en repeticiones.)_
 
 ## Decisiones técnicas
 
@@ -130,6 +133,7 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - Mock local para desarrollo sin dependencias externas.
 - Introducción gradual de Knowledge Engine sin romper funcionalidad existente.
 - Estrategia de transición limpia con soporte para ambos formatos.
+- Implementación de batch processing con caché para mejorar performance.
 
 ## Diseño Visual (Rediseño Fase 9)
 
@@ -194,16 +198,17 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 10. **QualityButtons.tsx**: Colores semánticos
 11. **TopicMasteryChart.tsx**: Visualización mejorada
 12. **WeakPointsList.tsx**: Diseño consistente
-13. **QuestionList.tsx**: Tarjetas con etiquetas
+13. \*\*QuestionList.tsx`: Tarjetas con etiquetas
+14. **AddMaterialModal.tsx**: Soporte para batch processing
 
 ### Páginas Actualizadas:
 
 1. **Dashboard.tsx**: Empty states y diseño mejorado
-2. **MaterialsPage.tsx**: Tarjetas consistentes
+2. **MaterialsPage.tsx**: Tarjetas consistentes + botón de batch processing
 3. **QuizPlayer.tsx**: Visualización de resultados
-4. **Flashcards.tsx**: Diseño de tarjetas
-5. **Statistics.tsx**: Visualización de datos
-6. **QuizManagement.tsx**: Migración a KnowledgeNodes y empty state mejorado
+4. \*\*Flashcards.tsx`: Diseño de tarjetas
+5. \*\*Statistics.tsx`: Visualización de datos
+6. \*\*QuizManagement.tsx`: Migración a KnowledgeNodes y empty state mejorado
 
 ### Decisiones de Diseño:
 
@@ -215,17 +220,28 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 
 ## Próxima tarea
 
+- **Fase de Estabilización**: Validar batch processing en producción
 - **Fase 8 del Knowledge Engine**: Eliminación final de sistema antiguo
 
 ## Próximos Pasos (orden según KNOWLEDGE_ENGINE_ROADMAP.md)
 
-1. Completar **Fase 8 del Knowledge Engine** (Eliminación Final):
+1. **Estabilizar Batch Processing** (Prioridad Alta):
+   - [ ] Validar en múltiples navegadores
+   - [ ] Optimizar rendimiento con archivos grandes
+   - [ ] Mejorar manejo de errores
+   - [ ] Añadir pruebas unitarias
+2. **Completar Fase 8 del Knowledge Engine** (Eliminación Final):
    - [ ] Deprecar ISpacedRepetitionData
    - [ ] Eliminar tabla flashcards de Dexie
    - [ ] Eliminar contenidoProcesado completamente
    - [ ] Validar KnowledgeNode como único Source of Truth
    - [ ] Eliminar adaptadores obsoletos
    - [ ] Eliminar funciones marcadas como @deprecated
+
+3. **Implementar Knowledge Graph** (Prioridad Media):
+   - [ ] Implementar relaciones entre nodos
+   - [ ] Crear visualización de grafo de conocimiento
+   - [ ] Implementar navegación por relaciones semánticas
 
 ## Estado del Knowledge Engine
 
@@ -239,6 +255,7 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - ✅ SM-2 Algorithm (desacoplado y puro)
 - ✅ KnowledgeNode Updater (actualización de nodos)
 - ✅ Adaptive Engine (adaptado a KnowledgeNode)
+- ✅ Batch Processing (procesamiento por lotes)
 
 ### Consumidores migrados:
 
@@ -246,6 +263,8 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 - ✅ Statistics.tsx → KnowledgeNode
 - ✅ FlashcardFlip.tsx → KnowledgeNode
 - ✅ flashcard.service.ts → Métodos basados en KnowledgeNode
+- ✅ MaterialsPage.tsx → Soporte para batch processing
+- ✅ AddMaterialModal.tsx → Batch mode
 
 ### Código legado pendiente:
 
@@ -258,3 +277,32 @@ _(El dominio por tema ahora refleja el desempeño real del usuario en quizzes. E
 ### Consolidación del Dominio: ✅ COMPLETADA
 
 **Nuevo modelo de KnowledgeNode:**
+
+- Soporte para múltiples algoritmos (SM-2, FSRS, custom)
+- Historial completo de reviews
+- Metadata estructurada
+- Relaciones entre nodos
+
+### Batch Processing: ✅ IMPLEMENTADO
+
+**Nuevo pipeline de procesamiento:**
+
+- Carga múltiple de archivos
+- Conversión a Markdown
+- Caché de archivos
+- Procesamiento por etapas
+- Barra de progreso
+- Generación de KnowledgeNodes y preguntas
+
+## Porcentaje de Avance
+
+**Global: 92%**
+
+- Backend / Lógica: 95%
+- Knowledge Engine: 95%
+- Batch Processing: 90% (nuevo)
+- UI/UX: 95%
+- Testing: 50%
+- Documentación: 85%
+
+**El proyecto está listo para pruebas de usuario con el nuevo pipeline de batch processing.**

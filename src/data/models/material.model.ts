@@ -7,6 +7,10 @@ export interface IMaterial {
   contenidoOriginal?: string | ArrayBuffer;
   fechaCarga: Date;
   idMateria?: string;
+  // Nuevo campo para almacenar el Markdown procesado
+  markdownContent?: string;
+  // Nuevo campo para almacenar el hash del contenido (para caché)
+  contentHash?: string;
 }
 
 export interface IEtiqueta {

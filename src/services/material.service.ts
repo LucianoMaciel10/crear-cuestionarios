@@ -4,6 +4,8 @@ import type { IMaterial } from "../data/models/material.model";
 import { parsePDF } from "./material-parser/pdf-parser";
 import { parseDOCX } from "./material-parser/docx-parser";
 import { extractKnowledgeFromMaterial } from "./knowledge-extraction/extraction-service";
+import { BatchProcessor } from "./batch-processing/batch-processor";
+import { batchCache } from "./batch-processing/batch-cache";
 
 /**
  * Obtiene todos los materiales almacenados.
@@ -18,6 +20,9 @@ export async function getMaterialsBySubject(
   return db.materiales.where("idMateria").equals(subjectId).toArray();
 }
 
+/**
+ * Procesa un solo material (versión legacy para compatibilidad)
+ */
 export async function addMaterial(
   nombre: string,
   contenido: File | string,
@@ -67,6 +72,67 @@ export async function addMaterial(
   // Guardar material en la base de datos
   await db.materiales.add(material);
   return material;
+}
+
+/**
+ * Procesa múltiples archivos en batch con conversión a Markdown
+ */
+export async function processBatchMaterials(
+  files: File[],
+  subjectId: string,
+  options: {
+    preferAI?: boolean;
+    generateQuestions?: boolean;
+    onProgress?: (stages: any[]) => void;
+  } = {},
+): Promise<{
+  success: boolean;
+  materials: {
+    id: string;
+    name: string;
+    markdownContent: string;
+    knowledgeNodeIds: string[];
+    questionIds?: string[];
+  }[];
+  stats: {
+    totalFiles: number;
+    processedFiles: number;
+    knowledgeNodesCreated: number;
+    questionsGenerated: number;
+  };
+}> {
+  // Inicializar caché
+  await batchCache.initialize();
+
+  // Crear procesador por lotes
+  const processor = new BatchProcessor({
+    subjectId,
+    preferAI: options.preferAI ?? true,
+    generateQuestions: options.generateQuestions ?? true,
+  });
+
+  // Registrar callback de progreso si se proporciona
+  if (options.onProgress) {
+    // Simular notificaciones de progreso
+    const interval = setInterval(() => {
+      options.onProgress?.(processor.getStages());
+    }, 200);
+
+    // Limpiar intervalo al finalizar
+    try {
+      const result = await processor.processFiles(files);
+      clearInterval(interval);
+      options.onProgress?.(processor.getStages());
+      return result;
+    } catch (error) {
+      clearInterval(interval);
+      options.onProgress?.(processor.getStages());
+      throw error;
+    }
+  }
+
+  // Procesar archivos
+  return processor.processFiles(files);
 }
 
 export async function removeMaterial(id: string): Promise<void> {

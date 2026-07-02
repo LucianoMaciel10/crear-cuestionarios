@@ -2,6 +2,7 @@
 
 /**
  * Interfaz para representar una flashcard con datos de repetición espaciada.
+ * @deprecated Usar IKnowledgeNode en su lugar
  */
 export interface ISpacedRepetitionData {
   id: string;
