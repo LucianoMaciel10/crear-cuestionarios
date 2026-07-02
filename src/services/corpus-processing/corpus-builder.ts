@@ -454,9 +454,9 @@ source: ${new Date().toISOString()}
 
     // Buscar patrones de ejemplos
     const examplePatterns = [
-      /por ejemplo,?\s*(.+?)(?=\.|\n|$)/i,
-      /ejemplo:\s*(.+?)(?=\.|\n|$)/i,
-      /un ejemplo de esto es\s*(.+?)(?=\.|\n|$)/i,
+      /por ejemplo,?\s*(.+?)(?=\.|\n|$)/gi,
+      /ejemplo:\s*(.+?)(?=\.|\n|$)/gi,
+      /un ejemplo de esto es\s*(.+?)(?=\.|\n|$)/gi,
     ];
 
     for (const chunk of this.corpus.chunks) {
