@@ -27,8 +27,15 @@ export interface ExtractionOptions {
    * ID del material fuente
    */
   sourceMaterialId?: string;
+  /**
+   * Contexto adicional para extracción mejorada
+   */
+  context?: {
+    relatedConcepts?: string[];
+    sectionTitle?: string;
+    importanceScore?: number;
+  };
 }
-
 /**
  * Resultado de la extracción de conocimiento
  */
@@ -51,6 +58,9 @@ export interface ExtractionResult {
     source: "ai" | "regex";
     conceptCount: number;
     definitionCount: number;
+    // Nuevas métricas
+    duplicateConcepts?: number;
+    highQualityDefinitions?: number;
   };
 }
 
@@ -90,7 +100,13 @@ export async function extractKnowledgeFromText(
     extractionResult.definiciones,
     sourceMaterialId,
     source,
+    options?.context,
   );
+
+  // Calcular métricas mejoradas
+  const highQualityDefinitions = extractionResult.definiciones.filter(
+    (d) => d.definicion.length > 20,
+  ).length;
 
   // Devolver resultado con datos legacy para compatibilidad
   return {
@@ -103,6 +119,7 @@ export async function extractKnowledgeFromText(
       source,
       conceptCount: extractionResult.conceptos.length,
       definitionCount: extractionResult.definiciones.length,
+      highQualityDefinitions,
     },
   };
 }
@@ -130,6 +147,70 @@ export async function extractKnowledgeFromMaterial(
     ...options,
     sourceMaterialId: materialId,
   });
+}
+
+/**
+ * Extrae conocimiento desde un corpus completo
+ * @param corpus - Corpus unificado de la materia
+ * @returns Promesa con KnowledgeNodes mejorados
+ */
+export async function extractKnowledgeFromCorpus(corpus: {
+  chunks: { id: string; content: string; title: string }[];
+  concepts: { id: string; name: string; importanceScore: number }[];
+}): Promise<ExtractionResult> {
+  let allConcepts: string[] = [];
+  let allDefinitions: { concepto: string; definicion: string }[] = [];
+  let totalKnowledgeNodes = 0;
+
+  // Procesar cada chunk con su contexto
+  for (const chunk of corpus.chunks) {
+    const extractionResult = await extractKnowledgeFromText(chunk.content, {
+      preferAI: true,
+      sourceType: "ai",
+      sourceMaterialId: crypto.randomUUID(),
+      context: {
+        relatedConcepts: corpus.concepts.map((c) => c.name),
+        sectionTitle: chunk.title,
+        importanceScore: corpus.concepts.find(
+          (c) => c.name === chunk.title.split(" ")[0],
+        )?.importanceScore,
+      },
+    });
+
+    allConcepts = [
+      ...allConcepts,
+      ...(extractionResult.legacyContent?.conceptos || []),
+    ];
+    allDefinitions = [
+      ...allDefinitions,
+      ...(extractionResult.legacyContent?.definiciones || []),
+    ];
+    totalKnowledgeNodes += extractionResult.knowledgeNodeIds.length;
+  }
+
+  // Eliminar duplicados
+  const uniqueConcepts = [...new Set(allConcepts)];
+  const uniqueDefinitions = allDefinitions.filter(
+    (def, index, self) =>
+      index === self.findIndex((d) => d.concepto === def.concepto),
+  );
+
+  return {
+    knowledgeNodeIds: Array(totalKnowledgeNodes).fill(""), // Placeholder
+    legacyContent: {
+      conceptos: uniqueConcepts,
+      definiciones: uniqueDefinitions,
+    },
+    stats: {
+      source: "ai",
+      conceptCount: uniqueConcepts.length,
+      definitionCount: uniqueDefinitions.length,
+      duplicateConcepts: allConcepts.length - uniqueConcepts.length,
+      highQualityDefinitions: uniqueDefinitions.filter(
+        (d) => d.definicion.length > 20,
+      ).length,
+    },
+  };
 }
 
 /**

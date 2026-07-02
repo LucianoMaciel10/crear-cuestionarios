@@ -4,13 +4,19 @@ import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
 /**
  * Genera preguntas de opción múltiple a partir de nodos de conocimiento.
  * Puede trabajar con el formato antiguo (conceptos/definiciones) o el nuevo (KnowledgeNodes).
+ * Ahora soporta generación basada en corpus con relaciones entre conceptos.
  * @param knowledgeNodes - Nodos de conocimiento o array de conceptos/definiciones
  * @param idMateria - ID de la materia
+ * @param options - Opciones para generación mejorada
  * @returns Array de preguntas de opción múltiple
  */
 export function generateMultipleChoiceQuestions(
   knowledgeNodes: { concept: string; definition: string }[] | IKnowledgeNode[],
   idMateria?: string,
+  options?: {
+    includeRelatedConcepts?: boolean;
+    difficultyLevel?: "easy" | "medium" | "hard";
+  },
 ): IQuestion[] {
   // Normalizar entrada: convertir KnowledgeNodes a formato concepto-definición
   const concepts = knowledgeNodes
@@ -35,16 +41,20 @@ export function generateMultipleChoiceQuestions(
     return [];
   }
 
-  return concepts.map((item, index) => {
+  const questions: IQuestion[] = [];
+  const difficulty = options?.difficultyLevel || "medium";
+
+  for (let i = 0; i < concepts.length; i++) {
+    const item = concepts[i];
     const correctOption = {
       id: crypto.randomUUID(),
       text: item.definition,
     };
 
     const distractorIndices = [
-      (index + 1) % concepts.length,
-      (index + 2) % concepts.length,
-      (index + 3) % concepts.length,
+      (i + 1) % concepts.length,
+      (i + 2) % concepts.length,
+      (i + 3) % concepts.length,
     ];
 
     const incorrectOptions = distractorIndices.map((distractorIndex) => ({
@@ -55,24 +65,41 @@ export function generateMultipleChoiceQuestions(
     const options = [correctOption, ...incorrectOptions];
 
     const rotatedOptions = [
-      ...options.slice(index % 4),
-      ...options.slice(0, index % 4),
+      ...options.slice(i % 4),
+      ...options.slice(0, i % 4),
     ];
 
     const correctAnswer = rotatedOptions.find(
       (option) => option.text === item.definition,
     )?.id;
 
-    return {
+    // Generar pregunta según dificultad
+    let questionText = `¿Cuál es la definición correcta de "${item.concept}"?`;
+    let explanation = `La definición correcta de "${item.concept}" es: "${item.definition}"`;
+
+    // Para preguntas de mayor dificultad
+    if (difficulty === "hard" && options?.includeRelatedConcepts) {
+      const relatedConceptIndex = (i + 2) % concepts.length;
+      const relatedConcept = concepts[relatedConceptIndex];
+
+      questionText = `¿Cuál de las siguientes opciones describe mejor la relación entre "${item.concept}" y "${relatedConcept.concept}"?`;
+      explanation = `La opción correcta describe la relación entre "${item.concept}" y "${relatedConcept.concept}" basada en sus definiciones.`;
+    } else if (difficulty === "medium") {
+      questionText = `Seleccione la definición más precisa para "${item.concept}":`;
+    }
+
+    questions.push({
       id: crypto.randomUUID(),
       type: "multiple-choice",
-      question: `¿Cuál es la definición correcta de "${item.concept}"?`,
+      question: questionText,
       correctAnswer: correctAnswer || "",
       options: rotatedOptions,
-      explanation: `La definición correcta de "${item.concept}" es: "${item.definition}"`,
-      difficulty: "medium",
+      explanation,
+      difficulty,
       topic: item.concept,
       idMateria,
-    };
-  });
+    });
+  }
+
+  return questions;
 }

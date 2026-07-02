@@ -4,13 +4,19 @@ import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
 /**
  * Genera preguntas booleanas a partir de nodos de conocimiento.
  * Puede trabajar con el formato antiguo (conceptos/definiciones) o el nuevo (KnowledgeNodes).
+ * Ahora soporta generación basada en corpus con relaciones entre conceptos.
  * @param knowledgeNodes - Nodos de conocimiento o array de conceptos/definiciones
  * @param idMateria - ID de la materia
+ * @param options - Opciones para generación mejorada
  * @returns Array de preguntas booleanas
  */
 export const generateBooleanQuestions = (
   knowledgeNodes: { concept: string; definition: string }[] | IKnowledgeNode[],
   idMateria?: string,
+  options?: {
+    includeRelatedConcepts?: boolean;
+    difficultyLevel?: "easy" | "medium" | "hard";
+  },
 ): IQuestion[] => {
   // Normalizar entrada: convertir KnowledgeNodes a formato concepto-definición
   const concepts = knowledgeNodes
@@ -55,29 +61,50 @@ export const generateBooleanQuestions = (
     ];
   }
 
-  return concepts.map((item, index) => {
+  const questions: IQuestion[] = [];
+  const difficulty = options?.difficultyLevel || "medium";
+
+  for (let i = 0; i < concepts.length; i++) {
+    const item = concepts[i];
     const isTrue = Math.random() > 0.5;
-    const nextIndex = (index + 1) % concepts.length;
+    const nextIndex = (i + 1) % concepts.length;
     const falseDefinition = concepts[nextIndex].definition;
 
     const correctAnswer = isTrue;
     const definitionToUse = isTrue ? item.definition : falseDefinition;
 
-    return {
+    // Generar preguntas de diferente dificultad
+    let questionText = `¿La siguiente definición corresponde al concepto "${item.concept}"?\n\n${definitionToUse}`;
+    let explanation = isTrue
+      ? `La definición mostrada sí corresponde a "${item.concept}".`
+      : `La definición mostrada no corresponde a "${item.concept}".`;
+
+    // Para preguntas de mayor dificultad, incluir conceptos relacionados
+    if (difficulty === "hard" && options?.includeRelatedConcepts) {
+      const relatedConceptIndex = (i + 2) % concepts.length;
+      const relatedConcept = concepts[relatedConceptIndex];
+
+      questionText = `¿Cuál de las siguientes afirmaciones sobre "${item.concept}" y "${relatedConcept.concept}" es correcta?\n\n${definitionToUse}`;
+      explanation = isTrue
+        ? `La definición describe correctamente la relación entre "${item.concept}" y "${relatedConcept.concept}".`
+        : `La definición no describe correctamente la relación entre estos conceptos.`;
+    }
+
+    questions.push({
       id: crypto.randomUUID(),
       type: "boolean",
-      question: `¿La siguiente definición corresponde al concepto "${item.concept}"?\n\n${definitionToUse}`,
+      question: questionText,
       correctAnswer,
       options: [
         { id: "true", text: "Verdadero" },
         { id: "false", text: "Falso" },
       ],
-      explanation: isTrue
-        ? `La definición mostrada sí corresponde a "${item.concept}".`
-        : `La definición mostrada no corresponde a "${item.concept}".`,
-      difficulty: "easy",
+      explanation,
+      difficulty,
       topic: item.concept,
       idMateria,
-    };
-  });
+    });
+  }
+
+  return questions;
 };
