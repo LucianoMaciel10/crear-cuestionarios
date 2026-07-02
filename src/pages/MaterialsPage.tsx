@@ -6,7 +6,7 @@ import AddMaterialModal from "../components/AddMaterialModal";
 import Button from "../components/common/Button";
 import { useParams, useNavigate } from "react-router-dom";
 import { processBatchMaterials } from "../services/material.service";
-import type { ProcessingStage } from "../components/AddMaterialModal";
+import type { ProcessingStage } from "../types/shared-types";
 
 function MaterialsPage() {
   const { subjectId } = useParams<{ subjectId: string }>();

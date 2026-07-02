@@ -2,15 +2,9 @@ import { useState, useRef } from "react";
 import Button from "./common/Button";
 import Modal from "./common/Modal";
 import { useToast } from "../hooks/useToast";
+import type { ProcessingStage } from "../types/shared-types";
 
 type MaterialType = "texto" | "pdf" | "docx" | "txt" | "md";
-
-interface ProcessingStage {
-  name: string;
-  status: "pending" | "processing" | "completed" | "failed";
-  progress: number;
-  error?: string;
-}
 
 type AddMaterialModalProps = {
   isOpen: boolean;

@@ -6,7 +6,7 @@ import { parseDOCX } from "./material-parser/docx-parser";
 import { extractKnowledgeFromMaterial } from "./knowledge-extraction/extraction-service";
 import { BatchProcessor } from "./batch-processing/batch-processor";
 import { batchCache } from "./batch-processing/batch-cache";
-import type { ProcessingStage } from "../components/AddMaterialModal";
+import type { ProcessingStage } from "../types/shared-types";
 
 /**
  * Obtiene todos los materiales almacenados.
