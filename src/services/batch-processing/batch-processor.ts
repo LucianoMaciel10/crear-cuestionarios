@@ -296,18 +296,33 @@ export class BatchProcessor {
       extractionResult: Awaited<ReturnType<typeof extractKnowledgeFromText>>;
     }[],
   ): Promise<void> {
+    // Importar servicio de materiales para guardar en la base de datos
+    const { addMaterial } = await import("../material.service");
+
     for (let i = 0; i < extractionResults.length; i++) {
-      const { extractionResult } = extractionResults[i];
+      const { extractionResult, file, text } = extractionResults[i];
       const progress = Math.round(((i + 1) / extractionResults.length) * 100);
       this.updateStage("Generación de KnowledgeNodes", "processing", progress);
 
       try {
         const materialId = crypto.randomUUID();
 
+        // Guardar material en la base de datos
+        await addMaterial(
+          file.name,
+          text,
+          file.type.includes("pdf")
+            ? "pdf"
+            : file.type.includes("presentation")
+              ? "pptx"
+              : "txt",
+          this.options.subjectId,
+        );
+
         this.results.materials.push({
           id: materialId,
-          name: extractionResults[i].file.name,
-          markdownContent: extractionResults[i].text,
+          name: file.name,
+          markdownContent: text,
           knowledgeNodeIds: extractionResult.knowledgeNodeIds,
           questionIds: [],
         });
@@ -315,6 +330,8 @@ export class BatchProcessor {
         this.results.stats.knowledgeNodesCreated +=
           extractionResult.stats.conceptCount +
           extractionResult.stats.definitionCount;
+
+        this.results.stats.processedFiles++;
       } catch (error) {
         console.error(`Error generando KnowledgeNodes para chunk ${i}:`, error);
         throw new Error(`Failed to generate KnowledgeNodes for chunk ${i}`, {
