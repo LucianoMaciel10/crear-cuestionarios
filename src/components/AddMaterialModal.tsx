@@ -1,3 +1,4 @@
+// src/components/AddMaterialModal.tsx
 import { useState, useRef } from "react";
 import Button from "./common/Button";
 import Modal from "./common/Modal";
@@ -84,12 +85,18 @@ function AddMaterialModal({
           setProcessingStages(stages);
         });
 
-        if (result.success) {
+        // Esperar a que todas las etapas estén completas
+        const allStagesCompleted =
+          result &&
+          processingStages.every((stage) => stage.status === "completed");
+
+        if (result.success && allStagesCompleted) {
           showToast(
             `Procesados ${result.stats.processedFiles} de ${result.stats.totalFiles} archivos. ` +
               `${result.stats.knowledgeNodesCreated} KnowledgeNodes creados.`,
             "success",
           );
+          onClose();
         } else {
           showToast("Error al procesar algunos archivos", "error");
         }
@@ -112,6 +119,7 @@ function AddMaterialModal({
 
         await onAdd(nombre, tipo, contenidoParaEnviar);
         showToast("Material creado exitosamente", "success");
+        onClose();
       }
 
       // Limpiar estados
@@ -124,7 +132,6 @@ function AddMaterialModal({
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      onClose();
     } catch (error) {
       showToast("Error al crear el material", "error");
       console.error("Error al crear material:", error);

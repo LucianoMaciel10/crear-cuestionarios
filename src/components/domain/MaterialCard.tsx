@@ -1,11 +1,12 @@
 // src/components/domain/MaterialCard.tsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import type { IMaterial } from "../../data/models/material.model";
-import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
-import * as knowledgeNodeService from "../../services/knowledge-node.service";
 import Card from "../common/Card";
 import Button from "../common/Button";
 import Modal from "../common/Modal";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "../../data/db/dexie-db";
+import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
 
 interface MaterialCardProps {
   material: IMaterial;
@@ -20,31 +21,20 @@ const MaterialCard: React.FC<MaterialCardProps> = ({
   onDelete,
   showDebugInfo = false,
 }: MaterialCardProps) => {
-  const [knowledgeNodes, setKnowledgeNodes] = useState<IKnowledgeNode[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Usar useLiveQuery para escuchar cambios en los KnowledgeNodes asociados al material
+  const knowledgeNodes = useLiveQuery(() =>
+    db.knowledgeNodes.where("sourceMaterialId").equals(material.id).toArray(),
+  );
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  useEffect(() => {
-    const loadKnowledgeNodes = async () => {
-      try {
-        setLoading(true);
-        const nodes = await knowledgeNodeService.getKnowledgeNodesByMaterial(
-          material.id,
-        );
-        setKnowledgeNodes(nodes);
-      } catch (error) {
-        console.error("Error loading knowledge nodes:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadKnowledgeNodes();
-  }, [material.id]);
-
-  const concepts = knowledgeNodes.filter((node) => node.type === "concept");
-  const definitions = knowledgeNodes.filter(
-    (node) => node.type === "definition",
-  );
+  const concepts =
+    knowledgeNodes?.filter((node: IKnowledgeNode) => node.type === "concept") ||
+    [];
+  const definitions =
+    knowledgeNodes?.filter(
+      (node: IKnowledgeNode) => node.type === "definition",
+    ) || [];
 
   const handleDelete = async () => {
     if (onDelete) {
@@ -127,11 +117,13 @@ const MaterialCard: React.FC<MaterialCardProps> = ({
           <div className="mb-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               <strong>Conceptos:</strong>{" "}
-              {loading ? "Cargando..." : concepts.length}
+              {knowledgeNodes === undefined ? "Cargando..." : concepts.length}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               <strong>Definiciones:</strong>{" "}
-              {loading ? "Cargando..." : definitions.length}
+              {knowledgeNodes === undefined
+                ? "Cargando..."
+                : definitions.length}
             </p>
           </div>
 

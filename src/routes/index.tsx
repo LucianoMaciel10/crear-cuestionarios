@@ -1,3 +1,4 @@
+// src/routes/index.tsx
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import Dashboard from "../pages/Dashboard";
@@ -7,6 +8,7 @@ import QuizManagement from "../pages/QuizManagement";
 import Flashcards from "../pages/Flashcards";
 import Statistics from "../pages/Statistics";
 import NotFoundPage from "../pages/NotFoundPage";
+import MaterialDetail from "../pages/MaterialDetail";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +22,10 @@ export const router = createBrowserRouter([
       {
         path: "materiales/:subjectId",
         element: <MaterialsPage />,
+      },
+      {
+        path: "materiales/:subjectId/material/:materialId",
+        element: <MaterialDetail />,
       },
       {
         path: "cuestionario/:subjectId",
