@@ -8,7 +8,9 @@ import QuizManagement from "../pages/QuizManagement";
 import Flashcards from "../pages/Flashcards";
 import Statistics from "../pages/Statistics";
 import NotFoundPage from "../pages/NotFoundPage";
-import MaterialDetail from "../pages/MaterialDetail";
+
+// Eliminar la ruta de MaterialDetail ya que no se necesita
+// y el componente MaterialDetail ya no es utilizado.
 
 export const router = createBrowserRouter([
   {
@@ -22,10 +24,6 @@ export const router = createBrowserRouter([
       {
         path: "materiales/:subjectId",
         element: <MaterialsPage />,
-      },
-      {
-        path: "materiales/:subjectId/material/:materialId",
-        element: <MaterialDetail />,
       },
       {
         path: "cuestionario/:subjectId",

@@ -10,14 +10,12 @@ import type { IKnowledgeNode } from "../../data/models/knowledge-node.model";
 
 interface MaterialCardProps {
   material: IMaterial;
-  onClick?: () => void;
   onDelete?: (id: string) => void | Promise<void>;
   showDebugInfo?: boolean;
 }
 
 const MaterialCard: React.FC<MaterialCardProps> = ({
   material,
-  onClick,
   onDelete,
   showDebugInfo = false,
 }: MaterialCardProps) => {
@@ -104,7 +102,7 @@ const MaterialCard: React.FC<MaterialCardProps> = ({
   return (
     <>
       <Card className="hover:shadow-lg transition-shadow duration-200">
-        <div className="p-4" onClick={onClick}>
+        <div className="p-4">
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 truncate">
               {material.originalFilename || material.nombre}

@@ -149,9 +149,6 @@ function MaterialsPage() {
             <MaterialCard
               key={material.id}
               material={material}
-              onClick={() =>
-                navigate(`/materiales/${subjectId}/material/${material.id}`)
-              }
               onDelete={handleDeleteMaterial}
               showDebugInfo={false} // Ocultar info de desarrollo en producción
             />
