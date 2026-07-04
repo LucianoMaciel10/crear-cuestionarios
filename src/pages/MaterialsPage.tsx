@@ -7,11 +7,14 @@ import Button from "../components/common/Button";
 import { useParams, useNavigate } from "react-router-dom";
 import { processBatchMaterials } from "../services/material.service";
 import type { ProcessingStage } from "../types/shared-types";
+import * as knowledgeNodeService from "../services/knowledge-node.service";
+import * as questionService from "../services/question.service";
 
 function MaterialsPage() {
   const { subjectId } = useParams<{ subjectId: string }>();
   const navigate = useNavigate();
-  const { materials, addMaterial, loading } = useMaterials(subjectId);
+  const { materials, addMaterial, removeMaterial, loading } =
+    useMaterials(subjectId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [batchMode, setBatchMode] = useState(false);
 
@@ -43,6 +46,25 @@ function MaterialsPage() {
       return result;
     } catch (error) {
       console.error("Error en procesamiento por lotes:", error);
+      throw error;
+    }
+  };
+
+  const handleDeleteMaterial = async (materialId: string) => {
+    try {
+      // Eliminar KnowledgeNodes asociados
+      await knowledgeNodeService.deleteKnowledgeNodesByMaterial(materialId);
+
+      // Eliminar preguntas asociadas (por tema, usando el nombre del material)
+      const material = materials.find((m) => m.id === materialId);
+      if (material) {
+        await questionService.removeQuestionsByTopic(material.nombre);
+      }
+
+      // Eliminar el material
+      await removeMaterial(materialId);
+    } catch (error) {
+      console.error("Error al eliminar material:", error);
       throw error;
     }
   };
@@ -128,6 +150,7 @@ function MaterialsPage() {
               key={material.id}
               material={material}
               onClick={() => navigate(`/materiales/${material.id}`)}
+              onDelete={handleDeleteMaterial}
               showDebugInfo={false} // Ocultar info de desarrollo en producción
             />
           ))
