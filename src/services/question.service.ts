@@ -18,8 +18,19 @@ export async function saveQuestions(questions: IQuestion[]): Promise<void> {
 }
 
 /**
+ * Elimina todas las preguntas asociadas a un material.
+ * @param materialId - Identificador del material.
+ */
+export async function removeQuestionsByMaterial(
+  materialId: string,
+): Promise<void> {
+  await db.questions.where("sourceMaterialId").equals(materialId).delete();
+}
+
+/**
  * Elimina todas las preguntas asociadas a un tema.
  * @param topic - Tema de las preguntas a eliminar.
+ * @deprecated Usar removeQuestionsByMaterial() en su lugar.
  */
 export async function removeQuestionsByTopic(topic: string): Promise<void> {
   await db.questions.where("topic").equals(topic).delete();

@@ -8,6 +8,9 @@ export interface IQuestion {
   difficulty: "easy" | "medium" | "hard";
   topic: string;
   idMateria?: string;
+  // Nuevos campos para rastrear el origen de la pregunta
+  sourceMaterialId?: string;
+  sourceKnowledgeNodeId?: string;
 }
 
 export interface IQuizAttempt {

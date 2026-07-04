@@ -52,14 +52,11 @@ function MaterialsPage() {
 
   const handleDeleteMaterial = async (materialId: string) => {
     try {
+      // Eliminar preguntas asociadas al material
+      await questionService.removeQuestionsByMaterial(materialId);
+
       // Eliminar KnowledgeNodes asociados
       await knowledgeNodeService.deleteKnowledgeNodesByMaterial(materialId);
-
-      // Eliminar preguntas asociadas (por tema, usando el nombre del material)
-      const material = materials.find((m) => m.id === materialId);
-      if (material) {
-        await questionService.removeQuestionsByTopic(material.nombre);
-      }
 
       // Eliminar el material
       await removeMaterial(materialId);

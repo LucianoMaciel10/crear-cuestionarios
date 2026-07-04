@@ -376,7 +376,12 @@ export class BatchProcessor {
   private async generateQuestionsFromCorpus(): Promise<void> {
     // Generar preguntas basadas en los KnowledgeNodes extraídos
     // Usar los conceptos de los materiales procesados
-    const allConcepts: { concept: string; definition: string }[] = [];
+    const allConcepts: {
+      concept: string;
+      definition: string;
+      materialId: string;
+      knowledgeNodeId: string;
+    }[] = [];
 
     for (const material of this.results.materials) {
       // Obtener KnowledgeNodes para este material
@@ -389,10 +394,20 @@ export class BatchProcessor {
         if (node.type === "definition") {
           const [concept, definition] = node.content.split(": ");
           if (concept && definition) {
-            allConcepts.push({ concept, definition });
+            allConcepts.push({
+              concept,
+              definition,
+              materialId: material.id,
+              knowledgeNodeId: node.id,
+            });
           }
         } else if (node.type === "concept") {
-          allConcepts.push({ concept: node.content, definition: "" });
+          allConcepts.push({
+            concept: node.content,
+            definition: "",
+            materialId: material.id,
+            knowledgeNodeId: node.id,
+          });
         }
       }
     }
@@ -417,6 +432,12 @@ export class BatchProcessor {
           this.options.subjectId,
         );
         const allQuestions = [...booleanQuestions, ...multipleChoiceQuestions];
+
+        // Agregar información de origen a las preguntas
+        allQuestions.forEach((question) => {
+          question.sourceMaterialId = concept.materialId;
+          question.sourceKnowledgeNodeId = concept.knowledgeNodeId;
+        });
 
         if (allQuestions.length > 0) {
           await saveQuestions(allQuestions);
