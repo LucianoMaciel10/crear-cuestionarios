@@ -11,6 +11,17 @@ export interface IMaterial {
   markdownContent?: string;
   // Nuevo campo para almacenar el hash del contenido (para caché)
   contentHash?: string;
+  // Campos para seguimiento de procesamiento
+  processingStatus: "pending" | "processing" | "completed" | "failed";
+  processingStartedAt?: Date;
+  processingFinishedAt?: Date;
+  processingError?: string;
+  // Estadísticas de procesamiento
+  conceptCount?: number;
+  definitionCount?: number;
+  questionCount?: number;
+  originalFilename?: string;
+  fileType?: string;
 }
 
 export interface IEtiqueta {

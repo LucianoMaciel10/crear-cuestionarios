@@ -182,7 +182,7 @@ function AddMaterialModal({
           </label>
         )}
 
-        {!batchMode && (
+        {!batchMode && tipo !== "texto" && (
           <label className="block">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Tipo
@@ -199,7 +199,6 @@ function AddMaterialModal({
               }}
               className="w-full px-3 py-2 mt-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400"
             >
-              <option value="texto">Texto</option>
               <option value="pdf">PDF</option>
               <option value="pptx">PPTX</option>
               <option value="txt">TXT</option>
@@ -252,7 +251,7 @@ function AddMaterialModal({
               </div>
             )}
           </label>
-        ) : tipo === "texto" || tipo === "txt" || tipo === "md" ? (
+        ) : tipo === "texto" ? (
           <label className="block">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Contenido

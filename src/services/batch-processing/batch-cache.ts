@@ -106,6 +106,7 @@ class BatchCache {
         contenidoOriginal: markdownContent,
         fechaCarga: new Date(),
         idMateria: "cache", // Marcar como caché
+        processingStatus: "completed",
       });
     } catch (error) {
       console.error("Error al persistir en caché:", error);

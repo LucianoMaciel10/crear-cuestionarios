@@ -7,6 +7,11 @@ import { generateBooleanQuestions } from "../question-generator/boolean-generato
 import { generateMultipleChoiceQuestions } from "../question-generator/multiple-choice-generator";
 import { saveQuestions } from "../question.service";
 import { CorpusBuilder } from "../corpus-processing/corpus-builder";
+import {
+  createMaterial,
+  updateMaterialProcessingStatus,
+} from "../material.service";
+import { db } from "../../data/db/dexie-db";
 
 export interface BatchProcessingOptions {
   subjectId: string;
@@ -44,6 +49,7 @@ export class BatchProcessor {
   private results: BatchProcessingResult;
   private cache: Map<string, string>;
   private corpusBuilder: CorpusBuilder | null;
+  private materials: { file: File; materialId: string }[];
 
   constructor(options: BatchProcessingOptions) {
     this.options = options;
@@ -68,6 +74,7 @@ export class BatchProcessor {
     };
     this.cache = new Map();
     this.corpusBuilder = null;
+    this.materials = [];
   }
 
   getStages(): ProcessingStage[] {
@@ -98,32 +105,35 @@ export class BatchProcessor {
     this.results.stats.totalFiles = files.length;
 
     try {
-      // Etapa 1: Lectura de archivos
+      // Etapa 1: Crear materiales primero
+      await this.createMaterials(files);
+
+      // Etapa 2: Lectura de archivos
       this.updateStage("Lectura de archivos", "processing", 0);
       const fileContents = await this.readFiles(files);
       this.updateStage("Lectura de archivos", "completed", 100);
 
-      // Etapa 2: Conversión a Markdown
+      // Etapa 3: Conversión a Markdown
       this.updateStage("Conversión a Markdown", "processing", 0);
       const markdownContents = await this.convertToMarkdownBatch(fileContents);
       this.updateStage("Conversión a Markdown", "completed", 100);
 
-      // Etapa 3: Construcción de Corpus Unificado
+      // Etapa 4: Construcción de Corpus Unificado
       this.updateStage("Construcción de Corpus", "processing", 0);
       await this.buildSubjectCorpus(markdownContents);
       this.updateStage("Construcción de Corpus", "completed", 100);
 
-      // Etapa 4: Extracción de conocimiento desde corpus
+      // Etapa 5: Extracción de conocimiento desde corpus
       this.updateStage("Extracción de Conocimiento", "processing", 0);
       const extractionResults = await this.extractKnowledgeFromCorpus();
       this.updateStage("Extracción de Conocimiento", "completed", 100);
 
-      // Etapa 5: Generación de KnowledgeNodes
+      // Etapa 6: Generación de KnowledgeNodes
       this.updateStage("Generación de KnowledgeNodes", "processing", 0);
       await this.generateKnowledgeNodesBatch(extractionResults);
       this.updateStage("Generación de KnowledgeNodes", "completed", 100);
 
-      // Etapa 6: Generación de preguntas (opcional)
+      // Etapa 7: Generación de preguntas (opcional)
       if (this.options.generateQuestions) {
         this.updateStage("Generación de Preguntas", "processing", 0);
         await this.generateQuestionsFromCorpus();
@@ -132,9 +142,9 @@ export class BatchProcessor {
         this.updateStage("Generación de Preguntas", "completed", 100);
       }
 
-      // Etapa 7: Finalización
+      // Etapa 8: Finalización
       this.updateStage("Finalización", "processing", 0);
-      this.results.success = true;
+      await this.finalizeProcessing();
       this.updateStage("Finalización", "completed", 100);
 
       return this.results;
@@ -148,6 +158,26 @@ export class BatchProcessor {
       );
       this.results.success = false;
       throw error;
+    }
+  }
+
+  private async createMaterials(files: File[]): Promise<void> {
+    for (const file of files) {
+      const material = await createMaterial(
+        file.name,
+        file.type.includes("pdf")
+          ? "pdf"
+          : file.type.includes("presentation")
+            ? "pptx"
+            : file.type.includes("text")
+              ? "txt"
+              : "md",
+        undefined,
+        this.options.subjectId,
+        file.name,
+        file.type,
+      );
+      this.materials.push({ file, materialId: material.id });
     }
   }
 
@@ -241,6 +271,7 @@ export class BatchProcessor {
       file: File;
       text: string;
       extractionResult: Awaited<ReturnType<typeof extractKnowledgeFromText>>;
+      materialId: string;
     }[]
   > {
     if (!this.corpusBuilder) {
@@ -252,6 +283,7 @@ export class BatchProcessor {
       file: File;
       text: string;
       extractionResult: Awaited<ReturnType<typeof extractKnowledgeFromText>>;
+      materialId: string;
     }[] = [];
 
     // Procesar cada chunk del corpus como un documento separado
@@ -261,22 +293,33 @@ export class BatchProcessor {
       this.updateStage("Extracción de Conocimiento", "processing", progress);
 
       try {
-        // Crear un nombre virtual para el chunk
-        const virtualFileName = `chunk-${i}-${chunk.title.substring(0, 20)}.md`;
-        const file = new File([chunk.content], virtualFileName, {
-          type: "text/markdown",
-        });
+        // Encontrar el material asociado con este chunk
+        const sourceFiles = chunk.sourceFiles;
+        const materialEntry = this.materials.find((m) =>
+          sourceFiles.includes(m.file.name),
+        );
+
+        if (!materialEntry) {
+          console.warn(
+            `No se encontró material para chunk ${chunk.id}, usando ID temporal`,
+          );
+          // Esto no debería ocurrir en la nueva arquitectura
+        }
+
+        const materialId = materialEntry?.materialId || crypto.randomUUID();
 
         const extractionResult = await extractKnowledgeFromText(chunk.content, {
           preferAI: this.options.preferAI,
           sourceType: "ai",
-          sourceMaterialId: crypto.randomUUID(),
+          sourceMaterialId: materialId,
         });
 
         results.push({
-          file,
+          file:
+            materialEntry?.file || new File([chunk.content], `chunk-${i}.md`),
           text: chunk.content,
           extractionResult,
+          materialId,
         });
       } catch (error) {
         console.error(`Error extrayendo conocimiento del chunk ${i}:`, error);
@@ -294,30 +337,19 @@ export class BatchProcessor {
       file: File;
       text: string;
       extractionResult: Awaited<ReturnType<typeof extractKnowledgeFromText>>;
+      materialId: string;
     }[],
   ): Promise<void> {
-    // Importar servicio de materiales para guardar en la base de datos
-    const { addMaterial } = await import("../material.service");
-
     for (let i = 0; i < extractionResults.length; i++) {
-      const { extractionResult, file, text } = extractionResults[i];
+      const { extractionResult, file, text, materialId } = extractionResults[i];
       const progress = Math.round(((i + 1) / extractionResults.length) * 100);
       this.updateStage("Generación de KnowledgeNodes", "processing", progress);
 
       try {
-        const materialId = crypto.randomUUID();
-
-        // Guardar material en la base de datos
-        await addMaterial(
-          file.name,
-          text,
-          file.type.includes("pdf")
-            ? "pdf"
-            : file.type.includes("presentation")
-              ? "pptx"
-              : "txt",
-          this.options.subjectId,
-        );
+        // Actualizar material con contenido markdown
+        await db.materiales.update(materialId, {
+          markdownContent: text,
+        });
 
         this.results.materials.push({
           id: materialId,
@@ -409,5 +441,23 @@ export class BatchProcessor {
         );
       }
     }
+  }
+
+  private async finalizeProcessing(): Promise<void> {
+    // Actualizar estado de todos los materiales a completado
+    for (const material of this.materials) {
+      await updateMaterialProcessingStatus(
+        material.materialId,
+        "completed",
+        undefined,
+        {
+          conceptCount: this.results.stats.knowledgeNodesCreated,
+          definitionCount: this.results.stats.knowledgeNodesCreated,
+          questionCount: this.results.stats.questionsGenerated,
+        },
+      );
+    }
+
+    this.results.success = true;
   }
 }

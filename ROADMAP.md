@@ -1,6 +1,6 @@
 # ROADMAP de Implementación
 
-Este documento detalla el plan de ejecución completo del Generador Inteligente de Cuestionarios Académicos. Las fases 0–9 corresponden al plan original. Las fases 10–11 son la continuación natural surgida durante el desarrollo.
+Este documento detalla el plan de ejecución completo del Generador Inteligente de Cuestionarios Académicos. Las fases 0–9 corresponden al plan original. Las fases 10–12 son la continuación natural surgida durante el desarrollo.
 
 ---
 
@@ -169,7 +169,92 @@ Este documento detalla el plan de ejecución completo del Generador Inteligente 
 
 ---
 
-## Fase 12: Knowledge Graph ⏳ PENDIENTE
+## Fase 12: Material Processing Pipeline Stabilization ✅ COMPLETADA
+
+**Objetivo:** Reconstruir completamente el pipeline de procesamiento de materiales para resolver problemas arquitectónicos y garantizar estabilidad.
+
+### Lo implementado:
+
+1. **Nueva Arquitectura Obligatoria:**
+   - ARCHIVO ORIGINAL → CREAR MATERIAL → GUARDAR material.id → EXTRAER TEXTO → MARKDOWN → CORPUS → CHUNKS → EXTRACCIÓN DE CONOCIMIENTO → CREACIÓN DE KNOWLEDGENODES → GENERACIÓN DE PREGUNTAS → ACTUALIZACIÓN DEL MATERIAL → COMPLETED
+
+2. **Refactor del Modelo Material:**
+   - Añadidos campos de estado: `processingStatus`, `processingStartedAt`, `processingFinishedAt`, `processingError`
+   - Añadidas estadísticas: `conceptCount`, `definitionCount`, `questionCount`
+   - Añadidos campos originales: `originalFilename`, `fileType`
+
+3. **Refactor del Batch Processor:**
+   - Eliminada creación de materiales desde chunks
+   - Materiales creados inmediatamente al inicio
+   - `materialId` mantenido durante todo el pipeline
+   - KnowledgeNodes asociados correctamente con `sourceMaterialId`
+   - Eliminados nombres de chunks visibles
+
+4. **Refactor de MaterialCard:**
+   - Eliminada dependencia de `knowledgeNodes.length === 0`
+   - Display basado en `processingStatus` real
+   - Mostrar nombre original y tipo correcto
+   - Estados claros: Pendiente, Procesando, Completado, Error
+
+5. **Refactor de PDF.js:**
+   - Eliminada dependencia de CDN externo
+   - Worker local configurado correctamente
+   - Eliminados errores 404
+
+6. **Refactor de AddMaterialModal:**
+   - Reset completo al cerrar
+   - Eliminado selector de tipo para texto manual
+   - Mejorada UX
+
+7. **Refactor de Dexie DB:**
+   - Versión 10 con índice para `processingStatus`
+
+8. **Refactor de Material Service:**
+   - Funciones `createMaterial` y `updateMaterialProcessingStatus`
+   - Eliminados IDs temporales
+   - Actualización con resultados reales
+
+### Problemas Resueltos:
+
+- ✅ Eliminados nombres `chunk-0-Untitled.md`
+- ✅ Tipos de archivo correctos (PDF, PPTX, TXT, MD)
+- ✅ KnowledgeNodes asociados correctamente
+- ✅ MaterialCard muestra datos reales
+- ✅ Progreso real en todas las etapas
+- ✅ Eliminados estados visuales falsos
+- ✅ Chunks como implementación interna
+- ✅ PDF.js funciona correctamente
+- ✅ PPTX extrae texto correctamente
+- ✅ Eliminada duplicación de llamadas a Mistral
+- ✅ Barra de progreso refleja estado real
+- ✅ Modal se resetea completamente
+- ✅ Texto manual siempre es tipo "texto"
+
+### Archivos Modificados:
+
+- `src/data/models/material.model.ts` → Campos de estado y estadísticas
+- `src/services/material.service.ts` → Nuevas funciones de creación y actualización
+- `src/services/batch-processing/batch-processor.ts` → Nueva arquitectura
+- `src/services/material-parser/pdf-parser.ts` → Worker local
+- `src/components/domain/MaterialCard.tsx` → Display basado en estado real
+- `src/components/AddMaterialModal.tsx` → Reset completo y mejoras UX
+- `src/data/db/dexie-db.ts` → Versión 10 con nuevo índice
+
+### Criterio de Finalización:
+
+- ✅ Build: `npm run build` - exitoso
+- ✅ Lint: `npm run lint` - exitoso
+- ✅ TypeScript: `npx tsc --noEmit` - exitoso
+- ✅ Validación con PDF real
+- ✅ Validación con PPTX real
+- ✅ Validación con TXT real
+- ✅ Estados de procesamiento correctos
+- ✅ KnowledgeNodes asociados correctamente
+- ✅ MaterialCard muestra información real
+
+---
+
+## Fase 13: Knowledge Graph ⏳ PENDIENTE
 
 **Objetivo:** Implementar relaciones semánticas entre nodos de conocimiento y su visualización.
 
@@ -183,4 +268,33 @@ Este documento detalla el plan de ejecución completo del Generador Inteligente 
 
 - Los KnowledgeNodes pueden tener relaciones entre sí (ya tiene `relatedNodes?: string[]` en el modelo).
 - El usuario puede navegar visualmente el grafo de conocimiento de una materia.
-- **Dependencia:** Fase 11 debe estar completa antes de iniciar esta.
+- **Dependencia:** Fase 12 debe estar completa antes de iniciar esta.
+
+---
+
+## Decisiones Arquitectónicas Clave
+
+1. **Materiales creados antes del procesamiento:** Garantiza IDs consistentes durante todo el pipeline.
+2. **Worker local para PDF.js:** Elimina dependencia de CDN externo y errores 404.
+3. **Chunks como implementación interna:** Invisible para la UI, solo para procesamiento.
+4. **Estados reales de procesamiento:** Eliminados indicadores falsos basados en knowledgeNodes.length.
+5. **Asociación correcta de KnowledgeNodes:** Todos los nodos guardan `sourceMaterialId = material.id`.
+6. **Eliminación de código muerto:** Limpieza de imports sin uso, logs innecesarios, warnings de lint.
+
+---
+
+## Riesgos Mitigados
+
+- **Calidad de la Extracción de Información:** Mejorada con corpus unificado y extracción por chunks.
+- **Rendimiento de IndexedDB:** Optimizado con índices adecuados y consultas eficientes.
+- **Algoritmos de Aprendizaje Adaptativo:** Integrados correctamente con KnowledgeNodes.
+- **Compatibilidad de Navegadores:** Garantizada con worker local y polyfills necesarios.
+
+---
+
+## Próximos Pasos
+
+1. **Fase 13 — Knowledge Graph:** Implementar visualización de relaciones entre KnowledgeNodes.
+2. **Testing:** Aumentar cobertura en servicios críticos.
+3. **FSRS:** Implementar algoritmo alternativo a SM-2.
+4. **Gamificación:** Rachas, logros y objetivos diarios (opcional).
