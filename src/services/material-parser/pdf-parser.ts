@@ -5,12 +5,9 @@ import {
   GlobalWorkerOptions,
 } from "pdfjs-dist";
 
-// Configurar worker para pdf.js usando el worker local
-// Esto evita problemas con CDN y garantiza compatibilidad con la versión instalada
-GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.js",
-  import.meta.url,
-).toString();
+// Configure worker for pdf.js using the worker URL
+// This ensures the worker is bundled by Vite and works in both dev and production
+GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 /**
  * Verifica si un elemento tiene la propiedad 'str'.
@@ -24,7 +21,7 @@ function hasStr(item: unknown): item is { str: string } {
 /**
  * Extrae texto de un archivo PDF.
  * @param file - Archivo PDF como ArrayBuffer.
- * @returns Texto extraído del PDF.
+ * @returns Texto extra?do del PDF.
  * @throws Error si falla el parseo del PDF.
  */
 export async function parsePDF(file: ArrayBuffer): Promise<string> {
