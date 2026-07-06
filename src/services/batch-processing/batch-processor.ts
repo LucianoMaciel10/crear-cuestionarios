@@ -55,6 +55,7 @@ export class BatchProcessor {
     this.options = options;
     this.stages = [
       { name: "Lectura de archivos", status: "pending", progress: 0 },
+      { name: "OCR en progreso", status: "pending", progress: 0 },
       { name: "Conversión a Markdown", status: "pending", progress: 0 },
       { name: "Construcción de Corpus", status: "pending", progress: 0 },
       { name: "Extracción de Conocimiento", status: "pending", progress: 0 },
@@ -112,6 +113,14 @@ export class BatchProcessor {
       this.updateStage("Lectura de archivos", "processing", 0);
       const fileContents = await this.readFiles(files);
       this.updateStage("Lectura de archivos", "completed", 100);
+
+      // Check if OCR was used and update OCR stage
+      const ocrStage = this.stages.find((s) => s.name === "OCR en progreso");
+      if (ocrStage && ocrStage.status === "pending") {
+        // OCR was not used, mark as completed
+        ocrStage.status = "completed";
+        ocrStage.progress = 100;
+      }
 
       // Etapa 3: Conversión a Markdown
       this.updateStage("Conversión a Markdown", "processing", 0);
@@ -196,13 +205,62 @@ export class BatchProcessor {
 
         if (file.type === "application/pdf") {
           const arrayBuffer = await file.arrayBuffer();
-          content = await parsePDF(arrayBuffer);
+          // Add OCR progress tracking for PDF
+          let ocrUsed = false;
+          content = await parsePDF(arrayBuffer, (currentPage, totalPages) => {
+            if (!ocrUsed) {
+              // Add OCR stage when first OCR progress is received
+              this.stages.splice(2, 0, {
+                name: "OCR en progreso",
+                status: "processing",
+                progress: Math.round((currentPage / totalPages) * 100),
+              });
+              ocrUsed = true;
+            }
+
+            // Update OCR progress
+            const ocrStage = this.stages.find(
+              (s) => s.name === "OCR en progreso",
+            );
+            if (ocrStage) {
+              ocrStage.progress = Math.round((currentPage / totalPages) * 100);
+              ocrStage.status =
+                currentPage === totalPages ? "completed" : "processing";
+            }
+          });
         } else if (
           file.type ===
           "application/vnd.openxmlformats-officedocument.presentationml.presentation"
         ) {
           const arrayBuffer = await file.arrayBuffer();
-          content = await parsePPTX(arrayBuffer);
+          // Add OCR progress tracking for PPTX
+          let ocrUsed = false;
+          content = await parsePPTX(
+            arrayBuffer,
+            (currentSlide, totalSlides) => {
+              if (!ocrUsed) {
+                // Add OCR stage when first OCR progress is received
+                this.stages.splice(2, 0, {
+                  name: "OCR en progreso",
+                  status: "processing",
+                  progress: Math.round((currentSlide / totalSlides) * 100),
+                });
+                ocrUsed = true;
+              }
+
+              // Update OCR progress
+              const ocrStage = this.stages.find(
+                (s) => s.name === "OCR en progreso",
+              );
+              if (ocrStage) {
+                ocrStage.progress = Math.round(
+                  (currentSlide / totalSlides) * 100,
+                );
+                ocrStage.status =
+                  currentSlide === totalSlides ? "completed" : "processing";
+              }
+            },
+          );
         } else {
           content = await file.text();
         }

@@ -1,44 +1,20 @@
 // src/services/material-parser/pdf-parser.ts
-import {
-  getDocument,
-  type PDFDocumentProxy,
-  GlobalWorkerOptions,
-} from "pdfjs-dist";
-
-// Configure worker for pdf.js using the worker URL
-// This ensures the worker is bundled by Vite and works in both dev and production
-GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-
-/**
- * Verifica si un elemento tiene la propiedad 'str'.
- * @param item - Elemento a verificar.
- * @returns true si el elemento tiene la propiedad 'str'.
- */
-function hasStr(item: unknown): item is { str: string } {
-  return typeof item === "object" && item !== null && "str" in item;
-}
+import { getPDFOCRService } from "../ocr/pdf-ocr.service";
 
 /**
  * Extrae texto de un archivo PDF.
  * @param file - Archivo PDF como ArrayBuffer.
- * @returns Texto extra?do del PDF.
+ * @param onProgress - Callback opcional para progreso de OCR.
+ * @returns Texto extraído del PDF.
  * @throws Error si falla el parseo del PDF.
  */
-export async function parsePDF(file: ArrayBuffer): Promise<string> {
+export async function parsePDF(
+  file: ArrayBuffer,
+  onProgress?: (currentPage: number, totalPages: number, text: string) => void,
+): Promise<string> {
   try {
-    const pdf: PDFDocumentProxy = await getDocument({ data: file }).promise;
-    let text = "";
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items
-        .map((item: unknown) => (hasStr(item) ? item.str : ""))
-        .join(" ");
-      text += pageText + "\n";
-    }
-
-    return text;
+    const pdfOCRService = getPDFOCRService();
+    return await pdfOCRService.extractTextWithOCR(file, onProgress);
   } catch (error) {
     const err = new Error("Failed to parse PDF file");
     console.error("Error parsing PDF:", { error });
