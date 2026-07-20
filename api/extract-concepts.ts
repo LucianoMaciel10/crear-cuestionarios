@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 // Constante para el modelo de Mistral
-const MISTRAL_MODEL = "devstral-medium-2507";
+// Usar un modelo soportado por la API de Mistral
+const MISTRAL_MODEL = "mistral-medium";
 
 // URL de la API de Mistral
 export const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";

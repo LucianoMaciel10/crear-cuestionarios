@@ -9,6 +9,7 @@ import {
   detectScannedDocument,
   analyzeDocumentTextQuality,
 } from "./document-detector.service";
+import { getOCRTextCleaner } from "./ocr-text-cleaner.service";
 
 // Configure worker for pdf.js
 GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
@@ -41,6 +42,11 @@ export class PDFOCRService {
     // Try normal text extraction using the same PDFDocumentProxy
     const normalText = await this.extractTextNormalFromPDF(pdf);
 
+    // Log original text length
+    if (import.meta.env.DEV) {
+      console.info("OCR original:", normalText.length);
+    }
+
     // Analyze text quality to determine if OCR is needed
     const isScanned = detectScannedDocument(normalText, pageCount);
 
@@ -51,7 +57,14 @@ export class PDFOCRService {
 
     // Document appears to be scanned, use OCR with the same PDFDocumentProxy
     console.log("Document detected as scanned, using OCR...");
-    return await this.extractTextWithOCRFull(pdf, onProgress);
+    const ocrText = await this.extractTextWithOCRFull(pdf, onProgress);
+
+    // Log cleaned text length
+    if (import.meta.env.DEV) {
+      console.info("OCR limpio:", ocrText.length);
+    }
+
+    return ocrText;
   }
 
   /**
@@ -108,6 +121,7 @@ export class PDFOCRService {
 
       let fullText = "";
       const totalPages = pdf.numPages;
+      const ocrTextCleaner = getOCRTextCleaner();
 
       // Process each page
       for (let i = 1; i <= totalPages; i++) {
@@ -140,10 +154,13 @@ export class PDFOCRService {
         // Perform OCR on the image
         const pageText = await this.tesseractService.recognize(imageData);
 
-        fullText += pageText + "\n\n";
+        // Clean OCR text for this page
+        const cleanedPageText = ocrTextCleaner.clean(pageText);
+
+        fullText += cleanedPageText + "\n\n";
 
         if (onProgress) {
-          onProgress(i, totalPages, pageText);
+          onProgress(i, totalPages, cleanedPageText);
         }
 
         // Clean up

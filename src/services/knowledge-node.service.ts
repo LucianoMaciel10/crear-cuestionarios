@@ -1,6 +1,7 @@
 // src/services/knowledge-node.service.ts
 import { db } from "../data/db/dexie-db";
 import type { IKnowledgeNode } from "../data/models/knowledge-node.model";
+import { getOCRTextCleaner } from "../services/ocr/ocr-text-cleaner.service";
 
 /**
  * Obtiene todos los nodos de conocimiento almacenados.
@@ -106,9 +107,18 @@ export async function createKnowledgeNodesFromConcepts(
   sourceType: "ai" | "regex" | "manual" = "ai",
 ): Promise<string[]> {
   const createdIds: string[] = [];
+  const ocrTextCleaner = getOCRTextCleaner();
 
-  // Crear nodos para conceptos
-  for (const concept of concepts) {
+  // Filtrar conceptos válidos
+  const validConcepts = concepts.filter((concept) =>
+    ocrTextCleaner.isValidConcept(concept),
+  );
+
+  // Limitar cantidad de conceptos (máximo 100)
+  const limitedConcepts = validConcepts.slice(0, 100);
+
+  // Crear nodos para conceptos válidos
+  for (const concept of limitedConcepts) {
     const conceptId = await createKnowledgeNode({
       type: "concept",
       content: concept,
@@ -138,8 +148,14 @@ export async function createKnowledgeNodesFromConcepts(
     createdIds.push(conceptId);
   }
 
-  // Crear nodos para definiciones
-  for (const definition of definitions) {
+  // Filtrar definiciones válidas
+  const validDefinitions = definitions.filter(
+    (def) =>
+      ocrTextCleaner.isValidConcept(def.concepto) && def.definicion.length > 10,
+  );
+
+  // Crear nodos para definiciones válidas
+  for (const definition of validDefinitions) {
     const definitionId = await createKnowledgeNode({
       type: "definition",
       content: `${definition.concepto}: ${definition.definicion}`,

@@ -441,6 +441,11 @@ export class BatchProcessor {
       knowledgeNodeId: string;
     }[] = [];
 
+    // Import OCR text cleaner for validation
+    const { getOCRTextCleaner } =
+      await import("../../services/ocr/ocr-text-cleaner.service");
+    const ocrTextCleaner = getOCRTextCleaner();
+
     for (const material of this.results.materials) {
       // Obtener KnowledgeNodes para este material
       const knowledgeNodes = await import("../knowledge-node.service").then(
@@ -470,10 +475,24 @@ export class BatchProcessor {
       }
     }
 
-    // Generar preguntas para cada concepto
-    for (let i = 0; i < allConcepts.length; i++) {
-      const concept = allConcepts[i];
-      const progress = Math.round(((i + 1) / allConcepts.length) * 100);
+    // Filtrar conceptos válidos antes de generar preguntas
+    const validConcepts = allConcepts.filter((concept) =>
+      ocrTextCleaner.isValidConcept(concept.concept),
+    );
+
+    // Limitar cantidad de conceptos (máximo 100)
+    const limitedConcepts = validConcepts.slice(0, 100);
+
+    // Log initial concept count
+    if (import.meta.env.DEV) {
+      console.info("Conceptos antes del filtro:", allConcepts.length);
+      console.info("Conceptos después del filtro:", limitedConcepts.length);
+    }
+
+    // Generar preguntas para cada concepto válido
+    for (let i = 0; i < limitedConcepts.length; i++) {
+      const concept = limitedConcepts[i];
+      const progress = Math.round(((i + 1) / limitedConcepts.length) * 100);
       this.updateStage("Generación de Preguntas", "processing", progress);
 
       try {
@@ -519,6 +538,14 @@ export class BatchProcessor {
           { cause: error },
         );
       }
+    }
+
+    // Log final question count
+    if (import.meta.env.DEV) {
+      console.info(
+        "Preguntas generadas:",
+        this.results.stats.questionsGenerated,
+      );
     }
   }
 
