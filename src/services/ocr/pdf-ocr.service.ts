@@ -34,10 +34,12 @@ export class PDFOCRService {
       text: string,
     ) => void,
   ): Promise<string> {
-    // First, try normal text extraction
-    const normalText = await this.extractTextNormal(file);
+    // Open PDF once and reuse the same PDFDocumentProxy to avoid detached ArrayBuffer
     const pdf = await getDocument({ data: file }).promise;
     const pageCount = pdf.numPages;
+
+    // Try normal text extraction using the same PDFDocumentProxy
+    const normalText = await this.extractTextNormalFromPDF(pdf);
 
     // Analyze text quality to determine if OCR is needed
     const isScanned = detectScannedDocument(normalText, pageCount);
@@ -47,19 +49,20 @@ export class PDFOCRService {
       return normalText;
     }
 
-    // Document appears to be scanned, use OCR
+    // Document appears to be scanned, use OCR with the same PDFDocumentProxy
     console.log("Document detected as scanned, using OCR...");
-    return this.extractTextWithOCRFull(pdf, onProgress);
+    return await this.extractTextWithOCRFull(pdf, onProgress);
   }
 
   /**
-   * Extract text using normal PDF.js method
-   * @param file - PDF file as ArrayBuffer
+   * Extract text from an existing PDFDocumentProxy
+   * @param pdf - PDF document proxy
    * @returns Extracted text
    */
-  private async extractTextNormal(file: ArrayBuffer): Promise<string> {
+  private async extractTextNormalFromPDF(
+    pdf: PDFDocumentProxy,
+  ): Promise<string> {
     try {
-      const pdf: PDFDocumentProxy = await getDocument({ data: file }).promise;
       let text = "";
 
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -73,6 +76,9 @@ export class PDFOCRService {
           )
           .join(" ");
         text += pageText + "\n";
+
+        // Clean up page resources
+        page.cleanup();
       }
 
       return text;
@@ -163,10 +169,11 @@ export class PDFOCRService {
     analysis: unknown;
     isScanned: boolean;
   }> {
-    const text = await this.extractTextNormal(file);
+    // Open PDF once and reuse the same PDFDocumentProxy
     const pdf = await getDocument({ data: file }).promise;
     const pageCount = pdf.numPages;
 
+    const text = await this.extractTextNormalFromPDF(pdf);
     const analysis = analyzeDocumentTextQuality(text, pageCount);
     const isScanned = detectScannedDocument(text, pageCount);
 
